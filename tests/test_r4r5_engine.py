@@ -655,21 +655,25 @@ def test_r5_revert_flag_suppresses_demotion():
     assert adj.session_type == "threshold" and reason == ""
 
 
-def test_r5_sits_below_g2_first_match_wins():
+def test_r5_sits_below_g2_first_match_wins(freeze_clock):
     """A G2-grade 48h dose (≥25min z5-z7) must take the STRONGER Z2 cap —
     R5 never runs when G2 fired (no double-demotion, grill A6 ordering).
 
     The ride arms BOTH gates at once: `date` = the frozen planner-yesterday
     (R5's calendar trigger, z6 600s ≥ 480) and `start_date_local` = 2h ago on
-    the REAL clock (G2's rolling-48h window uses datetime.now(), which the
-    fixture does not freeze). First-match-wins must hand the day to G2."""
-    from datetime import datetime as _dt
+    the same frozen clock. Pin 01:00 so two hours ago is also yesterday;
+    future real-world timestamps must not arm the frozen window.
+    First-match-wins must hand the day to G2."""
+    from datetime import datetime as _dt, time, timezone
+    import clock
+    freeze_clock(_dt.combine(tp.date.today(), time(1), timezone.utc))
     planned = _planned_hard("threshold")
+    planned.day = tp.date.today()
     adj, reason = tp.adjust_today_session(
         planned, _fresh_readiness(),
         rides_recent=[{
             "date": _yesterday_iso(),
-            "start_date_local": (_dt.now() - timedelta(hours=2)).isoformat(),
+            "start_date_local": (clock.now(timezone.utc) - timedelta(hours=2)).isoformat(),
             "time_in_zone": {"z5": 1000, "z6": 600, "z7": 0},
         }],
         daily_log_today={},
