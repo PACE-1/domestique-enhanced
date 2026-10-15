@@ -1,47 +1,55 @@
-# tests/
+# Tests
 
-Pytest suite for Domestique. Covers planner, calendar, ride storage, FIT
-classification, route picking, training-load math, wellness sync,
-content classification, and HTTP endpoints.
-
-## Run
-
-From repo root:
+Run from the repository root with Python 3.12 and the test dependencies installed:
 
 ```sh
-pytest -q
+python -m pip install -r requirements.txt pytest pytest-xdist pytest-timeout fitparse
+python -m pytest tests/test_hermetic_home.py tests/test_gate_script.py -q
 ```
 
-Pytest auto-discovers `tests/test_*.py`. `pytest.ini` ships
-`addopts = -m "not hardware"` so hardware-gated tests (BLE/ANT
-trainer-control, deprecated since v4.0.0-alpha) stay skipped by
-default. Re-enable explicitly with `pytest -m hardware`.
+The current requirements file includes desktop dependencies. Separating and
+locking server, desktop and test environments is tracked in Forgejo issue #2.
 
-There is no `conftest.py` — each test file does its own
-`sys.path.insert(0, REPO_ROOT)` if it needs to import a root-level
-module by bare name. Tests that read source files via
-`Path(__file__)` (e.g. `test_planner_fixes.py`,
-`test_route_shape_primitives.py`, `test_training_live.py`,
-`test_content_classifier.py`) use `Path(__file__).parent.parent`
-to reach repo root.
+`conftest.py` adds `src/` to the import path and sets up the application fixtures.
+Before project imports it redirects both `HOME` and `DOMESTIQUE_HOME` into a
+fresh per-process directory, blanks inherited ICU credentials, and disables the
+real training transport. Child pytest processes and xdist workers create their
+own roots; normal test subprocesses inherit the parent's disposable root.
+Sandboxes are removed at interpreter exit. Tests intentionally exercising path
+overrides must use temporary directories. Never supply real rider data.
 
-## Layout
+Virtual environments keep their own dependencies: the harness only preserves
+the user site when Python actually enables user-site packages. Network mocks
+can exercise API behavior without using real accounts. Some historical tests
+explicitly read the original home through `DOMESTIQUE_REAL_HOME`; this is not
+permission to write there, and their external fixture dependencies remain a
+separate isolation task (#8).
 
-This folder mixes endpoint-level integration tests (FastAPI
-TestClient against `app.py`) and unit tests (pure functions in
-`training_planner.py`, `analytics.py`, `route_archetypes.py`,
-`zones.py`, etc.). They aren't physically split — pytest discovers
-both flavours together.
+## Full verification
 
-## Baseline
+```sh
+GATE_PYTHON="$PWD/.venv/bin/python" bash tools/gate.sh "$PWD" linux-baseline
+```
 
-Target: 783 passed. Three pre-existing flakes in the wellness /
-training-load area pass on a clean checkout but can race when the
-local SQLite DB has stale state from a prior run; rerun if one
-fails. They are tracked separately and not introduced by the v1.0
-cleanup.
+The gate runs non-hardware bulk tests in parallel by file, then `release_serial`
+performance checks without parallel workers. It requires pytest-xdist and
+pytest-timeout in the selected interpreter; it never installs dependencies.
+`GATE_WORKERS` defaults to 5. `GATE_OUT` selects the log directory (default
+`/tmp/domestique-gate`); `GATE_TEST_TIMEOUT` defaults to 900 seconds per test.
+The outer bulk and serial limits default to 3300 seconds each.
 
-## Relocation history
+The exit status remains nonzero for failures, collection/setup errors and outer
+timeouts. The historical failure list and isolated reruns are diagnostics, not
+permission to return success. Failures that pass alone remain failures of the
+original run. Status, full output, failure IDs and rerun logs are saved together.
+An optional third argument compares diagnostic failures to a previous label.
+`GATE_RERUN_FAILURES=0` skips reruns without changing the result.
 
-Most `test_*.py` files were relocated from repo root into `tests/`
-as part of the v1.0 layout cleanup. See git log for that commit.
+For a focused iteration, run `python -m pytest tests/test_<feature>.py -q`.
+`pytest.ini` excludes hardware-marked tests by default. Keep expected failures,
+skips and platform-specific failures explicit; use a measured baseline rather
+than the old documentation's obsolete target of 783 passes.
+
+Unit and endpoint integration tests still share the application-wide harness.
+Separating them is tracked in #8. Source-string UI contracts should be replaced
+with behavior coverage as workflows migrate (#9), not deleted indiscriminately.
