@@ -26,6 +26,8 @@ after every test so the singleton can never leak across test boundaries.
 from __future__ import annotations
 
 import os
+import atexit
+import shutil
 import sys
 import tempfile
 import threading
@@ -57,6 +59,16 @@ from datetime import date
 # its own sandbox; subprocesses spawned by tests inherit the env. The real
 # home is kept in DOMESTIQUE_REAL_HOME for tests that need to LOOK at it.
 _SANDBOX_HOME = tempfile.mkdtemp(prefix="domestique-test-home-")
+atexit.register(shutil.rmtree, _SANDBOX_HOME, ignore_errors=True)
+# The explicit override wins over HOME in user_home.domestique_home(). Never
+# inherit a developer/server data root, even during collection or in a worker.
+os.environ["DOMESTIQUE_HOME"] = str(_Path(_SANDBOX_HOME) / ".domestique")
+os.environ["DOMESTIQUE_NO_NET"] = "1"
+# App/config .env loaders use setdefault. Blank credentials before importing
+# them so a repository .env or inherited shell credentials cannot enter tests.
+for _credential in ("ICU_ATHLETE_ID", "ICU_API_KEY", "ICU_ACCESS_TOKEN",
+                    "ICU_REFRESH_TOKEN", "ICU_OAUTH_CLIENT_SECRET"):
+    os.environ[_credential] = ""
 # Idempotent across nested interpreters: xdist WORKERS inherit the
 # controller's env with HOME already swapped — only the first process in
 # the chain records the true real home; every process still gets its OWN
@@ -71,7 +83,7 @@ os.environ["DOMESTIQUE_REAL_HOME"] = _REAL_HOME
 import site  # noqa: E402
 
 _REAL_USER_SITE = site.getusersitepackages()
-if _REAL_USER_SITE and os.path.isdir(_REAL_USER_SITE):
+if site.ENABLE_USER_SITE and _REAL_USER_SITE and os.path.isdir(_REAL_USER_SITE):
     os.environ["PYTHONPATH"] = _REAL_USER_SITE + (
         os.pathsep + os.environ["PYTHONPATH"]
         if os.environ.get("PYTHONPATH") else "")

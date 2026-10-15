@@ -14,6 +14,8 @@ validations). These tests pin that contract.
 """
 import json
 import os
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -77,3 +79,67 @@ def test_real_home_helper_points_outside_sandbox():
     # Never a sandbox artifact: the recorded real home must not be a tmp dir
     # minted by this gate.
     assert "domestique-test-home-" not in str(real)
+
+
+@pytest.mark.parametrize("mode", ["collect", "run", "workers"])
+def test_inherited_data_root_and_credentials_cannot_escape_sandbox(tmp_path, mode):
+    """Exercise the real bootstrap in a fresh interpreter, before collection."""
+    external = tmp_path / "external-data"
+    external.mkdir()
+    (external / "sentinel").write_text("untouched")
+    suite = tmp_path / "suite"
+    suite.mkdir()
+    (suite / "conftest.py").symlink_to(Path(__file__).with_name("conftest.py"))
+    report = tmp_path / "report.json"
+    (suite / "test_probe.py").write_text('''
+import json, os
+from pathlib import Path
+import app, db, config, training_planner
+from user_home import domestique_home
+
+root = domestique_home()
+assert root.is_relative_to(Path.home())
+assert os.environ["DOMESTIQUE_NO_NET"] == "1"
+assert not config.ICU_API_KEY
+assert not config.ICU_ACCESS_TOKEN
+assert not config.ICU_OAUTH_CLIENT_SECRET
+assert db._USER_DATA == root
+assert app.DATA_DIR == root
+assert training_planner.PLAN_DIR.is_relative_to(root)
+(root / "collection-probe").write_text("sandbox only")
+worker = os.environ.get("PYTEST_XDIST_WORKER", "main")
+Path(os.environ["SANDBOX_REPORT"] + "." + worker).write_text(json.dumps({"root": str(root)}))
+
+def test_startup_and_write():
+    from fastapi.testclient import TestClient
+    with TestClient(app.app) as client:
+        assert client.get("/").status_code == 200
+    (app._plan_dir() / "probe.json").write_text("{}")
+''')
+    env = os.environ.copy()
+    env.update(DOMESTIQUE_HOME=str(external), ICU_API_KEY="external-key",
+               ICU_ACCESS_TOKEN="external-token", ICU_OAUTH_CLIENT_SECRET="external-secret",
+               SANDBOX_REPORT=str(report), PYTEST_ADDOPTS="")
+    env.pop("DOMESTIQUE_NO_NET", None)
+    # Block real transports even before pytest's network fixtures run.
+    runner = '''
+import socket, sys, pytest
+def blocked(*args, **kwargs):
+    raise AssertionError("unexpected network during sandbox bootstrap")
+socket.socket.connect = blocked
+socket.socket.connect_ex = blocked
+sys.exit(pytest.main(sys.argv[1:]))
+'''
+    args = [sys.executable, "-c", runner, str(suite), "-q", "-p", "no:cacheprovider"]
+    if mode == "collect":
+        args.append("--collect-only")
+    elif mode == "workers":
+        args.extend(["-n", "2", "--dist", "each"])
+    result = subprocess.run(args, env=env, capture_output=True, text=True, timeout=90)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert list(external.iterdir()) == [external / "sentinel"]
+    assert (external / "sentinel").read_text() == "untouched"
+    reports = list(tmp_path.glob("report.json.*"))
+    roots = {Path(json.loads(p.read_text())["root"]) for p in reports}
+    assert len(roots) == (2 if mode == "workers" else 1)
+    assert all(not root.exists() for root in roots), "child sandboxes must be cleaned up"
