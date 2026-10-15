@@ -27,13 +27,16 @@ if not serial and os.environ.get('SLOW'):
     time.sleep(5)
 code = int(os.environ['SERIAL' if serial else 'BULK'])
 if code == 1:
+    print('ERROR app:app.py:100 a captured application error, not a test ID')
+    print('=== short test summary info ===')
     print('FAILED tests/test_probe.py::test_failure - diagnostic failure')
 print('test-run-status', code)
 sys.exit(code)
 ''')
     fake.chmod(0o755)
     env = dict(os.environ, GATE_PYTHON=str(fake), GATE_OUT=str(tmp_path / 'logs'),
-               BULK=str(bulk), SERIAL=str(serial), CALLS=str(tmp_path / 'calls'))
+               BULK=str(bulk), SERIAL=str(serial), CALLS=str(tmp_path / 'calls'),
+               GATE_RERUN_FAILURES='1')
     if timeout:
         env.update(SLOW='1', GATE_BULK_TIMEOUT='0.1')
     return subprocess.run(['bash', str(GATE), str(tmp_path), 'probe'], env=env,
@@ -60,6 +63,12 @@ def test_historical_failure_is_still_a_failure(tmp_path):
 def test_passing_rerun_does_not_erase_original_failure(tmp_path):
     assert _run(tmp_path, bulk=1).returncode == 1
     assert 'test_failure' in (tmp_path / 'logs/probe.alone.txt').read_text()
+
+
+def test_application_error_logs_are_not_failure_ids(tmp_path):
+    assert _run(tmp_path, bulk=1).returncode == 1
+    assert (tmp_path / 'logs/probe.bad.txt').read_text().splitlines() == [
+        'tests/test_probe.py::test_failure']
 
 
 def test_outer_timeout_fails_without_running_more_tests(tmp_path):

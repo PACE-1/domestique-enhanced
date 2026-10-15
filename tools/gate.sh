@@ -8,8 +8,8 @@ WT=${1:?worktree}; LABEL=${2:?label}; BASE=${3:-}
 [[ "$LABEL" =~ ^[a-zA-Z0-9._-]+$ ]] || exit 2
 [[ -z "$BASE" || "$BASE" =~ ^[a-zA-Z0-9._-]+$ ]] || exit 2
 cd "$WT" || exit 2
-PYTHON=${GATE_PYTHON:-$PWD/.venv/bin/python}
-[[ -x "$PYTHON" ]] || { echo "Missing test interpreter: $PYTHON" >&2; exit 2; }
+TEST_PYTHON=${GATE_PYTHON:-$PWD/.venv/bin/python}
+[[ -x "$TEST_PYTHON" ]] || { echo "Missing test interpreter: $TEST_PYTHON" >&2; exit 2; }
 S=${GATE_OUT:-/tmp/domestique-gate}
 mkdir -p "$S" || exit 2
 OUT=$S/$LABEL
@@ -18,7 +18,7 @@ if [[ -n "$BASE" && ! -f "$S/$BASE.real.txt" ]]; then
     exit 2
 fi
 export PYTHONDONTWRITEBYTECODE=1 PYTHONHASHSEED=0
-PYT=("$PYTHON" -m pytest -p no:cacheprovider)
+PYT=("$TEST_PYTHON" -m pytest -p no:cacheprovider --color=no)
 date > "$OUT.full.txt"
 timeout "${GATE_BULK_TIMEOUT:-3300}" "${PYT[@]}" tests/ -n "${GATE_WORKERS:-5}" \
     --dist loadfile -q -m "not hardware and not release_serial" \
@@ -38,8 +38,14 @@ if [[ "$bulk_status" -le 1 ]]; then
     fi
 fi
 printf 'bulk=%s\nserial=%s\nexit=%s\n' "$bulk_status" "$serial_status" "$status" > "$OUT.status.txt"
-grep -E '^(FAILED|ERROR) ' "$OUT.full.txt" | sed -E 's/^(FAILED|ERROR) //; s/ - .*//' \
-    | sort -u > "$OUT.bad.txt"
+# Captured application ERROR logs are not pytest failure IDs. Restrict parsing
+# to the short summary, resetting at the next section heading/run.
+awk '
+    /^=+ .* =+$/ { summary = ($0 ~ / short test summary info /); next }
+    summary && /^(FAILED|ERROR) / {
+        sub(/^(FAILED|ERROR) /, ""); sub(/ - .*/, ""); print
+    }
+' "$OUT.full.txt" | sort -u > "$OUT.bad.txt"
 # The historical list is diagnostic only, never an allow-list for success.
 if [[ -f tests/known-failures-clean-main.txt ]]; then
     comm -23 "$OUT.bad.txt" <(sort tests/known-failures-clean-main.txt) > "$OUT.unknown.txt"
