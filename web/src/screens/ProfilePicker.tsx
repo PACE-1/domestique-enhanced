@@ -59,7 +59,7 @@ export function ProfilePicker({ onSwitched = goHome }: { onSwitched?: () => void
               Every rider needs a profile. It holds your FTP, weight, training plans, ride history
               and intervals.icu connection.
             </p>
-            <Button render={<a href="/profile-setup" />}>Create account to start</Button>
+            <Button render={<a href="#/profile-setup" />}>Create account to start</Button>
           </CardContent>
         </Card>
       </Shell>
@@ -103,7 +103,7 @@ export function ProfilePicker({ onSwitched = goHome }: { onSwitched?: () => void
         ))}
         <Card className="border-dashed">
           <CardContent className="flex h-full items-center justify-center py-6">
-            <Button variant="ghost" render={<a href="/profile-setup" />}>
+            <Button variant="ghost" render={<a href="#/profile-setup" />}>
               + Add Profile
             </Button>
           </CardContent>
