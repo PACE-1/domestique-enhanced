@@ -60,10 +60,14 @@ def test_no_step_is_longer_than_the_workout():
 
 
 def test_fit_tool_is_pinned_exactly_and_installed_at_the_pin():
-    req = (REPO / "requirements.txt").read_text()
+    # Every install profile shares the same runtime declaration; the pin
+    # must remain exact there rather than being copied into desktop/dev files.
+    for profile in ("requirements.txt", "requirements-dev.txt"):
+        assert "-r requirements-server.txt" in (REPO / profile).read_text()
+    req = (REPO / "requirements-server.txt").read_text()
     m = re.search(r"^fit-tool==([0-9.]+)\b", req, re.M)
-    assert m, "requirements.txt must pin fit-tool with ==; a range let the builds drift to a version the code was not written for"
+    assert m, "requirements-server.txt must pin fit-tool with ==; a range let builds drift"
     installed = importlib.metadata.version("fit-tool")
     assert installed == m.group(1), (
-        f"fit-tool {installed} is installed but requirements.txt pins {m.group(1)}: "
+        f"fit-tool {installed} is installed but requirements-server.txt pins {m.group(1)}: "
         f"run `pip install -r requirements.txt`; the two versions scale step durations differently")
