@@ -916,6 +916,8 @@ templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 _static_dir = Path(__file__).parent / "static"
 _static_dir.mkdir(exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(_static_dir)), name="static")
+from web_spa import mount_spa
+mount_spa(app, Path(__file__).resolve().parent.parent / "web" / "dist")
 
 
 
