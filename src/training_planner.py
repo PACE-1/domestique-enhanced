@@ -1292,20 +1292,6 @@ def _row_end(cursor: date, phase) -> date:
     return min(phase.end, _next_week_cursor(cursor, phase) - timedelta(days=1))
 
 
-def _taper_anchor(target: date) -> date:
-    """The Monday a taper ending on ``target`` should start.
-
-    Mujika 2003 puts the useful taper at 8-14 days inclusive, so the start has
-    to land in [target-13, target-7]. That window is exactly seven days wide,
-    which means exactly ONE Monday falls inside it and there is no rounding
-    decision to make -- take the last Monday at least a week before the event.
-
-    Rounding to the *nearest* Monday is the trap: an event on a Monday rounds
-    back three days from TAPER_DAYS and yields a 15-day taper, over the
-    ceiling. tests/test_week_anchoring.py checks all seven weekdays.
-    """
-    return _monday_on_or_before(target - timedelta(days=7))
-
 # ── 3.4.0 W1 (IP_CONTINUOUS_MODE A) — open-ended "continuous" goal ────────────
 # Rolling generation horizon: the plan always keeps this many weeks ahead
 # (3 load + 1 deload — the deload rides the existing STEP_BACK_EVERY cadence,
