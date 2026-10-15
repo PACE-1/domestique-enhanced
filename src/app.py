@@ -71,6 +71,7 @@ import config
 import db
 import zones as _zones_mod
 import training_planner as tp  # module-level: every plan endpoint uses tp.plan_write_lock()
+from workout_facts import planned_power_np_fraction as _np_fraction_from_samples
 import continuous_policy as cpol  # 3.4.0 W2 — continuous-mode deload + rotation policy
 # v1.6.1 — register _log_error as the planner's observability hook so any
 # planner-internal failure (generate_plan phase build, reforecast, match_zwo
@@ -5361,27 +5362,6 @@ def api_hrv_recording_dismiss(payload: dict = Body(...)):
 # v4.2.0 IMPL-LIBRARY: helper to scan a single ZWO into the structural
 # metrics the score helper + filters need. Extracted so /api/workouts and
 # /api/workouts/tags can share the parse without duplicating XML walking.
-def _np_fraction_from_samples(samples: "list[float]") -> float:
-    """Coggan NP as an FTP fraction over a 1 Hz planned-power series.
-
-    30-s simple rolling mean, full windows only (first value covers samples
-    [0, 30)), 4th-power mean, 4th root. Byte-identical to the planner's
-    training_planner._np_fraction_from_samples — the two scanners must stay
-    in lockstep (v4.1.1 Bug C / score_sync contract).
-    """
-    n = len(samples)
-    if n < 30:
-        return 0.0
-    s = sum(samples[:30])
-    p4 = (s / 30.0) ** 4
-    count = 1
-    for i in range(30, n):
-        s += samples[i] - samples[i - 30]
-        p4 += (s / 30.0) ** 4
-        count += 1
-    return (p4 / count) ** 0.25
-
-
 def _scan_zwo_for_library(zwo_path: Path) -> dict | None:
     """Parse one ZWO file → metrics dict, or None on parse error / empty.
 
