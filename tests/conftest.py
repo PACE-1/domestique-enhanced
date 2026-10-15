@@ -62,7 +62,7 @@ _SANDBOX_HOME = tempfile.mkdtemp(prefix="domestique-test-home-")
 atexit.register(shutil.rmtree, _SANDBOX_HOME, ignore_errors=True)
 # The explicit override wins over HOME in user_home.domestique_home(). Never
 # inherit a developer/server data root, even during collection or in a worker.
-os.environ["DOMESTIQUE_HOME"] = str(_Path(_SANDBOX_HOME) / ".domestique")
+os.environ.pop("DOMESTIQUE_HOME", None)
 os.environ["DOMESTIQUE_NO_NET"] = "1"
 # App/config .env loaders use setdefault. Blank credentials before importing
 # them so a repository .env or inherited shell credentials cannot enter tests.
