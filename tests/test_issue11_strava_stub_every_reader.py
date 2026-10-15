@@ -135,6 +135,12 @@ def test_sqlite_mirror_leaves_out_strava_stubs(tmp_path, monkeypatch):
     pm.save_env("i111", "key_a")
     db_mod.shutdown_sync()
 
+    # run_sync reads the imported config snapshot, not the newly saved env.
+    # Supply synthetic credentials explicitly, independent of suite order.
+    import config
+    monkeypatch.setattr(config, "ICU_ATHLETE_ID", "i111")
+    monkeypatch.setattr(config, "ICU_API_KEY", "key_a")
+
     monkeypatch.setattr(
         db_mod, "fetch_wellness",
         lambda days=90: [{"id": "2026-01-28", "ctl": 10.0, "atl": 5.0,
@@ -143,7 +149,8 @@ def test_sqlite_mirror_leaves_out_strava_stubs(tmp_path, monkeypatch):
         db_mod, "fetch_activities",
         lambda days=90: [_stub("18814420332"), _real("i2"), _stub("18815009190")])
 
-    db_mod.run_sync(days=1)
+    result = db_mod.run_sync(days=1)
+    assert result["status"] == "ok", result
 
     db_file = tmp_path / ".domestique" / "profiles" / "alice" / "health_tracker.db"
     assert _activity_rows(db_file) == [("i2", "Endurance")]
