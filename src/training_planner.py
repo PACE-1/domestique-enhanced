@@ -100,7 +100,7 @@ def _tp_log_error(code: str, exc: Exception | None = None, **context) -> None:
 
 from contextlib import asynccontextmanager, contextmanager
 from dataclasses import dataclass, field, asdict, replace
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -938,20 +938,19 @@ def _last_48h_z5plus_min(rides: list[dict]) -> float:
     """
     if not rides:
         return 0.0
-    cutoff = clock.now() - timedelta(hours=48)
+    now = clock.now(timezone.utc)
+    cutoff = now - timedelta(hours=48)
     total_seconds = 0.0
     for r in rides:
         start_str = r.get("start_date_local") or r.get("date") or ""
-        if not start_str:
+        if not isinstance(start_str, str) or not start_str:
             continue
         try:
-            if "T" in start_str:
-                dt = datetime.fromisoformat(start_str.replace("Z", "+00:00").split("+")[0])
-            else:
-                dt = datetime.fromisoformat(start_str + "T00:00:00")
+            # Preserve offsets; naive/date-only records mean host-local time.
+            dt = datetime.fromisoformat(start_str.replace("Z", "+00:00")).astimezone(timezone.utc)
         except ValueError:
             continue
-        if dt < cutoff:
+        if not cutoff <= dt <= now:
             continue
         tiz = r.get("time_in_zone")
         if isinstance(tiz, dict) and tiz:
