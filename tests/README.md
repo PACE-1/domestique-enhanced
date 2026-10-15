@@ -3,16 +3,17 @@
 Run from the repository root with Python 3.12 and the test dependencies installed:
 
 ```sh
-python -m pip install -r requirements.txt pytest pytest-xdist pytest-timeout fitparse
+python -m pip install -r requirements-dev.txt -c requirements-linux-py312.lock
 python -m pytest tests/test_hermetic_home.py tests/test_gate_script.py -q
 ```
 
-The current requirements file includes desktop dependencies. Separating and
-locking server, desktop and test environments is tracked in Forgejo issue #2.
+This installs the headless development profile. See [Linux setup](../docs/DEVELOPMENT.md)
+for dependency profiles, the Python 3.12 lock and desktop installation. Full
+Linux baseline/remote CI validation is tracked in Forgejo issue #2.
 
 `conftest.py` adds `src/` to the import path and sets up the application fixtures.
-Before project imports it redirects both `HOME` and `DOMESTIQUE_HOME` into a
-fresh per-process directory, blanks inherited ICU credentials, and disables the
+Before project imports it redirects `HOME` into a fresh per-process directory,
+clears inherited `DOMESTIQUE_HOME`, blanks inherited ICU credentials, and disables the
 real training transport. Child pytest processes and xdist workers create their
 own roots; normal test subprocesses inherit the parent's disposable root.
 Sandboxes are removed at interpreter exit. Tests intentionally exercising path

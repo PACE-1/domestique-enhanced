@@ -1,0 +1,33 @@
+name: Linux tests
+
+on:
+  pull_request:
+    branches: [clean-main]
+  workflow_dispatch:
+
+jobs:
+  linux:
+    # Requires a Forgejo runner advertising this label. None was visible to
+    # the repository account when this workflow was added; configure a runner
+    # before treating the workflow as remotely validated.
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install locked headless test profile
+        run: python -m pip install -r requirements-dev.txt -c requirements-linux-py312.lock
+      - name: Full Linux gate
+        env:
+          GATE_WORKERS: '4'
+          GATE_RERUN_FAILURES: '0'
+        run: GATE_PYTHON="$(command -v python)" bash tools/gate.sh "$PWD" linux-baseline
+      - name: Show verification diagnostics
+        if: always()
+        run: |
+          if test -f /tmp/domestique-gate/linux-baseline.status.txt; then
+            cat /tmp/domestique-gate/linux-baseline.status.txt
+            tail -n 150 /tmp/domestique-gate/linux-baseline.full.txt
+          fi
