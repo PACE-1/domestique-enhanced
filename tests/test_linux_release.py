@@ -109,11 +109,14 @@ def test_linux_picks_the_versioned_appimage():
 
 # ─── 2. requirements.txt ─────────────────────────────────────────────────────
 
-def _requirements() -> dict[str, Requirement]:
+def _requirements(path: Path = ROOT / "requirements.txt") -> dict[str, Requirement]:
     reqs = {}
-    for raw in (ROOT / "requirements.txt").read_text(encoding="utf-8").splitlines():
+    for raw in path.read_text(encoding="utf-8").splitlines():
         line = raw.split("#", 1)[0].strip()
         if not line:
+            continue
+        if line.startswith("-r "):
+            reqs.update(_requirements(path.parent / line[3:].strip()))
             continue
         req = Requirement(line)
         reqs[req.name.lower()] = req

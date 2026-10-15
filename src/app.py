@@ -558,7 +558,6 @@ except OSError:
 # through plain HTTP; the heavy lifting happens in the user's preferred
 # indoor app (Tacx / MyWhoosh / Golden Cheetah), and Domestique imports
 # the resulting FIT afterward via POST /api/ride/import.
-APP_VERSION = "4.0.0-alpha"
 
 # v1.0.2 IMPL-MIGRATION: cached migration-check result for the dashboard.
 # Populated once at lifespan startup; consumed by GET /api/migrations/last-run-result.

@@ -39,12 +39,6 @@ _HR_ROWS = [
     (4, 105.0, 0.95, 1.05),
 ]
 
-# Piecewise-linear %FTP → %LTHR map for ramp endpoints, through the Coggan
-# zone-boundary pairs. Input clamped to [55, 105]: below 55% FTP maps to the
-# 68% LTHR "easy" ceiling; 106–120% caps at 105% LTHR (HR won't meaningfully
-# exceed threshold mid-ramp); >120% is not mappable at all (RPE).
-_RAMP_ANCHORS = [(55.0, 0.68), (75.0, 0.83), (90.0, 0.94), (105.0, 1.05)]
-
 # Zone → RPE cue (CR10). Z5+ and any too-short segment degrade to these.
 _RPE_ROWS = {
     1: (1, 2, "very easy spin"),
@@ -86,15 +80,6 @@ def zone_of_pct(pct: float) -> int:
     if pct <= 150:
         return 6
     return 7
-
-
-def _lthr_frac_at(pct: float) -> float:
-    """Continuous %FTP → LTHR-fraction map (ramp endpoints). Clamped [55,105]."""
-    pct = max(55.0, min(105.0, pct))
-    for (x1, y1), (x2, y2) in zip(_RAMP_ANCHORS, _RAMP_ANCHORS[1:]):
-        if pct <= x2:
-            return y1 + (y2 - y1) * (pct - x1) / (x2 - x1)
-    return _RAMP_ANCHORS[-1][1]
 
 
 def _rpe(zone: int, reason: str) -> dict:

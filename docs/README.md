@@ -6,6 +6,8 @@ planning artefacts.
 
 | File | Category | One-liner |
 |---|---|---|
+| `DEVELOPMENT.md` | Fork development | Linux dependency profiles, constraint lock and verification gate. |
+| `code-bloat/README.md` | Fork maintenance | Initial cleanup inventory, candidate dispositions and verification receipt. |
 | `SYSTEM.md` | Architecture & system | High-level system architecture (modules, data flow, persistence). |
 | `DEBUGGING.md` | Architecture & system | Common diagnostic commands + log layout. |
 | `SCIENCE_REVIEW.md` | Science & research | Citation-by-citation review of the seven injury guardrails and the periodisation model. |

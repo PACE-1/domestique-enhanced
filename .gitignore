@@ -90,3 +90,6 @@ gen_*.zwo
 # Packaging generates them: see tools/build-library-caches.py.
 src/workouts/.library_index.json
 src/workouts/.workout_facts.json
+
+# Local development environment (dependencies are reproducible from the lock).
+.venv/

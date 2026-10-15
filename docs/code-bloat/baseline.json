@@ -1,0 +1,776 @@
+{
+  "source_commit": "11cc77cb598d1684ccbb04aef3f67e0ef15a0760",
+  "tool_commit": "11cc77cb598d1684ccbb04aef3f67e0ef15a0760",
+  "scope": "Tracked baseline files, before production cleanup; test safety changes are not counted as runtime deletion.",
+  "census": {
+    "development and generation tools": {
+      "files": 19,
+      "bytes": 232442,
+      "text_lines": 5373
+    },
+    "docs, project metadata and other assets": {
+      "files": 79,
+      "bytes": 6683512,
+      "text_lines": 18217
+    },
+    "first-party static assets": {
+      "files": 8,
+      "bytes": 62859,
+      "text_lines": 1253
+    },
+    "packaging and CI": {
+      "files": 13,
+      "bytes": 156738,
+      "text_lines": 2733
+    },
+    "route assets": {
+      "files": 1884,
+      "bytes": 49468638,
+      "text_lines": 126037
+    },
+    "runtime Python": {
+      "files": 50,
+      "bytes": 2918630,
+      "text_lines": 63064
+    },
+    "templates (HTML/CSS/JS)": {
+      "files": 5,
+      "bytes": 1263290,
+      "text_lines": 23366
+    },
+    "tests and fixtures": {
+      "files": 399,
+      "bytes": 4886215,
+      "text_lines": 157921
+    },
+    "vendored frontend": {
+      "files": 2,
+      "bytes": 407211,
+      "text_lines": 34
+    },
+    "workout assets": {
+      "files": 4314,
+      "bytes": 12874646,
+      "text_lines": 263350
+    }
+  },
+  "python_ast_modules": 54,
+  "python_ast_lines": 66573,
+  "structural_clone_groups": 10,
+  "structural_candidate_duplicate_lines": 228,
+  "reciprocal_import_pairs": [
+    [
+      "app",
+      "icu_calendar_push"
+    ],
+    [
+      "app",
+      "training_planner"
+    ],
+    [
+      "db",
+      "profile_manager"
+    ],
+    [
+      "db",
+      "ride_storage"
+    ],
+    [
+      "db",
+      "training"
+    ],
+    [
+      "power_curve",
+      "ride_storage"
+    ],
+    [
+      "profile_manager",
+      "training_planner"
+    ],
+    [
+      "training_planner",
+      "week_plan"
+    ]
+  ],
+  "declared_global_rebindings": {
+    "app.py:WORKOUT_DIR": [
+      "_apply_profile_paths",
+      "setup_save"
+    ],
+    "app.py:GPX_DIR": [
+      "_apply_profile_paths",
+      "setup_save"
+    ],
+    "app.py:EXTRA_WORKOUT_DIR": [
+      "_apply_profile_paths"
+    ],
+    "app.py:_LAST_MIGRATION_RESULT": [
+      "lifespan"
+    ],
+    "app.py:_LIBRARY_TAGS_CACHE": [
+      "_get_library_tags_cached",
+      "api_set_extra_workout_folder"
+    ],
+    "app.py:_LIBRARY_ROWS_CACHE": [
+      "_get_library_rows_cached"
+    ],
+    "app.py:_icu_push_last_result": [
+      "_icu_push_note_result"
+    ],
+    "app.py:_icu_push_timer": [
+      "_icu_push_cancel_pending",
+      "_icu_push_debounced_run",
+      "_icu_push_schedule_debounced"
+    ],
+    "app.py:_icu_push_last_daily": [
+      "_icu_push_daily_from_sync"
+    ],
+    "app.py:_last_sync_elapsed_s": [
+      "_runner"
+    ],
+    "clock.py:_frozen": [
+      "freeze"
+    ],
+    "db.py:DB_PATH": [
+      "set_db_path"
+    ],
+    "db.py:_db_version": [
+      "close_all_connections"
+    ],
+    "db.py:_auth_disabled": [
+      "_sync_loop",
+      "restart_sync"
+    ],
+    "db.py:_consecutive_failures": [
+      "_sync_loop",
+      "restart_sync"
+    ],
+    "db.py:_last_sync_error": [
+      "_sync_loop",
+      "restart_sync"
+    ],
+    "db.py:_sync_thread": [
+      "restart_sync",
+      "shutdown_sync",
+      "start_background_sync"
+    ],
+    "db.py:_sync_stop": [
+      "restart_sync",
+      "shutdown_sync",
+      "start_background_sync"
+    ],
+    "db.py:_sync_epoch": [
+      "purge_profile_data"
+    ],
+    "icu_calendar_push.py:_SWEEP_GENERATION": [
+      "_sweep_then_bump"
+    ],
+    "launcher.py:_server_error": [
+      "_run"
+    ],
+    "launcher.py:_server_traceback": [
+      "_run"
+    ],
+    "launcher.py:_uvicorn_server": [
+      "_run"
+    ],
+    "log_config.py:_configured": [
+      "setup_logging"
+    ],
+    "log_config.py:_flusher_thread": [
+      "_start_flusher"
+    ],
+    "log_config.py:LOG_FILE": [
+      "setup_logging"
+    ],
+    "plan_invariants.py:_classes": [
+      "content_class"
+    ],
+    "routes_lib.py:_SURFACE_TYPES_CACHE": [
+      "_load_surface_types_db"
+    ],
+    "routes_lib.py:_SURFACE_TYPES_MTIME": [
+      "_load_surface_types_db"
+    ],
+    "routes_lib.py:_ROUTES_CACHE": [
+      "_load_routes_v2"
+    ],
+    "routes_lib.py:_ROUTES_INDEX": [
+      "_load_routes_v2"
+    ],
+    "routes_lib.py:_ROUTES_MTIME": [
+      "_load_routes_v2"
+    ],
+    "search_lib.py:_SEARCH_HAYS_CACHE": [
+      "_get_search_haystacks"
+    ],
+    "sleep_inhibit.py:_proc": [
+      "disable",
+      "enable"
+    ],
+    "sleep_inhibit.py:_win_state_prev": [
+      "disable",
+      "enable"
+    ],
+    "tls_trust.py:_OPENSSL_CTX": [
+      "make_context"
+    ],
+    "training_planner.py:_LOG_ERROR_HOOK": [
+      "_set_log_error_hook"
+    ],
+    "training_planner.py:_CONTENT_CLASSIFICATION_CACHE": [
+      "_load_content_classifications"
+    ],
+    "training_planner.py:_WORKOUT_LIB_CACHE": [
+      "_load_library_dir"
+    ],
+    "training_planner.py:_WORKOUT_LIB_FAST_VALIDATOR": [
+      "_load_library_dir"
+    ],
+    "workout_facts.py:_CLC": [
+      "_clc"
+    ]
+  },
+  "largest_functions": [
+    {
+      "lines": 1079,
+      "branches": 261,
+      "nesting": 7,
+      "module": "training_planner.py",
+      "function": "sample_week_workouts",
+      "line": 7449
+    },
+    {
+      "lines": 712,
+      "branches": 139,
+      "nesting": 11,
+      "module": "training_planner.py",
+      "function": "reforecast",
+      "line": 11906
+    },
+    {
+      "lines": 704,
+      "branches": 111,
+      "nesting": 6,
+      "module": "training_planner.py",
+      "function": "generate_plan",
+      "line": 8696
+    },
+    {
+      "lines": 523,
+      "branches": 110,
+      "nesting": 4,
+      "module": "training_planner.py",
+      "function": "_match_zwo_unclamped",
+      "line": 5345
+    },
+    {
+      "lines": 515,
+      "branches": 116,
+      "nesting": 6,
+      "module": "structure_fidelity.py",
+      "function": "score_blocks",
+      "line": 931
+    },
+    {
+      "lines": 511,
+      "branches": 101,
+      "nesting": 5,
+      "module": "training_planner.py",
+      "function": "regenerate_from_today",
+      "line": 13411
+    },
+    {
+      "lines": 487,
+      "branches": 82,
+      "nesting": 5,
+      "module": "training_planner.py",
+      "function": "recalculate_plan",
+      "line": 14032
+    },
+    {
+      "lines": 452,
+      "branches": 102,
+      "nesting": 4,
+      "module": "app.py",
+      "function": "merge_plan_with_rides",
+      "line": 15398
+    },
+    {
+      "lines": 449,
+      "branches": 184,
+      "nesting": 6,
+      "module": "app.py",
+      "function": "_build_programme_summary",
+      "line": 19891
+    },
+    {
+      "lines": 409,
+      "branches": 72,
+      "nesting": 4,
+      "module": "training_planner.py",
+      "function": "refit_remaining_week",
+      "line": 14900
+    },
+    {
+      "lines": 395,
+      "branches": 63,
+      "nesting": 4,
+      "module": "training_planner.py",
+      "function": "generate_phases",
+      "line": 3497
+    },
+    {
+      "lines": 356,
+      "branches": 84,
+      "nesting": 6,
+      "module": "training_planner.py",
+      "function": "_enforce_build2_peak_hard_floor",
+      "line": 9750
+    }
+  ],
+  "candidate_ledger": [
+    {
+      "symbol": "app.APP_VERSION",
+      "source": "app.py",
+      "line": 561,
+      "lines": 1,
+      "test_files_mentioning": 0,
+      "disposition": "remove batch 1",
+      "reason": "Unused stale alias. Active version comes from VERSION via _VERSION; no whole-tree consumer.",
+      "issue": 22
+    },
+    {
+      "symbol": "analytics.compute_dfa_threshold_analysis",
+      "source": "analytics.py",
+      "line": 809,
+      "lines": 96,
+      "test_files_mentioning": 1,
+      "disposition": "defer",
+      "reason": "Public/test utility or unresolved consumer; preserve until caller and compatibility review.",
+      "issue": 22
+    },
+    {
+      "symbol": "app.legacy_card_state",
+      "source": "app.py",
+      "line": 14582,
+      "lines": 21,
+      "test_files_mentioning": 1,
+      "disposition": "defer",
+      "reason": "Public/test utility or unresolved consumer; preserve until caller and compatibility review.",
+      "issue": 22
+    },
+    {
+      "symbol": "clock.unfreeze",
+      "source": "clock.py",
+      "line": 49,
+      "lines": 2,
+      "test_files_mentioning": 16,
+      "disposition": "retain",
+      "reason": "Test/diagnostic infrastructure; test-only use has a demonstrated purpose.",
+      "issue": 22
+    },
+    {
+      "symbol": "db.query_metrics_latest",
+      "source": "db.py",
+      "line": 1031,
+      "lines": 7,
+      "test_files_mentioning": 0,
+      "disposition": "defer",
+      "reason": "Public/test utility or unresolved consumer; preserve until caller and compatibility review.",
+      "issue": 22
+    },
+    {
+      "symbol": "db.upsert_blood_marker",
+      "source": "db.py",
+      "line": 1121,
+      "lines": 8,
+      "test_files_mentioning": 0,
+      "disposition": "defer",
+      "reason": "Public/test utility or unresolved consumer; preserve until caller and compatibility review.",
+      "issue": 22
+    },
+    {
+      "symbol": "db.query_blood_markers",
+      "source": "db.py",
+      "line": 1131,
+      "lines": 8,
+      "test_files_mentioning": 0,
+      "disposition": "defer",
+      "reason": "Public/test utility or unresolved consumer; preserve until caller and compatibility review.",
+      "issue": 22
+    },
+    {
+      "symbol": "error_codes.all_codes",
+      "source": "error_codes.py",
+      "line": 496,
+      "lines": 3,
+      "test_files_mentioning": 1,
+      "disposition": "retain",
+      "reason": "Test/diagnostic infrastructure; test-only use has a demonstrated purpose.",
+      "issue": 22
+    },
+    {
+      "symbol": "fitness_estimation.compute_fitness_signature",
+      "source": "fitness_estimation.py",
+      "line": 284,
+      "lines": 44,
+      "test_files_mentioning": 1,
+      "disposition": "defer",
+      "reason": "Public/test utility or unresolved consumer; preserve until caller and compatibility review.",
+      "issue": 22
+    },
+    {
+      "symbol": "fitness_estimation.aerobic_decoupling",
+      "source": "fitness_estimation.py",
+      "line": 1271,
+      "lines": 100,
+      "test_files_mentioning": 3,
+      "disposition": "defer",
+      "reason": "Public/test utility or unresolved consumer; preserve until caller and compatibility review.",
+      "issue": 22
+    },
+    {
+      "symbol": "hr_targets._lthr_frac_at",
+      "source": "hr_targets.py",
+      "line": 91,
+      "lines": 7,
+      "test_files_mentioning": 0,
+      "disposition": "remove batch 1",
+      "reason": "Private helper with no runtime or test callers; whole-tree name search independently confirms no consumer.",
+      "issue": 22
+    },
+    {
+      "symbol": "log_config.set_level",
+      "source": "log_config.py",
+      "line": 253,
+      "lines": 40,
+      "test_files_mentioning": 3,
+      "disposition": "retain",
+      "reason": "Diagnostic/log lifecycle surface; public helpers or runtime hooks need explicit consumer contract.",
+      "issue": 22
+    },
+    {
+      "symbol": "log_config.get_levels",
+      "source": "log_config.py",
+      "line": 295,
+      "lines": 15,
+      "test_files_mentioning": 1,
+      "disposition": "retain",
+      "reason": "Diagnostic/log lifecycle surface; public helpers or runtime hooks need explicit consumer contract.",
+      "issue": 22
+    },
+    {
+      "symbol": "log_config._SessionContextFilter",
+      "source": "log_config.py",
+      "line": 344,
+      "lines": 12,
+      "test_files_mentioning": 0,
+      "disposition": "retain",
+      "reason": "Diagnostic/log lifecycle surface; public helpers or runtime hooks need explicit consumer contract.",
+      "issue": 22
+    },
+    {
+      "symbol": "log_config.start_session_log",
+      "source": "log_config.py",
+      "line": 358,
+      "lines": 7,
+      "test_files_mentioning": 1,
+      "disposition": "retain",
+      "reason": "Diagnostic/log lifecycle surface; public helpers or runtime hooks need explicit consumer contract.",
+      "issue": 22
+    },
+    {
+      "symbol": "log_config.get_active_log_path",
+      "source": "log_config.py",
+      "line": 367,
+      "lines": 3,
+      "test_files_mentioning": 1,
+      "disposition": "retain",
+      "reason": "Diagnostic/log lifecycle surface; public helpers or runtime hooks need explicit consumer contract.",
+      "issue": 22
+    },
+    {
+      "symbol": "log_config.stop_session_log",
+      "source": "log_config.py",
+      "line": 372,
+      "lines": 3,
+      "test_files_mentioning": 1,
+      "disposition": "retain",
+      "reason": "Diagnostic/log lifecycle surface; public helpers or runtime hooks need explicit consumer contract.",
+      "issue": 22
+    },
+    {
+      "symbol": "log_config.stop_flusher",
+      "source": "log_config.py",
+      "line": 416,
+      "lines": 9,
+      "test_files_mentioning": 1,
+      "disposition": "retain",
+      "reason": "Diagnostic/log lifecycle surface; public helpers or runtime hooks need explicit consumer contract.",
+      "issue": 22
+    },
+    {
+      "symbol": "plan_invariants.check_acwr",
+      "source": "plan_invariants.py",
+      "line": 560,
+      "lines": 29,
+      "test_files_mentioning": 4,
+      "disposition": "defer",
+      "reason": "Tested safety capability; missing production wiring is not a deletion argument.",
+      "issue": 11
+    },
+    {
+      "symbol": "plan_invariants.projected_ctl",
+      "source": "plan_invariants.py",
+      "line": 591,
+      "lines": 19,
+      "test_files_mentioning": 2,
+      "disposition": "defer",
+      "reason": "Tested safety capability; missing production wiring is not a deletion argument.",
+      "issue": 11
+    },
+    {
+      "symbol": "readiness_composite.compute_training_severity",
+      "source": "readiness_composite.py",
+      "line": 695,
+      "lines": 81,
+      "test_files_mentioning": 4,
+      "disposition": "defer",
+      "reason": "Public/test utility or unresolved consumer; preserve until caller and compatibility review.",
+      "issue": 22
+    },
+    {
+      "symbol": "ride_report_png.render_ride_report_png",
+      "source": "ride_report_png.py",
+      "line": 136,
+      "lines": 93,
+      "test_files_mentioning": 0,
+      "disposition": "defer",
+      "reason": "Unwired PNG capability; keep until product/export scope is decided.",
+      "issue": 22
+    },
+    {
+      "symbol": "ride_storage.recent_mean_weekly_tss",
+      "source": "ride_storage.py",
+      "line": 1615,
+      "lines": 52,
+      "test_files_mentioning": 4,
+      "disposition": "defer",
+      "reason": "Superseded-load helper with tests; consolidate only after semantic and consumer review.",
+      "issue": 23
+    },
+    {
+      "symbol": "ride_storage.detect_wbal_overshoot",
+      "source": "ride_storage.py",
+      "line": 1900,
+      "lines": 40,
+      "test_files_mentioning": 1,
+      "disposition": "defer",
+      "reason": "Public/test utility or unresolved consumer; preserve until caller and compatibility review.",
+      "issue": 22
+    },
+    {
+      "symbol": "routes_lib._route_key_for",
+      "source": "routes_lib.py",
+      "line": 37,
+      "lines": 11,
+      "test_files_mentioning": 0,
+      "disposition": "defer",
+      "reason": "Re-exported by app.py even though the function is never called; unknown external callers prevent automatic removal.",
+      "issue": 22
+    },
+    {
+      "symbol": "scripts.title_from_zwo.title_from_zwo",
+      "source": "scripts/title_from_zwo.py",
+      "line": 261,
+      "lines": 49,
+      "test_files_mentioning": 1,
+      "disposition": "defer",
+      "reason": "Public/test utility or unresolved consumer; preserve until caller and compatibility review.",
+      "issue": 22
+    },
+    {
+      "symbol": "strain_score.compute_sr_avg",
+      "source": "strain_score.py",
+      "line": 417,
+      "lines": 34,
+      "test_files_mentioning": 1,
+      "disposition": "defer",
+      "reason": "Public/test utility or unresolved consumer; preserve until caller and compatibility review.",
+      "issue": 22
+    },
+    {
+      "symbol": "tau_fitting.count_weighted_markers",
+      "source": "tau_fitting.py",
+      "line": 136,
+      "lines": 21,
+      "test_files_mentioning": 1,
+      "disposition": "defer",
+      "reason": "Public/test utility or unresolved consumer; preserve until caller and compatibility review.",
+      "issue": 22
+    },
+    {
+      "symbol": "tls_trust.backend_of",
+      "source": "tls_trust.py",
+      "line": 103,
+      "lines": 3,
+      "test_files_mentioning": 2,
+      "disposition": "retain",
+      "reason": "Test/diagnostic infrastructure; test-only use has a demonstrated purpose.",
+      "issue": 22
+    },
+    {
+      "symbol": "training.classify_acwr",
+      "source": "training.py",
+      "line": 910,
+      "lines": 12,
+      "test_files_mentioning": 0,
+      "disposition": "defer",
+      "reason": "Public/test utility or unresolved consumer; preserve until caller and compatibility review.",
+      "issue": 22
+    },
+    {
+      "symbol": "training.classify_tsb",
+      "source": "training.py",
+      "line": 924,
+      "lines": 9,
+      "test_files_mentioning": 0,
+      "disposition": "defer",
+      "reason": "Public/test utility or unresolved consumer; preserve until caller and compatibility review.",
+      "issue": 22
+    },
+    {
+      "symbol": "training.classify_ramp",
+      "source": "training.py",
+      "line": 935,
+      "lines": 9,
+      "test_files_mentioning": 0,
+      "disposition": "defer",
+      "reason": "Public/test utility or unresolved consumer; preserve until caller and compatibility review.",
+      "issue": 22
+    },
+    {
+      "symbol": "training.classify_monotony",
+      "source": "training.py",
+      "line": 946,
+      "lines": 9,
+      "test_files_mentioning": 0,
+      "disposition": "defer",
+      "reason": "Public/test utility or unresolved consumer; preserve until caller and compatibility review.",
+      "issue": 22
+    },
+    {
+      "symbol": "training_planner._taper_anchor",
+      "source": "training_planner.py",
+      "line": 1295,
+      "lines": 13,
+      "test_files_mentioning": 0,
+      "disposition": "remove batch 1",
+      "reason": "Private helper with no runtime or test callers; whole-tree name search independently confirms no consumer.",
+      "issue": 22
+    },
+    {
+      "symbol": "training_planner.required_weekly_tss",
+      "source": "training_planner.py",
+      "line": 2888,
+      "lines": 9,
+      "test_files_mentioning": 0,
+      "disposition": "defer",
+      "reason": "Public/test utility or unresolved consumer; preserve until caller and compatibility review.",
+      "issue": 22
+    },
+    {
+      "symbol": "training_planner.schedule_double_threshold_pair",
+      "source": "training_planner.py",
+      "line": 11709,
+      "lines": 52,
+      "test_files_mentioning": 1,
+      "disposition": "defer",
+      "reason": "Public/test utility or unresolved consumer; preserve until caller and compatibility review.",
+      "issue": 22
+    },
+    {
+      "symbol": "week_plan._install_seal",
+      "source": "week_plan.py",
+      "line": 180,
+      "lines": 24,
+      "test_files_mentioning": 2,
+      "disposition": "defer",
+      "reason": "Dormant enforcement mechanism with tests; audit planner ownership before choosing disposition.",
+      "issue": 11
+    },
+    {
+      "symbol": "workout_facts.reset_cache",
+      "source": "workout_facts.py",
+      "line": 96,
+      "lines": 5,
+      "test_files_mentioning": 9,
+      "disposition": "retain",
+      "reason": "Test/diagnostic infrastructure; test-only use has a demonstrated purpose.",
+      "issue": 22
+    },
+    {
+      "symbol": "workout_facts.audit_labels",
+      "source": "workout_facts.py",
+      "line": 427,
+      "lines": 21,
+      "test_files_mentioning": 1,
+      "disposition": "defer",
+      "reason": "Public/test utility or unresolved consumer; preserve until caller and compatibility review.",
+      "issue": 22
+    },
+    {
+      "symbol": "zones.power_zone_at",
+      "source": "zones.py",
+      "line": 219,
+      "lines": 5,
+      "test_files_mentioning": 1,
+      "disposition": "defer",
+      "reason": "Public/test utility or unresolved consumer; preserve until caller and compatibility review.",
+      "issue": 22
+    },
+    {
+      "symbol": "zones.hr_zone_at",
+      "source": "zones.py",
+      "line": 226,
+      "lines": 5,
+      "test_files_mentioning": 1,
+      "disposition": "defer",
+      "reason": "Public/test utility or unresolved consumer; preserve until caller and compatibility review.",
+      "issue": 22
+    },
+    {
+      "symbol": "zones.zone_distribution",
+      "source": "zones.py",
+      "line": 233,
+      "lines": 18,
+      "test_files_mentioning": 2,
+      "disposition": "defer",
+      "reason": "Public/test utility or unresolved consumer; preserve until caller and compatibility review.",
+      "issue": 22
+    }
+  ],
+  "endpoint_consumers": {
+    "api_routes": 131,
+    "reached": 126,
+    "ambiguous": 3,
+    "unreached": 2,
+    "control_fetch_paths": 107,
+    "control_misidentified": 0
+  },
+  "measurement_limits": [
+    "Import pairs are not a complete SCC analysis; use the full out graph for further decomposition.",
+    "Name/AST reachability and structural clones are candidates, not semantic or external-consumer proof.",
+    "No Docker/AppImage binaries built; deployment size/startup/memory remain #12. Installed dev environment is not a production footprint."
+  ],
+  "dependency_profiles": {
+    "server": "requirements-server.txt",
+    "development": "requirements-dev.txt",
+    "desktop": "requirements.txt",
+    "linux_py312_constraint": "requirements-linux-py312.lock",
+    "clean_server_site_packages_bytes": 267272911,
+    "server_smoke": "Uvicorn startup, HTTP health/setup and SIGTERM exit without Qt/webview",
+    "desktop_artifact": "not built; #12 remains open"
+  }
+}
