@@ -59,6 +59,7 @@ from plan_invariants import (  # leaf: the auditor's rules are the planner's
     chronic_after)
 import week_plan  # single owner of week/session state (lazy tp import inside)
 import workout_facts  # v3.2.0 watertight classifier — L1 facts layer (leaf module)
+from workout_facts import planned_power_np_fraction as _np_fraction_from_samples
 import week_view  # leaf: the one session type → exposure band table
 _LOG_ERROR_HOOK = None
 
@@ -4764,29 +4765,6 @@ def _classify_protocol(
         3: "Sweet Spot", 4: "VO2max", 5: "Anaerobic",
     }
     return protocol_map.get(dom_idx, "Mixed")
-
-
-def _np_fraction_from_samples(samples: "list[float]") -> float:
-    """Coggan NP as an FTP fraction over a 1 Hz planned-power series.
-
-    30-s simple rolling mean, full windows only (first value covers samples
-    [0, 30) — no zero-pad, no expanding mean), 4th-power mean, 4th root.
-    Matches ride_storage.compute_power_tss windowing exactly, so planned
-    library TSS and ridden TSS are in the same units (README documents the
-    NP formula; the pre-v3.5.0 parser computed RMS power instead).
-    Returns 0.0 for series shorter than one window (NP undefined).
-    """
-    n = len(samples)
-    if n < 30:
-        return 0.0
-    s = sum(samples[:30])
-    p4 = (s / 30.0) ** 4
-    count = 1
-    for i in range(30, n):
-        s += samples[i] - samples[i - 30]
-        p4 += (s / 30.0) ** 4
-        count += 1
-    return (p4 / count) ** 0.25
 
 
 def load_workout_library() -> list[dict]:

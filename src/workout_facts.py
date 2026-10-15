@@ -58,6 +58,25 @@ from pathlib import Path
 
 log = logging.getLogger("workout_facts")
 
+def planned_power_np_fraction(samples: list[float]) -> float:
+    """Coggan NP for 1 Hz power fractions, using complete 30-second windows.
+
+    Shorter series return zero. Callers supply planned power samples; the
+    classifier's separate variant filters FreeRide sentinels before computing.
+    """
+    n = len(samples)
+    if n < 30:
+        return 0.0
+    s = sum(samples[:30])
+    p4 = (s / 30.0) ** 4
+    count = 1
+    for i in range(30, n):
+        s += samples[i] - samples[i - 30]
+        p4 += (s / 30.0) ** 4
+        count += 1
+    return (p4 / count) ** 0.25
+
+
 FACTS_FILENAME = ".workout_facts.json"
 # R4/R5 (2026-07-07): v2 adds t101/l101 (sustained supra-FTP run metrics for
 # the SS/tempo D3 ceiling). Version mismatch drops the WHOLE cache file
