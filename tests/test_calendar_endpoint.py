@@ -17,15 +17,49 @@ from __future__ import annotations
 
 import json
 import tempfile
+import time
 import unittest
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
+
 from fastapi.testclient import TestClient
 
 import app as app_module
 import training_planner as tp
+
+
+@pytest.mark.parametrize('zone,expected_date', [
+    ('UTC', '2026-10-12'), ('Pacific/Honolulu', '2026-10-11'),
+])
+def test_planless_calendar_indexes_utc_ride_on_local_day_and_week(
+        tmp_path, monkeypatch, freeze_clock, zone, expected_date):
+    freeze_clock(datetime(2026, 10, 15, 12, tzinfo=timezone.utc))
+    ride = {
+        'id': 'boundary', 'ride_id': 'boundary', 'source': 'json',
+        'started_at': '2026-10-12T03:00:00Z',
+        'summary': {'duration_sec': 3600, 'tss': 50, 'avg_power': 180},
+    }
+    try:
+        with monkeypatch.context() as mp:
+            mp.setenv('TZ', zone)
+            time.tzset()
+            mp.setattr(tp, 'PLAN_DIR', tmp_path)
+            mp.setattr(app_module, '_load_all_rides_safe', lambda: [ride])
+            mp.setattr(app_module, '_kick_lazy_icu_sync', lambda **kw: False)
+            with patch('ride_storage.list_rides', return_value=[]), \
+                 patch('ride_storage.get_ride', return_value=ride):
+                response = TestClient(app_module.app).get('/api/calendar')
+            assert response.status_code == 200
+            actuals = [day for week in response.json()['weeks'] for day in week['days']
+                       if day.get('actual')]
+            assert len(actuals) == 1
+            assert actuals[0]['date'] == expected_date
+            assert actuals[0]['actual']['tss'] == 50
+    finally:
+        time.tzset()
 
 
 def _mk_plan_dict(monday: date, weeks_count: int = 2) -> dict:
@@ -173,7 +207,7 @@ class TestCalendarEndpoint(CalendarBase):
         ride_d = (date.today() - timedelta(days=3)).isoformat()
         ride = {
             "id": "ride_x", "ride_id": "ride_x", "source": "json",
-            "started_at": f"{ride_d}T08:00:00+00:00",
+            "started_at": datetime.fromisoformat(f"{ride_d}T08:00:00").astimezone().isoformat(),
             "summary": {"duration_sec": 3600, "tss": 50, "avg_power": 180,
                         "decoupling_pct": 3.5},
             "zones": {"power": {"Z1": 300, "Z2": 2700, "Z3": 600, "Z4": 0,
