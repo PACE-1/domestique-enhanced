@@ -28,17 +28,17 @@ CI. No Rust is introduced.
 ## Evidence
 
 The initial deletion batch produced identical isolated planner fingerprints
-for 49 builder + 80 owner0 + 80 owner1 cases (209 total), before the separate
-intensity-window behavior fix. Both serialized results had SHA-256:
+for 49 builder + 80 owner0 + 80 owner1 cases (209 total), before and after the separate
+intensity-window behavior fix, and after shared-metric consolidation (#32).
+All serialized results had SHA-256:
 
 `352a8b461bcff8fc1b6bec902e6eeef89b98e49483686f2150a3a8aebbbfb4fe`.
 
 Runs used separate copies of tracked workout files so suite-generated
 workouts could not contaminate the comparison. The tracked characterization
 golden already differs in one owner0 case on pre-cleanup code. It was not
-edited or blessed. A further isolated comparison across the timezone behavior
-fix is being recorded separately; it must not be represented as part of a
-behavior-neutral deletion.
+edited or blessed. The timezone fix was checked separately from the
+behavior-neutral deletion; these 209 cases remain unchanged across both.
 
 Current focused verification:
 
@@ -71,16 +71,25 @@ reduction, with the separate timezone fix accounting for the other line.
 
 ## Full gate and remaining work
 
-The final full gate is in progress. Its logs/status are stored under
-`.git/verification/bloat-phase0.*` in this checkout so interruption does not
-lose the evidence:
+The final full gate passed at source commit `5a521cb5`:
+
+- Bulk: **3,924 passed**, 7 skipped, 20 expected failures, 13 non-strict
+  unexpected passes and 26 passed subtests in 546.03 seconds.
+- Serial: **3 passed**, 3,964 deselected in 1.54 seconds.
+- Status: `bulk=0`, `serial=0`, `exit=0`.
+
+The preceding run exposed a mocked-sync fixture's dependency on cached
+credential configuration. The correction supplies synthetic config explicitly
+and asserts successful sync while preserving the exact database-row assertion;
+all 22 sync/account checks passed before the successful full rerun.
+Logs/status are stored under `.git/verification/bloat-phase0-verified.*`:
 
 ```sh
 GATE_OUT="$PWD/.git/verification" GATE_WORKERS=4 GATE_RERUN_FAILURES=0 \
-  bash tools/gate.sh "$PWD" bloat-phase0
+  bash tools/gate.sh "$PWD" bloat-phase0-verified
 ```
 
-Do not infer a passing full suite from focused results. The earlier run exposed
+The initial run exposed
 an incorrect permanent override in the first sandbox implementation; that was
 corrected, and all 155 affected profile/account checks then passed. Subsequent
 calendar/negative-offset failures reproduced on untouched `11cc77cb` and are
