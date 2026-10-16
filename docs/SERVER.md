@@ -38,12 +38,38 @@ private network only. The app serves plain HTTP. Uvicorn trusts forwarding
 headers only from `127.0.0.1` unless `FORWARDED_ALLOW_IPS` is set; keep it that
 way unless the proxy is on another host. Run exactly one worker.
 
+## Behind an OIDC proxy (Pocket ID)
+
+The app has one shared token and no OIDC client of its own. To put Pocket ID (or
+any OIDC provider) in front, let the proxy do the sign-in and have it add the
+token to every request it forwards. The rider signs in at the proxy; the app
+sees only the proxy's bearer token. Identity headers such as `X-Forwarded-User`
+are ignored on purpose, so a request that reaches the app without the token is
+refused (`tests/test_access_control.py`).
+
+```caddy
+train.example.com {
+    forward_auth pocket-id:1411 {   # or oauth2-proxy; sign-in happens here
+        uri /api/auth/verify
+    }
+    reverse_proxy domestique:22400 {
+        header_up Authorization "Bearer {env.DOMESTIQUE_ACCESS_TOKEN}"
+    }
+}
+```
+
+Keep the app reachable only from the proxy (private network or loopback), and
+list the public origin in `DOMESTIQUE_TRUSTED_ORIGINS`. The Caddy block shows the
+shape; the forward-auth endpoint is your provider's, and it has not been run
+against a live Pocket ID here.
+
 ## intervals.icu sign-in from a remote browser
 
 The OAuth callback is a loopback URL (`ICU_OAUTH_REDIRECT_URI`). A browser on
 another machine would be redirected to its own loopback and the sign-in would
-fail. This has **not** been verified against intervals.icu with any other
-redirect address, so no remote callback is claimed. Supported options:
+fail. A non-loopback redirect needs to be registered on the intervals.icu OAuth
+client, which belongs to upstream and is not ours to change; that waits for the
+fork's own client (#16). No remote callback is claimed. Supported options:
 
 1. Forward the port (`ssh -L 22400:127.0.0.1:22400 server`) and open
    `http://127.0.0.1:22400` on the machine you sign in from.
