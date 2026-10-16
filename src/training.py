@@ -396,51 +396,21 @@ def fetch_activities(days: int = 14) -> list[dict]:
     return sorted(data, key=lambda r: r.get("start_date_local", ""))
 
 
-def fetch_recent_activities(
-    athlete_id: str | None = None,
-    api_key: str | None = None,
-    days: int = 90,
-) -> list[dict]:
+def fetch_recent_activities(days: int = 90) -> list[dict]:
     """v4.4.0 — pull the last `days` of activities for the local rides store.
 
-    Thin wrapper around :func:`fetch_activities` with explicit (athlete_id,
-    api_key) overrides so the calendar-sync code in app.py can use credentials
-    coming from a profile config file rather than the module-level constants
-    set at boot. When called with no overrides falls back to the configured
-    credentials.
+    Thin wrapper around :func:`fetch_activities`. Credentials come from the
+    active profile via ``config``; nothing swaps them per call (an earlier
+    athlete_id/api_key override rewrote module globals and no caller used it).
 
     Returns [] when credentials are missing (graceful degradation, same as
     fetch_activities). Raises ICU{Auth,RateLimit,Server,Network}Error on
     persistent failures so the caller can decide whether to disable sync.
     """
-    if athlete_id and api_key:
-        # Temporarily swap config so _get builds the right URL + auth header.
-        # v4.5.2 FIX-CREDS-HOTRELOAD: ``del`` in finally instead of restoring
-        # ``prev_id`` — config.ICU_* are normally resolved dynamically via
-        # ``config.__getattr__`` against ProfileManager._env, but assigning a
-        # module-level attribute here would shadow __getattr__ forever after,
-        # making subsequent in-memory cred refreshes invisible to readers.
-        config.ICU_ATHLETE_ID = athlete_id
-        config.ICU_API_KEY = api_key
-        try:
-            return fetch_activities(days=days)
-        finally:
-            try:
-                del config.ICU_ATHLETE_ID
-            except AttributeError:
-                pass
-            try:
-                del config.ICU_API_KEY
-            except AttributeError:
-                pass
     return fetch_activities(days=days)
 
 
-def fetch_recent_wellness(
-    athlete_id: str | None = None,
-    api_key: str | None = None,
-    days: int = 90,
-) -> list[dict]:
+def fetch_recent_wellness(days: int = 90) -> list[dict]:
     """v4.5.0 — pull the last `days` of wellness records for the local store.
 
     Mirrors :func:`fetch_recent_activities` for the wellness endpoint.
@@ -451,22 +421,6 @@ def fetch_recent_wellness(
     Network}Error on persistent failures so the caller can decide whether to
     disable sync.
     """
-    if athlete_id and api_key:
-        # See fetch_recent_activities above for the ``del``-instead-of-restore
-        # rationale (v4.5.2 FIX-CREDS-HOTRELOAD).
-        config.ICU_ATHLETE_ID = athlete_id
-        config.ICU_API_KEY = api_key
-        try:
-            return fetch_wellness(days=days)
-        finally:
-            try:
-                del config.ICU_ATHLETE_ID
-            except AttributeError:
-                pass
-            try:
-                del config.ICU_API_KEY
-            except AttributeError:
-                pass
     return fetch_wellness(days=days)
 
 
