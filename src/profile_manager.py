@@ -766,6 +766,8 @@ class ProfileManager:
         # mutated by an earlier switch (that's the bug).
         training_planner.WORKOUT_DIR = Path(training_planner.__file__).parent / "workouts"
         training_planner.EXTRA_WORKOUT_DIR = training_planner.extra_workout_dir_for(wp_dir)
+        # #15: generated workouts belong to the profile, not to the bundle.
+        training_planner.GENERATED_WORKOUT_DIR = self.active_dir / "generated_workouts"
 
     def on_switch(self, callback: Callable) -> None:
         """Register a callback for profile switches."""

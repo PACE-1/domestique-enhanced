@@ -120,6 +120,12 @@ WORKOUT_DIR = _BUNDLED_WORKOUT_DIR
 # replacing it (a replacement folder lacked every workout shipped later, e.g.
 # the CP test). None = built-in only. Set per profile, like WORKOUT_DIR.
 EXTRA_WORKOUT_DIR: "Path | None" = None
+# #15: workouts the planner synthesises (workout_gen) are written here, in the
+# active profile's own writable data, never into the built-in library, which
+# stays immutable (a read-only Docker image or AppImage squashfs). They resolve
+# for export and facts by file name but are not part of the browsable library.
+# None (no profile yet, tests) falls back to the built-in folder as before.
+GENERATED_WORKOUT_DIR: "Path | None" = None
 
 
 def is_builtin_library(path) -> bool:
@@ -4805,6 +4811,10 @@ def _facts_dir_for(fname: str) -> Path:
                 return Path(extra)
         elif not (WORKOUT_DIR / fname).is_file() and (Path(extra) / fname).is_file():
             return Path(extra)
+    gen = GENERATED_WORKOUT_DIR
+    if gen is not None and fname and not (WORKOUT_DIR / fname).is_file() \
+            and (Path(gen) / fname).is_file():
+        return Path(gen)
     return WORKOUT_DIR
 
 
@@ -7973,7 +7983,8 @@ def sample_week_workouts(ctx: "week_plan.WeekContext", state: "week_plan.PlanSta
                             if abs(_cand_min - _share) < abs(_pick_got - _share):
                                 _row = _wg.generate_row(
                                     _stype, max_min, _share,
-                                    WORKOUT_DIR, _zwo_scanner())
+                                    GENERATED_WORKOUT_DIR or WORKOUT_DIR,
+                                    _zwo_scanner())
                     except Exception as _e:      # never let this break a plan
                         log.debug(f"workout generation skipped: {_e}")
                         _row = None
