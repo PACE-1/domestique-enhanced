@@ -1,5 +1,9 @@
 # Homebrew Cask formula for Domestique.
 #
+# NOTE (fork): this cask describes the upstream project's v3.13.1 DMG. The
+# Domestique Enhanced fork publishes no macOS build yet, so do not treat it as
+# the fork's release channel. Packaging identity is tracked in roadmap #16.
+#
 # This file is the canonical Cask source. To distribute via Homebrew, copy
 # this into a separate tap repository (e.g. `platypus45/homebrew-tap` →
 # `Casks/domestique.rb`) and bump `version` + `sha256` on every release.
