@@ -896,6 +896,35 @@ async def origin_check(request, call_next):
     return await call_next(request)
 
 
+# ── Profile switch gate (#5) ─────────────────────────────────────────────────
+# A switch never overtakes an in-flight write, and every response says which
+# profile served it. See switch_gate.py. Registered before the access gate, so
+# it runs after it: unauthenticated requests never take a slot.
+@app.middleware("http")
+async def _switch_gate(request, call_next):
+    import switch_gate as _sg
+    write = request.method in _sg.WRITE_METHODS
+    try:
+        if request.url.path == _sg.SWITCH_PATH and write:
+            async with _sg.gate.exclusive():
+                resp = await call_next(request)
+        elif write:
+            async with _sg.gate.shared():
+                resp = await call_next(request)
+        else:
+            resp = await call_next(request)
+    except _sg.Busy as e:
+        return StarletteJSONResponse({"error": str(e)}, status_code=503, headers={"Retry-After": "2"})
+    try:
+        from profile_manager import ProfileManager as _PM
+        _pid = _PM.get().active_id
+        if _pid:
+            resp.headers["X-Profile-Id"] = str(_pid)
+    except Exception:
+        pass
+    return resp
+
+
 # ── Access gate (server deployments, #13) ────────────────────────────────────
 # No-op unless DOMESTIQUE_ACCESS_TOKEN is set. Registered after origin_check,
 # so it runs first: an unauthenticated request never reaches any handler.
