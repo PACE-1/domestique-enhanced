@@ -3233,7 +3233,7 @@ def _rider_stats_season_block(rides: list, start_iso: str, end_iso: str) -> dict
             "distance_km": round(dist), "hr_loads": hr_loads}
 
 
-@app.get("/api/rider-stats")
+@app.get("/api/rider-stats", responses={200: {"model": api_models.RiderStats}})
 def api_rider_stats():
     """P2.4 — read-only stats grid for the top of the Analysis tab."""
     out: dict = {"errors": []}
@@ -11097,7 +11097,7 @@ async def _heal_after_plan_writes(request, call_next):
     return response
 
 
-@app.get("/api/plan")
+@app.get("/api/plan", responses={200: {"model": api_models.PlanRead}})
 def api_plan():
     # Try structured JSON first
     json_path = _plan_dir() / "current_plan.json"
@@ -20135,7 +20135,7 @@ def _build_programme_summary(plan: dict) -> dict:
         ctl_end_val=ctl_end, log_rows=log_rows)
 
 
-@app.get("/api/programme/summary")
+@app.get("/api/programme/summary", responses={200: {"model": api_models.ProgrammeSummary}})
 def api_programme_summary(plan_id: str = Query("current")):
     """v4.6.7 IMPL-SUM — end-of-plan recap as structured JSON.
 

@@ -6,7 +6,7 @@ import { defineConfig } from "vitest/config"
 // https://vite.dev/config/
 export default defineConfig({
   base: "/v2/",
-  test: { environment: "jsdom", globals: false },
+  test: { environment: "jsdom", globals: false, exclude: ["e2e/**", "node_modules/**"] },
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
