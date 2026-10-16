@@ -750,6 +750,16 @@ async def lifespan(app):
                 db.stop_sync()
         except Exception as e:
             log.debug(f"db.stop_sync failed: {e}")
+        # #17: ask every registered job to stop and wait up to the budget
+        # (default 8 s, inside Docker's 10 s stop timeout).
+        try:
+            import jobs as _jobs
+            _budget = float(os.environ.get("DOMESTIQUE_SHUTDOWN_BUDGET_S", "8") or 8)
+            _rep = _jobs.shutdown(_budget)
+            if _rep["still_running"]:
+                log.warning("shutdown budget exhausted; still running: %s", _rep["still_running"])
+        except Exception as e:
+            log.debug(f"jobs.shutdown failed: {e}")
 
 app = FastAPI(title="Domestique", version=_VERSION, lifespan=lifespan)
 
@@ -2271,7 +2281,8 @@ def _kick_power_curve_backfill(pid, window_days: int, n_missing: int) -> dict:
             finally:
                 with _pc_backfill_running_lock:
                     _pc_backfill_running.discard(key)
-        threading.Thread(target=_work, daemon=True, name="pc-backfill").start()
+        import jobs as _jobs
+        _jobs.start_thread(_work, name="pc-backfill")
     try:
         n_win, n_miss = power_curve.count_rides_missing_efforts(int(window_days))
         pct = round(100 * (n_win - n_miss) / n_win) if n_win else 0
@@ -2378,8 +2389,8 @@ def api_profile_backfill_history():
             "already_cached": 0,
             "failed": 0,
         }
-    t = threading.Thread(target=_run_backfill_job, args=(task_id,), daemon=True)
-    t.start()
+    import jobs as _jobs
+    _jobs.start_thread(_run_backfill_job, args=(task_id,), name="backfill-history")
     return {"status": "started", "task_id": task_id}
 
 
@@ -2433,6 +2444,13 @@ _dfa_backfill_tasks: dict[str, dict] = {}
 _dfa_backfill_thread_lock = threading.Lock()
 _dfa_backfill_lock = threading.Lock()  # single-flight gate
 _dfa_backfill_cancel: set[str] = set()  # task IDs the user asked to cancel
+import jobs as _jobs_mod
+_DFA_AUGMENT_SLOT = _jobs_mod.Slot()
+
+
+def _jobs_stopping() -> bool:
+    import jobs
+    return jobs.stopping()
 
 
 def _run_dfa_backfill_job(task_id: str, force: bool = False,
@@ -2533,7 +2551,7 @@ def _run_dfa_backfill_job(task_id: str, force: bool = False,
     augmented = 0
     try:
         for p, ext in candidates:
-            if task_id in _dfa_backfill_cancel:
+            if task_id in _dfa_backfill_cancel or _jobs_stopping():
                 with _dfa_backfill_thread_lock:
                     e = dict(_dfa_backfill_tasks.get(task_id) or {})
                     e["state"] = "cancelled"
@@ -2625,12 +2643,13 @@ def api_profile_dfa_backfill(force: int = Query(0), migrate: int = Query(0)):
             "augmented": 0, "computed": 0, "no_rr_data": 0,
             "icu_deleted": 0, "failed": 0,
         }
-    t = threading.Thread(
-        target=_run_dfa_backfill_job,
+    import jobs as _jobs
+    _jobs.start_thread(
+        _run_dfa_backfill_job,
         args=(task_id, bool(int(force or 0)), bool(int(migrate or 0))),
-        daemon=True,
+        name="dfa-backfill",
+        cancel=lambda: _dfa_backfill_cancel.add(task_id),
     )
-    t.start()
     return {"status": "started", "task_id": task_id}
 
 
@@ -2808,12 +2827,9 @@ def api_profile_fatigue_resistance(window_days: int = Query(365, ge=1, le=3650),
                             "already_cached": 0,
                             "failed": 0,
                         }
-                    t = threading.Thread(
-                        target=_run_backfill_job,
-                        args=(task_id,),
-                        daemon=True,
-                    )
-                    t.start()
+                    import jobs as _jobs
+                    _jobs.start_thread(_run_backfill_job, args=(task_id,),
+                                       name="backfill-history")
                     auto_triggered = True
                     _log.info(
                         "fatigue_resistance: auto-triggered backfill "
@@ -18075,7 +18091,6 @@ def _augment_icu_record_with_dfa(rec_path: Path, external_id: str,
     import json as _json
     import tempfile as _tempfile
     import os as _os
-    import concurrent.futures as _futures
 
     try:
         rec = _json.loads(rec_path.read_text(encoding="utf-8"))
@@ -18210,27 +18225,21 @@ def _augment_icu_record_with_dfa(rec_path: Path, external_id: str,
     _cap = (_DFA_AUGMENT_RETRY_TIMEOUT_S
             if (not force and existing_status == "timeout")
             else _DFA_AUGMENT_TIMEOUT_S)
-    # NOTE: do NOT use ``with ThreadPoolExecutor(...)`` — its ``__exit__``
-    # calls ``shutdown(wait=True)`` which would block until the worker
-    # finishes, defeating the timeout entirely. Construct with daemon-style
-    # threads (default since Python 3.9 is non-daemon, so call
-    # ``shutdown(wait=False, cancel_futures=True)`` explicitly and let the
-    # worker thread continue running in the background; it lives on the
-    # ICU-sync daemon thread anyway, so it dies at process exit).
-    _ex = _futures.ThreadPoolExecutor(max_workers=1, thread_name_prefix="dfa_augment")
-    try:
-        fut = _ex.submit(_fetch_and_compute)
-        try:
-            dfa = fut.result(timeout=_cap)
-        except _futures.TimeoutError:
-            timed_out = True
-            fut.cancel()
-            _log.debug(
-                f"_augment_icu_record_with_dfa({external_id}) "
-                f"timed out after {_cap}s"
-            )
-    finally:
-        _ex.shutdown(wait=False, cancel_futures=True)
+    # #17: run the compute on a daemon thread under a one-computation slot. A
+    # timeout only abandons the wait: the computation itself cannot be
+    # interrupted, so it keeps the slot until it ends (at most one leaked
+    # computation, never a pile) and, being a daemon, cannot hold up exit.
+    _state, _value = _DFA_AUGMENT_SLOT.run(
+        _fetch_and_compute, _cap, name="dfa_augment")
+    if _state == "ok":
+        dfa = _value
+    elif _state == "error":
+        _log.debug(f"_augment_icu_record_with_dfa({external_id}) failed: {_value}")
+    else:   # "timeout" or "busy": an earlier computation still holds the slot
+        timed_out = True
+        _log.debug(
+            f"_augment_icu_record_with_dfa({external_id}) {_state} after {_cap}s"
+        )
 
     if timed_out:
         rec["dfa_alpha1_status"] = "timeout"
@@ -18391,6 +18400,9 @@ def _sync_icu_activities_locked(force: bool = False) -> dict:
             # the calendar. Removing this filter altogether would be safer; we
             # err on the side of inclusive.
             pass
+        if _jobs_stopping():
+            _log.info("_sync_icu_activities: stopped by shutdown")
+            break
         ext = a.get("id") or a.get("activity_id")
         if not ext:
             _set_sync_progress(done=_idx, added=added, updated=updated)
@@ -18891,11 +18903,8 @@ def _kick_lazy_icu_sync(force_if_today_missing: bool = False) -> bool:
                 except Exception as e:
                     _log.debug(f"_kick_lazy_icu_sync: slow-warn log swallowed: {e}")
 
-    threading.Thread(
-        target=_runner,
-        name="domestique.icu_sync",
-        daemon=True,
-    ).start()
+    import jobs as _jobs
+    _jobs.start_thread(_runner, name="domestique.icu_sync")
     return True
 
 
