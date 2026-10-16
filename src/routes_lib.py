@@ -34,17 +34,6 @@ def _slugify_route_name(name: str) -> str:
     """Slugify a route name using the same rule as generate_route_profiles.py."""
     return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
-def _route_key_for(world_slug: str, crs_filename: str) -> tuple[str, str]:
-    """Derive (slug, route_key) for a route based on its CRS filename.
-
-    Mirrors the logic in generate_route_profiles.py so the key matches what was
-    written to profiles_indexed.json and profiles/<world>__<slug>.json.
-    """
-    stem = crs_filename[:-4] if crs_filename.lower().endswith(".crs") else crs_filename
-    # Virtual-world routes embed "<world>__<slug>" in the filename; real-world
-    # routes slugify the whole filename.
-    slug = stem.split("__", 1)[1] if "__" in stem else _slugify_route_name(stem)
-    return slug, f"{world_slug}/{slug}"
 
 _ROUTES_CACHE: list[dict] = []
 _ROUTES_INDEX: dict = {}

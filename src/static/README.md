@@ -19,7 +19,7 @@ The whole folder ships into the PyInstaller bundle via
 | `apple-touch-icon.png` | iOS home-screen icon — `dashboard.html` adds it. |
 | `icon.svg` | Vector icon source. |
 | `js/smooth-display.js` | Scroll/animation helper. Loaded explicitly by templates that need it. |
-| `vendor/html2canvas.min.js` | Bundled third-party library for client-side PNG export of the finished-programme summary. |
+| `vendor/chart.umd.min.js` | Chart.js, used by the current dashboard's charts. |
 
 ## Path case sensitivity
 
