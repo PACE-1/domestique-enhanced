@@ -172,3 +172,12 @@ def test_upload_without_content_length_is_refused(client, tmp_path):
     r = asyncio.run(run())
     assert r.status_code == 411
     assert not list(client.rides.glob("*"))
+
+
+def test_a_parse_that_never_ends_is_abandoned_and_not_listed(client, tmp_path, monkeypatch):
+    import time
+    monkeypatch.setattr(app_module, "_FIT_PARSE_TIMEOUT_S", 0.2)
+    monkeypatch.setattr(app_module, "_parse_fit_stats", lambda p: time.sleep(1.0) or {})
+    r = _post(client, "slow.fit", _valid_fit(tmp_path))
+    assert r.status_code == 504
+    assert not list(client.rides.glob("*.fit"))
