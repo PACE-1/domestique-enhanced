@@ -48,6 +48,14 @@ On first launch after a version bump you'll see a one-off toast naming the fromâ
 
 ---
 
+## If an upgrade is interrupted
+
+The legacy-to-profiles migration copies files into `profiles/default/`, writes `profiles.json` last, and deletes the originals only after the registry reads back correctly. `tests/test_migration_interruption.py` kills it while copying, while writing the registry, before cleanup and mid-archive, and checks that the next start finishes the job with no ride, plan or credential file lost. A half-written copy is replaced from the source, which is still present until its move completes.
+
+Take a backup before upgrading real data (`python -m backup create`, see `docs/DATA.md`). Restoring a backup made by a newer data format is refused, so rolling back never silently rewrites newer data.
+
+---
+
 ## Rolling back
 
 Install the older DMG (or older Windows installer). Data still works because schema changes are additive: new columns are ignored by older code, unknown JSON fields are skipped.

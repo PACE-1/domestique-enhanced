@@ -15,6 +15,10 @@ on:
         description: "Tag to attach artifacts to (e.g. v2.0.0). Leave blank to just build."
         required: false
         default: ""
+      linux_only:
+        description: "Build only the Linux AppImage (skips the Windows job)."
+        type: boolean
+        default: false
 
 permissions:
   contents: write  # needed to upload to releases
@@ -103,6 +107,7 @@ jobs:
   # ───────────────────────────────────────────────────────────────────
   build-windows:
     name: Build Windows EXE
+    if: ${{ !inputs.linux_only }}
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -599,7 +604,13 @@ jobs:
           ICU_OAUTH_CLIENT_SECRET: ${{ secrets.ICU_OAUTH_CLIENT_SECRET }}
         run: |
           if [ -z "${ICU_OAUTH_CLIENT_SECRET}" ]; then
-            echo "::error::ICU_OAUTH_CLIENT_SECRET repo secret is not set — OAuth would ship broken."; exit 1
+            # A release must never ship a placeholder. A plain build (manual
+            # run without a tag) only proves the artifact, so it may.
+            if [ "${GITHUB_REF_TYPE}" = "tag" ] || [ -n "${{ inputs.tag }}" ]; then
+              echo "::error::ICU_OAUTH_CLIENT_SECRET repo secret is not set — OAuth would ship broken."; exit 1
+            fi
+            echo "::warning::ICU_OAUTH_CLIENT_SECRET is not set — building with a placeholder; this artifact must not be released."
+            ICU_OAUTH_CLIENT_SECRET="ci-placeholder-not-a-real-secret"
           fi
           printf 'ICU_OAUTH_CLIENT_ID=%s\nICU_OAUTH_CLIENT_SECRET=%s\n' \
             "${ICU_OAUTH_CLIENT_ID:-511}" "${ICU_OAUTH_CLIENT_SECRET}" > .oauth.env

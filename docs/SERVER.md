@@ -112,3 +112,27 @@ run reconciles against what intervals.icu now holds.
 HRV CSV at 5 MB. A request must declare its `Content-Length` (411 otherwise)
 and is refused before it is read when the declared size is over the limit. A
 reverse proxy should still set its own body limit.
+
+## Linux AppImage (#12)
+
+The AppImage bundles the same Python core and the Qt/PySide6 webview launcher
+(`packaging/build_linux.sh`, `packaging/domestique.spec`). It is built inside
+`ubuntu:22.04`, so the supported baseline is glibc 2.35 (Ubuntu 22.04 and
+newer); the build fails if any bundled binary needs newer symbols.
+
+Verified on 2026-10-16 for version 3.13.1:
+
+- Local build in `ubuntu:22.04`: 264 MB artifact, native window mapped under
+  Xvfb, `/api/version` correct, bundled library of 4,308 workouts intact,
+  screenshot rendered.
+- GitHub Actions, `release.yml` run with `linux_only=true`: build and the
+  smoke test passed, and the AppImage then ran on a stock `debian:12-slim` with
+  only the derived host packages installed (`verify-linux-clean-container`).
+
+A run without a tag uses a placeholder OAuth secret, so intervals.icu sign-in
+does not work in that artifact and it must not be released. A tag push or a run
+with a tag still fails when `ICU_OAUTH_CLIENT_SECRET` is unset.
+
+Not verified: a real desktop session (Wayland, GPU), distributions other than
+Ubuntu 22.04 and Debian 12, and the new `/v2` interface inside the AppImage.
+The AppImage runs as one user; it does not use the server access token.
