@@ -4489,6 +4489,74 @@ async def api_plan_auto_adjust(request: Request):
     }
 
 
+# ── Bounded uploads (#18) ────────────────────────────────────────────────────
+# Reading an upload with a bare ``await f.read()`` allocates whatever the
+# client sends before any size policy runs. These helpers stop reading at the
+# limit and validate the content type before anything is persisted. Starlette
+# has already spooled the multipart body to temporary storage by the time a
+# handler runs, so the middleware below also rejects an oversized declared
+# Content-Length before that happens. A proxy limit is a second layer, not a
+# substitute.
+_MAX_FIT_BYTES = 50 * 1024 * 1024
+_MAX_HRV_CSV_BYTES = 5 * 1024 * 1024
+_UPLOAD_CHUNK = 1024 * 1024
+# route path -> largest request body we accept (limit + multipart overhead)
+_UPLOAD_BODY_LIMITS = {
+    "/api/ride/import": _MAX_FIT_BYTES + 1024 * 1024,
+    "/api/wellness/import-hrv4training": _MAX_HRV_CSV_BYTES + 1024 * 1024,
+}
+
+
+async def _read_upload_limited(upload: UploadFile, limit: int, what: str) -> bytes:
+    """Read ``upload`` in chunks; 413 as soon as it exceeds ``limit`` bytes."""
+    buf = bytearray()
+    while True:
+        chunk = await upload.read(_UPLOAD_CHUNK)
+        if not chunk:
+            break
+        buf += chunk
+        if len(buf) > limit:
+            raise HTTPException(
+                status_code=413,
+                detail=f"{what} too large (>{limit // (1024 * 1024)} MB)")
+    return bytes(buf)
+
+
+def _fit_payload(data: bytes) -> bytes:
+    """The FIT bytes of an upload: gunzip when gzipped (bounded), then check
+    the header signature. Raises 400/413 with a reason a rider can act on."""
+    import zlib
+    if data[:2] == b"\x1f\x8b":
+        d = zlib.decompressobj(16 + zlib.MAX_WBITS)
+        try:
+            data = d.decompress(data, _MAX_FIT_BYTES + 1)
+        except zlib.error:
+            raise HTTPException(status_code=400, detail="corrupt gzip file")
+        if len(data) > _MAX_FIT_BYTES or d.unconsumed_tail:
+            raise HTTPException(status_code=413, detail="file too large (>50 MB)")
+    if len(data) < 32:
+        raise HTTPException(status_code=400, detail="file too small to be a FIT")
+    # FIT header: byte 0 = header size (12 or 14), bytes 8..11 = ".FIT".
+    if data[8:12] != b".FIT":
+        raise HTTPException(status_code=400, detail="not a FIT file (bad header)")
+    return data
+
+
+@app.middleware("http")
+async def _upload_size_guard(request, call_next):
+    limit = _UPLOAD_BODY_LIMITS.get(request.url.path)
+    if limit is not None and request.method == "POST":
+        try:
+            declared = int(request.headers.get("content-length") or 0)
+        except ValueError:
+            declared = 0
+        if declared > limit:
+            return StarletteJSONResponse(
+                {"error": f"upload too large (>{limit // (1024 * 1024)} MB)"},
+                status_code=413)
+    return await call_next(request)
+
+
 @app.post("/api/wellness/import-hrv4training")
 async def api_wellness_import_hrv4training(file: UploadFile = File(...)):
     """v1.1.0 IMPL-HRV-RECOVERY — HRV4Training CSV import (PATCH G16).
@@ -4501,7 +4569,7 @@ async def api_wellness_import_hrv4training(file: UploadFile = File(...)):
     Returns {"imported": int, "skipped": int}.
     """
     import csv as _csv
-    raw = await file.read()
+    raw = await _read_upload_limited(file, _MAX_HRV_CSV_BYTES, "HRV CSV")
     try:
         text = raw.decode("utf-8-sig")  # tolerates BOM
     except UnicodeDecodeError:
@@ -17531,14 +17599,9 @@ async def api_ride_import(
     if not (lower.endswith(".fit") or lower.endswith(".gz")):
         raise HTTPException(status_code=400, detail="file must have .fit extension")
 
-    data = await fit_file.read()
-    # Rough upper bound -- rides longer than ~24h would blow past this;
-    # 50 MB covers every real-world case. Reject anything larger so we
-    # do not silently consume disk on a bad upload.
-    if len(data) > 50 * 1024 * 1024:
-        raise HTTPException(status_code=413, detail="file too large (>50 MB)")
-    if len(data) < 32:
-        raise HTTPException(status_code=400, detail="file too small to be a FIT")
+    # Rides longer than ~24h would blow past 50 MB; it covers every real-world
+    # case. Reading stops at the limit instead of buffering the whole upload.
+    data = _fit_payload(await _read_upload_limited(fit_file, _MAX_FIT_BYTES, "file"))
 
     # Stable id: upload time in ISO form (filesystem-safe ":" replacement).
     now = clock.now(timezone.utc).astimezone()
@@ -17556,13 +17619,30 @@ async def api_ride_import(
             raise HTTPException(status_code=409, detail="id collision; try again")
     ride_id = fit_path.stem
 
+    # Write beside the target and rename, so a crash never leaves a half-written
+    # ride that the library would list.
+    tmp_path = fit_path.with_name(fit_path.name + ".part")
     try:
-        fit_path.write_bytes(data)
+        tmp_path.write_bytes(data)
+        os.replace(tmp_path, fit_path)
     except OSError as e:
         log_ride_import.exception(f"ride import write failed: {e}")
+        try:
+            tmp_path.unlink()
+        except OSError:
+            pass
         raise HTTPException(status_code=500, detail="failed to persist FIT")
 
     parsed = _parse_fit_stats(fit_path)
+    if parsed.get("error") == "parse_failed":
+        # Rejected data is never listed as a ride.
+        try:
+            fit_path.unlink()
+        except OSError:
+            pass
+        raise HTTPException(
+            status_code=422,
+            detail="could not read this FIT file: " + str(parsed.get("detail") or "parse failed"))
 
     # W4 (v2.5.0): compute + persist the load sidecar (tss + load_source)
     # at ingestion so load_all_rides / CTL / ATL / weekly-actual count this
