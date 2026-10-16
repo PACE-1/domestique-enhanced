@@ -20,6 +20,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_plan_api_plan_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/profile/dfa-backfill": {
         parameters: {
             query?: never;
@@ -127,6 +143,38 @@ export interface paths {
         put: operations["api_profiles_update_api_profiles__profile_id__put"];
         post?: never;
         delete: operations["api_profiles_delete_api_profiles__profile_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/programme/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_programme_summary_api_programme_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/rider-stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_rider_stats_api_rider_stats_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -393,6 +441,259 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** PlanGoal */
+        PlanGoal: {
+            /** Entry Mode */
+            entry_mode?: string | null;
+            /** Event Date */
+            event_date?: string | null;
+            /**
+             * Event Name
+             * @default
+             */
+            event_name: string;
+            /**
+             * Focus
+             * @default
+             */
+            focus: string;
+            /** Hours Per Week */
+            hours_per_week?: number | null;
+            /** Plan Weeks */
+            plan_weeks?: number | null;
+            /** Start Date */
+            start_date?: string | null;
+            /**
+             * Type
+             * @default
+             */
+            type: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** PlanJson */
+        PlanJson: {
+            /** Availability */
+            availability?: {
+                [key: string]: unknown;
+            } | null;
+            /** Ctl Snapshot */
+            ctl_snapshot?: {
+                [key: string]: unknown;
+            } | null;
+            /** Generated */
+            generated?: string | null;
+            /**
+             * @default {
+             *       "event_name": "",
+             *       "focus": "",
+             *       "type": ""
+             *     }
+             */
+            goal: components["schemas"]["PlanGoal"];
+            /**
+             * Phases
+             * @default []
+             */
+            phases: components["schemas"]["PlanPhase"][];
+            /**
+             * Weeks
+             * @default []
+             */
+            weeks: components["schemas"]["PlanWeek"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** PlanPhase */
+        PlanPhase: {
+            /**
+             * End
+             * @default
+             */
+            end: string;
+            /**
+             * Focus
+             * @default
+             */
+            focus: string;
+            /** Name */
+            name: string;
+            /**
+             * Start
+             * @default
+             */
+            start: string;
+            /** Weekly Tss */
+            weekly_tss?: number | null;
+            /**
+             * Weeks
+             * @default 0
+             */
+            weeks: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** PlanRead */
+        PlanRead: {
+            /**
+             * File
+             * @default
+             */
+            file: string;
+            /**
+             * Plan
+             * @default
+             */
+            plan: string;
+            plan_json: components["schemas"]["PlanJson"];
+        } & {
+            [key: string]: unknown;
+        };
+        /** PlanSession */
+        PlanSession: {
+            /**
+             * Adapted
+             * @default false
+             */
+            adapted: boolean;
+            /** Am Or Pm */
+            am_or_pm?: string | null;
+            /** Completion Matches */
+            completion_matches?: unknown[] | null;
+            /** Day */
+            day: string;
+            /**
+             * Day Name
+             * @default
+             */
+            day_name: string;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /**
+             * Dismissed At
+             * @default
+             */
+            dismissed_at: string;
+            /** Double Threshold Partner Id */
+            double_threshold_partner_id?: string | null;
+            /**
+             * Duration Min
+             * @default 0
+             */
+            duration_min: number;
+            /** Execution */
+            execution?: {
+                [key: string]: unknown;
+            } | null;
+            /** Hr Ceiling Pct */
+            hr_ceiling_pct?: number | null;
+            /**
+             * Is Double Threshold Pair
+             * @default false
+             */
+            is_double_threshold_pair: boolean;
+            /**
+             * Is Opener
+             * @default false
+             */
+            is_opener: boolean;
+            /**
+             * Is Race
+             * @default false
+             */
+            is_race: boolean;
+            /**
+             * Matched
+             * @default true
+             */
+            matched: boolean;
+            /**
+             * Moved From
+             * @default
+             */
+            moved_from: string;
+            /**
+             * Nutrition Note
+             * @default
+             */
+            nutrition_note: string;
+            /** Pmax Estimate */
+            pmax_estimate?: number | null;
+            /** Race */
+            race?: {
+                [key: string]: unknown;
+            } | null;
+            /** Session Type */
+            session_type: string;
+            /**
+             * Status
+             * @default pending
+             */
+            status: string;
+            /**
+             * Tss Estimate
+             * @default 0
+             */
+            tss_estimate: number;
+            /**
+             * User Moved
+             * @default false
+             */
+            user_moved: boolean;
+            /**
+             * User Swapped
+             * @default false
+             */
+            user_swapped: boolean;
+            /** Wprime Estimate */
+            wprime_estimate?: number | null;
+            /**
+             * Zwo File
+             * @default
+             */
+            zwo_file: string;
+            /**
+             * Zwo Name
+             * @default
+             */
+            zwo_name: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** PlanWeek */
+        PlanWeek: {
+            /** End */
+            end: string;
+            /**
+             * Is Stepback
+             * @default false
+             */
+            is_stepback: boolean;
+            /**
+             * Phase
+             * @default
+             */
+            phase: string;
+            /**
+             * Sessions
+             * @default []
+             */
+            sessions: components["schemas"]["PlanSession"][];
+            /** Start */
+            start: string;
+            /**
+             * Tss Target
+             * @default 0
+             */
+            tss_target: number;
+            /** Week Num */
+            week_num: number;
+        } & {
+            [key: string]: unknown;
+        };
         /** ProfileCreated */
         ProfileCreated: {
             /** Id */
@@ -456,6 +757,105 @@ export interface components {
              * @default []
              */
             profiles: components["schemas"]["ProfileEntry"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** ProgrammeSummary */
+        ProgrammeSummary: {
+            /**
+             * Citations
+             * @default []
+             */
+            citations: string[];
+            /**
+             * Compliance
+             * @default []
+             */
+            compliance: {
+                [key: string]: unknown;
+            }[];
+            /** Ctl Gain */
+            ctl_gain?: {
+                [key: string]: unknown;
+            } | null;
+            /** Eftp Delta */
+            eftp_delta?: {
+                [key: string]: unknown;
+            } | null;
+            /** End Date */
+            end_date?: string | null;
+            /** Ftp Delta */
+            ftp_delta?: {
+                [key: string]: unknown;
+            } | null;
+            /** Intensity Dist */
+            intensity_dist?: {
+                [key: string]: unknown;
+            } | null;
+            /** Plan Id */
+            plan_id?: string | null;
+            /** Pol Index */
+            pol_index?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Rides
+             * @default 0
+             */
+            rides: number;
+            /** Start Date */
+            start_date?: string | null;
+            /** Totals */
+            totals?: {
+                [key: string]: unknown;
+            } | null;
+            /** Vo2Max Delta */
+            vo2max_delta?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Weeks
+             * @default 0
+             */
+            weeks: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** RiderStats */
+        RiderStats: {
+            /** Body */
+            body?: {
+                [key: string]: unknown;
+            } | null;
+            /** Efficiency */
+            efficiency?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Errors
+             * @default []
+             */
+            errors: string[];
+            /** Heart */
+            heart?: {
+                [key: string]: unknown;
+            } | null;
+            /** Load */
+            load?: {
+                [key: string]: unknown;
+            } | null;
+            /** Peaks */
+            peaks?: {
+                [key: string]: unknown;
+            } | null;
+            /** Power */
+            power?: {
+                [key: string]: unknown;
+            } | null;
+            /** Season */
+            season?: {
+                [key: string]: unknown;
+            } | null;
         } & {
             [key: string]: unknown;
         };
@@ -529,6 +929,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["IcuConnection"];
+                };
+            };
+        };
+    };
+    api_plan_api_plan_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanRead"];
                 };
             };
         };
@@ -689,6 +1109,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Ok"];
+                };
+            };
+        };
+    };
+    api_programme_summary_api_programme_summary_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProgrammeSummary"];
+                };
+            };
+        };
+    };
+    api_rider_stats_api_rider_stats_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiderStats"];
                 };
             };
         };

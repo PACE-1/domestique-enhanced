@@ -595,6 +595,459 @@
         "title": "Ok",
         "type": "object"
       },
+      "PlanGoal": {
+        "additionalProperties": true,
+        "properties": {
+          "entry_mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entry Mode"
+          },
+          "event_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Date"
+          },
+          "event_name": {
+            "default": "",
+            "title": "Event Name",
+            "type": "string"
+          },
+          "focus": {
+            "default": "",
+            "title": "Focus",
+            "type": "string"
+          },
+          "hours_per_week": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hours Per Week"
+          },
+          "plan_weeks": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan Weeks"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "type": {
+            "default": "",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "title": "PlanGoal",
+        "type": "object"
+      },
+      "PlanJson": {
+        "additionalProperties": true,
+        "properties": {
+          "availability": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Availability"
+          },
+          "ctl_snapshot": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ctl Snapshot"
+          },
+          "generated": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Generated"
+          },
+          "goal": {
+            "$ref": "#/components/schemas/PlanGoal",
+            "default": {
+              "event_name": "",
+              "focus": "",
+              "type": ""
+            }
+          },
+          "phases": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PlanPhase"
+            },
+            "title": "Phases",
+            "type": "array"
+          },
+          "weeks": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PlanWeek"
+            },
+            "title": "Weeks",
+            "type": "array"
+          }
+        },
+        "title": "PlanJson",
+        "type": "object"
+      },
+      "PlanPhase": {
+        "additionalProperties": true,
+        "properties": {
+          "end": {
+            "default": "",
+            "title": "End",
+            "type": "string"
+          },
+          "focus": {
+            "default": "",
+            "title": "Focus",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "start": {
+            "default": "",
+            "title": "Start",
+            "type": "string"
+          },
+          "weekly_tss": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekly Tss"
+          },
+          "weeks": {
+            "default": 0,
+            "title": "Weeks",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "PlanPhase",
+        "type": "object"
+      },
+      "PlanRead": {
+        "additionalProperties": true,
+        "properties": {
+          "file": {
+            "default": "",
+            "title": "File",
+            "type": "string"
+          },
+          "plan": {
+            "default": "",
+            "title": "Plan",
+            "type": "string"
+          },
+          "plan_json": {
+            "$ref": "#/components/schemas/PlanJson"
+          }
+        },
+        "required": [
+          "plan_json"
+        ],
+        "title": "PlanRead",
+        "type": "object"
+      },
+      "PlanSession": {
+        "additionalProperties": true,
+        "properties": {
+          "adapted": {
+            "default": false,
+            "title": "Adapted",
+            "type": "boolean"
+          },
+          "am_or_pm": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Am Or Pm"
+          },
+          "completion_matches": {
+            "anyOf": [
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completion Matches"
+          },
+          "day": {
+            "title": "Day",
+            "type": "string"
+          },
+          "day_name": {
+            "default": "",
+            "title": "Day Name",
+            "type": "string"
+          },
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "dismissed_at": {
+            "default": "",
+            "title": "Dismissed At",
+            "type": "string"
+          },
+          "double_threshold_partner_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Double Threshold Partner Id"
+          },
+          "duration_min": {
+            "default": 0,
+            "title": "Duration Min",
+            "type": "integer"
+          },
+          "execution": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Execution"
+          },
+          "hr_ceiling_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hr Ceiling Pct"
+          },
+          "is_double_threshold_pair": {
+            "default": false,
+            "title": "Is Double Threshold Pair",
+            "type": "boolean"
+          },
+          "is_opener": {
+            "default": false,
+            "title": "Is Opener",
+            "type": "boolean"
+          },
+          "is_race": {
+            "default": false,
+            "title": "Is Race",
+            "type": "boolean"
+          },
+          "matched": {
+            "default": true,
+            "title": "Matched",
+            "type": "boolean"
+          },
+          "moved_from": {
+            "default": "",
+            "title": "Moved From",
+            "type": "string"
+          },
+          "nutrition_note": {
+            "default": "",
+            "title": "Nutrition Note",
+            "type": "string"
+          },
+          "pmax_estimate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pmax Estimate"
+          },
+          "race": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Race"
+          },
+          "session_type": {
+            "title": "Session Type",
+            "type": "string"
+          },
+          "status": {
+            "default": "pending",
+            "title": "Status",
+            "type": "string"
+          },
+          "tss_estimate": {
+            "default": 0,
+            "title": "Tss Estimate",
+            "type": "number"
+          },
+          "user_moved": {
+            "default": false,
+            "title": "User Moved",
+            "type": "boolean"
+          },
+          "user_swapped": {
+            "default": false,
+            "title": "User Swapped",
+            "type": "boolean"
+          },
+          "wprime_estimate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wprime Estimate"
+          },
+          "zwo_file": {
+            "default": "",
+            "title": "Zwo File",
+            "type": "string"
+          },
+          "zwo_name": {
+            "default": "",
+            "title": "Zwo Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "day",
+          "session_type"
+        ],
+        "title": "PlanSession",
+        "type": "object"
+      },
+      "PlanWeek": {
+        "additionalProperties": true,
+        "properties": {
+          "end": {
+            "title": "End",
+            "type": "string"
+          },
+          "is_stepback": {
+            "default": false,
+            "title": "Is Stepback",
+            "type": "boolean"
+          },
+          "phase": {
+            "default": "",
+            "title": "Phase",
+            "type": "string"
+          },
+          "sessions": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PlanSession"
+            },
+            "title": "Sessions",
+            "type": "array"
+          },
+          "start": {
+            "title": "Start",
+            "type": "string"
+          },
+          "tss_target": {
+            "default": 0,
+            "title": "Tss Target",
+            "type": "number"
+          },
+          "week_num": {
+            "title": "Week Num",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "week_num",
+          "start",
+          "end"
+        ],
+        "title": "PlanWeek",
+        "type": "object"
+      },
       "ProfileCreated": {
         "additionalProperties": true,
         "properties": {
@@ -781,6 +1234,256 @@
         "title": "ProfilesList",
         "type": "object"
       },
+      "ProgrammeSummary": {
+        "additionalProperties": true,
+        "properties": {
+          "citations": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Citations",
+            "type": "array"
+          },
+          "compliance": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Compliance",
+            "type": "array"
+          },
+          "ctl_gain": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ctl Gain"
+          },
+          "eftp_delta": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eftp Delta"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "ftp_delta": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp Delta"
+          },
+          "intensity_dist": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Intensity Dist"
+          },
+          "plan_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan Id"
+          },
+          "pol_index": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pol Index"
+          },
+          "rides": {
+            "default": 0,
+            "title": "Rides",
+            "type": "integer"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "totals": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Totals"
+          },
+          "vo2max_delta": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vo2Max Delta"
+          },
+          "weeks": {
+            "default": 0,
+            "title": "Weeks",
+            "type": "integer"
+          }
+        },
+        "title": "ProgrammeSummary",
+        "type": "object"
+      },
+      "RiderStats": {
+        "additionalProperties": true,
+        "properties": {
+          "body": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          },
+          "efficiency": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Efficiency"
+          },
+          "errors": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "heart": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Heart"
+          },
+          "load": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Load"
+          },
+          "peaks": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Peaks"
+          },
+          "power": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Power"
+          },
+          "season": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Season"
+          }
+        },
+        "title": "RiderStats",
+        "type": "object"
+      },
       "SetupDefaults": {
         "additionalProperties": true,
         "properties": {
@@ -945,6 +1648,23 @@
         }
       }
     },
+    "/api/plan": {
+      "get": {
+        "operationId": "api_plan_api_plan_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanRead"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/profile/dfa-backfill": {
       "post": {
         "operationId": "api_profile_dfa_backfill_api_profile_dfa_backfill_post",
@@ -1071,6 +1791,40 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Ok"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/programme/summary": {
+      "get": {
+        "operationId": "api_programme_summary_api_programme_summary_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProgrammeSummary"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/rider-stats": {
+      "get": {
+        "operationId": "api_rider_stats_api_rider_stats_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RiderStats"
                 }
               }
             },

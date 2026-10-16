@@ -161,3 +161,110 @@ class BackfillStatus(_Model):
     icu_deleted: Optional[int] = None
     failed: Optional[int] = None
     current: Optional[str] = None
+
+
+# ── plan and Home reads (#10) ───────────────────────────────────────────────
+# The plan models mirror the planner's own codec (``session_to_dict`` /
+# ``week_to_dict`` / ``goal_to_dict``); ``tests/test_api_models_plan.py`` fails if
+# a dataclass field is added without being declared here.
+class PlanSession(_Model):
+    day: str
+    day_name: str = ""
+    session_type: str
+    duration_min: int = 0
+    tss_estimate: float = 0
+    description: str = ""
+    zwo_file: str = ""
+    zwo_name: str = ""
+    nutrition_note: str = ""
+    matched: bool = True
+    adapted: bool = False
+    status: str = "pending"
+    user_moved: bool = False
+    moved_from: str = ""
+    user_swapped: bool = False
+    completion_matches: Optional[list] = None
+    dismissed_at: str = ""
+    wprime_estimate: Optional[float] = None
+    pmax_estimate: Optional[float] = None
+    hr_ceiling_pct: Optional[float] = None
+    is_double_threshold_pair: bool = False
+    double_threshold_partner_id: Optional[str] = None
+    am_or_pm: Optional[str] = None
+    is_race: bool = False
+    race: Optional[dict] = None
+    is_opener: bool = False
+    execution: Optional[dict] = None
+
+
+class PlanWeek(_Model):
+    week_num: int
+    start: str
+    end: str
+    phase: str = ""
+    tss_target: float = 0
+    is_stepback: bool = False
+    sessions: list[PlanSession] = []
+
+
+class PlanPhase(_Model):
+    name: str
+    weeks: int = 0
+    start: str = ""
+    end: str = ""
+    weekly_tss: Optional[float] = None
+    focus: str = ""
+
+
+class PlanGoal(_Model):
+    type: str = ""
+    event_date: Optional[str] = None
+    event_name: str = ""
+    hours_per_week: Optional[float] = None
+    plan_weeks: Optional[int] = None
+    start_date: Optional[str] = None
+    entry_mode: Optional[str] = None
+    focus: str = ""
+
+
+class PlanJson(_Model):
+    goal: PlanGoal = PlanGoal()
+    phases: list[PlanPhase] = []
+    weeks: list[PlanWeek] = []
+    generated: Optional[str] = None
+    ctl_snapshot: Optional[dict] = None
+    availability: Optional[dict] = None
+
+
+class PlanRead(_Model):
+    plan_json: PlanJson
+    plan: str = ""
+    file: str = ""
+
+
+class ProgrammeSummary(_Model):
+    plan_id: Optional[str] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    weeks: int = 0
+    rides: int = 0
+    ftp_delta: Optional[dict] = None
+    eftp_delta: Optional[dict] = None
+    vo2max_delta: Optional[dict] = None
+    ctl_gain: Optional[dict] = None
+    intensity_dist: Optional[dict] = None
+    pol_index: Optional[dict] = None
+    compliance: list[dict] = []
+    totals: Optional[dict] = None
+    citations: list[str] = []
+
+
+class RiderStats(_Model):
+    errors: list[str] = []
+    power: Optional[dict] = None
+    peaks: Optional[dict] = None
+    heart: Optional[dict] = None
+    efficiency: Optional[dict] = None
+    load: Optional[dict] = None
+    body: Optional[dict] = None
+    season: Optional[dict] = None
