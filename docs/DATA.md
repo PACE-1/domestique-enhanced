@@ -83,3 +83,19 @@ compares what the API returns.
 
 The same commands against `~/.domestique`; `tests/test_backup_restore.py`
 exercises create, verify and restore through the CLI into a fresh directory.
+
+## If intervals.icu stops serving Garmin data (#31)
+
+Rides and wellness reach Domestique through intervals.icu. If that source dries up,
+these rules keep what is already stored:
+
+- **Wellness:** a field the sync returns empty never replaces a stored value
+  (`ride_storage.persist_wellness`).
+- **Rides:** a ride intervals.icu stops listing is moved to
+  `<profile>/rides/icu/_pruned/` instead of being deleted. It disappears from the
+  calendar (that is how a deleted duplicate upload is cleaned up) but the file
+  stays and can be copied back. A pass that would prune more than 20 rides
+  refuses and prunes none.
+- **Not done:** treating a withheld ride as a ride, telling affected riders, and
+  the device or folder importer. They depend on what the API actually returns once
+  the block lands, and on the new UI.
