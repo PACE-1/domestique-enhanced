@@ -52,7 +52,7 @@ noted:
 
 ## Findings for the contract work
 
-- **Every plan command is `async def`** and returns an ad-hoc dict; errors are a
+- **21 of the 23 commands are `async def`** (the exceptions are `auto-recalc` and `update-ftp`) and they return an ad-hoc dict; errors are a
   mix of `{"error": ...}`, `{"detail": ...}` and bare HTTP exceptions. The first
   contract decision is one error shape.
 - **Reads are all plain `def`** (threadpool), so they are safe to type without
