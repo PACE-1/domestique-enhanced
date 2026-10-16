@@ -139,3 +139,8 @@ templates) found no caller, dynamic lookup or external consumer:
 Retained candidates from the ledger stay deferred: they have tests or a
 planned owner (#11, #23), so they are not dead code.
 
+
+## Planner structure
+
+The [slot-selection refactor receipt](planner-slots.md) records the first bounded
+sampler extraction, its RNG comparison and full-plan characterization checks.
