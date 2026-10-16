@@ -1,3 +1,5 @@
+> **Historical document** (last changed 2026-05-04). It records what was found or planned then; the code has moved on. Check the current source before treating anything here as a live defect or instruction. Index: [docs/README.md](README.md).
+
 # Workout Analysis — Evidence-Based Ranking
 
 *2459 workouts analyzed*

@@ -1,20 +1,66 @@
 name: Tests
 
-# The pull-request gate for clean-main: the full suite on macOS, the platform
-# the dev gate runs on (0 known failures there). Linux hosts fail 8 tests for
-# environment reasons (pywebview bridge, OpenSSL behaviour) and are covered by
-# the release workflow's AppImage smoke instead.
+# The pull-request gate for clean-main: the full suite on Linux with the locked
+# headless profile, through tools/gate.sh (fail-closed: failures, collection
+# errors and timeouts all fail the job). Linux is the fork's primary target
+# (Docker server and AppImage).
 #
-# A 3-core hosted Mac needs about 70 minutes for the whole suite, so it is
-# split over two runners by test file (odd/even). The serial tail runs once.
+# The macOS job is the upstream project's former gate. It is kept for manual
+# runs (workflow_dispatch) only: no support decision has been recorded for
+# retiring macOS testing, but a 3-core hosted Mac needs about 70 minutes, so it
+# does not run on every pull request.
 on:
   pull_request:
     branches: [clean-main]
   workflow_dispatch:
 
 jobs:
-  tests:
-    name: tests (shard ${{ matrix.shard }} of 2)
+  linux:
+    name: Linux gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install locked headless test profile
+        run: python -m pip install -r requirements-dev.txt -c requirements-linux-py312.lock
+      - name: Full Linux gate
+        env:
+          GATE_WORKERS: "4"
+          GATE_RERUN_FAILURES: "0"
+        run: GATE_PYTHON="$(command -v python)" bash tools/gate.sh "$PWD" linux-ci
+      - name: Show verification diagnostics
+        if: always()
+        run: |
+          if test -f /tmp/domestique-gate/linux-ci.status.txt; then
+            cat /tmp/domestique-gate/linux-ci.status.txt
+            tail -n 150 /tmp/domestique-gate/linux-ci.full.txt
+          fi
+
+  web:
+    name: Web build and tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - run: corepack enable && corepack prepare pnpm@12.11.2 --activate
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm build
+
+  macos:
+    name: macOS tests (manual, shard ${{ matrix.shard }} of 2)
+    if: github.event_name == 'workflow_dispatch'
     runs-on: macos-14
     timeout-minutes: 120
     strategy:

@@ -1,3 +1,5 @@
+> **Historical document, measured at e6d52b7d on 2026-09-16** (last changed 2026-09-19). It records what was found or planned then; the code has moved on. Check the current source before treating anything here as a live defect or instruction. Index: [docs/README.md](../docs/README.md).
+
 # Slimming audit — measured, not guessed
 
 Last measured **2026-09-16** at `e6d52b7d`. Everything below is a number an
