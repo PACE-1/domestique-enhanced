@@ -56821,10 +56821,10 @@
       ],
       [
        "2026-11-24",
-       "vo2max",
+       "z2",
        58,
-       66.0,
-       "anaerobic_3x20s-3min_125pct_58min.zwo",
+       44.0,
+       "neuromuscular_ladder7_150pct_55min.zwo",
        "pending"
       ]
      ]
@@ -56955,6 +56955,7 @@
     ]
    ],
    "inv": [
+    "under_delivery:11",
     "weekly_volume:3"
    ]
   },

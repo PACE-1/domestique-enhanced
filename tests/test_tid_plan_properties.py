@@ -124,14 +124,18 @@ class PlanProperties(unittest.TestCase):
 
     @unittest.expectedFailure
     def test_no_week_breaches_the_intensity_ceiling(self):
-        """Nothing holds a week to its intensity budget yet: both week
-        optimisers are off (_USE_WEEK_SOLVER, _REPAIR_MAX_MOVES) and the
-        sampler serves what the library offers. One 265-minute week with a
-        z5+ budget of 8 minutes was served 58. Swept over 8 seeds and 3
-        models on 2026-09-14, the 6 h rider breaches 18% at every load tried
-        (300, 330, 350, 390, 450); 12 h and 18 h never do. Strict: this goes
-        red-to-green when Step 6 makes the budget a build-time constraint
-        (notes/overhaul-plan.md, hard_share)."""
+        """No full week carries more than 18% of its minutes above 106% FTP.
+
+        Still an expectedFailure, but narrower. On 2026-10-16 4 of 576 weeks
+        breached (all the 6 h rider). The last pass of every entry point,
+        _enforce_z5plus_share_ceiling, swaps the heaviest z5+ session of an
+        over-line week for a real endurance file, but never a class sitting on
+        its phase floor. That leaves ONE week: 6 h threshold, build2 wk10 at
+        18.4%, where the floors (vo2_short and neuromuscular) are exactly what
+        carries the z5+ minutes. Floor or rail has to give there; that is an
+        owner decision, not a cleanup. Making the budget a build-time
+        constraint (notes/overhaul-plan.md, hard_share) is the real fix and is
+        still open."""
         bad = []
         for key, weeks in self.plans.items():
             for w in self._full_weeks(weeks):
