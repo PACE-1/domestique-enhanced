@@ -887,7 +887,10 @@ def backfill_icu_history(profile_id: "str | None" = None,
         if progress_cb:
             try: progress_cb(0, _total)
             except Exception: pass
+        import jobs as _jobs
         for ride_path in _ride_files:
+            if _jobs.stopping():
+                break
             if progress_cb:
                 try: progress_cb(backfilled + already_cached + failed, _total)
                 except Exception: pass
