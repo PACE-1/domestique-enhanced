@@ -23,11 +23,11 @@ session-type-swap helpers all go through it.
 
 ## What is already shared
 
-26 functions are reached from all seven entry points, about 1,700 lines: library
+26 functions are reached from every one of the seven doors (`reforecast_dict` and `extend_continuous_plan` counted separately, `sample_week_workouts` not), about 1,540 lines: library
 loading and indexing (`_load_library_dir`, `_read_library_index`), workout
 matching and scoring (`_match_zwo_unclamped` 523 lines, `score_workout`,
-`file_admissible`), content classification and a few race/hit helpers. Another
-~45 are reached from five or six: budgets (`scale_budget_to_week`,
+`file_admissible`), content classification and a few race/hit helpers. Dozens
+more are reached from five or six: budgets (`scale_budget_to_week`,
 `_budgets_for_model`, `budget_table`), `_repair_week`, `_enforce_slot_file_coherence`,
 `_space_hard_days_across_plan`, `sample_week_workouts`.
 
