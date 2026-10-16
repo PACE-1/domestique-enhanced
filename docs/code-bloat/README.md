@@ -145,3 +145,26 @@ planned owner (#11, #23), so they are not dead code.
 
 The [slot-selection refactor receipt](planner-slots.md) records the first bounded
 sampler extraction, its RNG comparison and full-plan characterization checks.
+
+## Third pass (#22): the stop condition
+
+Re-ran the reference count over every remaining ledger symbol (production
+references outside the definition, comments excluded, plus test references). The
+ones with **no production caller but a test** are the only plausible deletions,
+and each stays:
+
+| Symbol | Lines | Test refs | Decision | Why it stays |
+|---|---:|---:|---|---|
+| `plan_invariants.projected_ctl` | 19 | 2 | retain | Planner safety instrument (#11); used by the characterization harness. |
+| `plan_invariants.check_acwr` | 29 | 11 | retain | Same: a safety check, not dead weight. |
+| `week_plan._install_seal` | 24 | 2 | retain | The dormant week seal (`STRICT_SEAL`); decided under #11/#24, not here. |
+| `training_planner.schedule_double_threshold_pair` | 52 | 2 | defer | Planner scheduling rule with its own tests; belongs to #24. |
+| `ride_storage.detect_wbal_overshoot` | 40 | 10 | defer | W' analysis with 10 test references; removing it is a product decision. |
+| `workout_facts.audit_labels` | 21 | 1 | defer | Library audit helper; needs the library tooling owner. |
+| `scripts.title_from_zwo.title_from_zwo` | 49 | 10 | defer | Generation script helper under `src/scripts`. |
+
+Everything else has a production caller. Deleting a tested-only function means
+deleting its tests or declaring the capability gone, and neither is a cleanup
+call. Static candidates are therefore exhausted for now: further reduction comes
+from consolidation (#23/#24) and from the UI migration retiring the legacy
+dashboard (#25), not from more dead-code batches.
