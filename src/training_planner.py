@@ -440,10 +440,8 @@ def _write_library_index(rows: list[dict], count: int, max_mtime: float, wd: "Pa
         "rows": rows,
     }
     try:
-        tmp_path = index_path.with_suffix(".json.tmp")
-        with tmp_path.open("w", encoding="utf-8") as f:
-            json.dump(payload, f)
-        tmp_path.replace(index_path)
+        from atomic_io import write_json_atomic
+        write_json_atomic(index_path, payload, indent=None)
     except OSError as e:
         log.debug("library_index write skipped (%s)", e)
 
@@ -554,13 +552,11 @@ def atomic_write_plan(json_path: "Path | str", plan: dict) -> None:
             f"(got {type(plan).__name__})"
         )
     p = Path(json_path)
-    tmp = p.with_suffix('.tmp')
+    from atomic_io import write_json_atomic
     with _plan_write_lock:
         if p.exists():
             _rotate_plan_backups(p)
-        with open(tmp, "w", encoding="utf-8") as f:
-            json.dump(plan, f, indent=2, default=str)
-        tmp.replace(p)
+        write_json_atomic(p, plan, default=str)
     cb = post_write_callback
     if cb is not None:
         try:

@@ -179,20 +179,9 @@ def _profile_ftp_weight(profile_id: "str | None" = None) -> tuple[int, float]:
 
 
 def _atomic_write_json(path: Path, data: dict) -> None:
-    """Write ``data`` to ``path`` via tempfile + rename (G2 atomic-write)."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    fd, tmp = tempfile.mkstemp(prefix=path.name + ".", dir=str(path.parent))
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2)
-        os.replace(tmp, path)
-    except Exception:
-        # Best-effort cleanup of the tempfile if rename failed.
-        try:
-            os.unlink(tmp)
-        except OSError:
-            pass
-        raise
+    """Write ``data`` to ``path`` atomically (G2); see atomic_io."""
+    from atomic_io import write_json_atomic
+    write_json_atomic(path, data)
 
 
 # ══════════════════════════════════════════════════════════════════════════════

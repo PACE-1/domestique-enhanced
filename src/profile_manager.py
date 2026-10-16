@@ -1371,38 +1371,9 @@ class ProfileManager:
         self._write_text_atomic(path, json.dumps(data, indent=2))
 
     def _write_text_atomic(self, path: Path, content: str, *, mode: Optional[int] = None) -> None:
-        """Atomic text write: write to .tmp, fsync, os.replace onto target.
-
-        Uses `os.replace` (atomic rename on POSIX + Windows) and fsync the tmp
-        file before rename so a crash between the two leaves either the old
-        content or the new content intact, never a truncated file. Optional
-        `mode` applies permissions before the rename so the final file is
-        never visible with laxer permissions than requested.
-        """
-        path = Path(path)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        tmp = path.with_suffix(path.suffix + ".tmp")
-        fd = os.open(str(tmp), os.O_WRONLY | os.O_CREAT | os.O_TRUNC, mode or 0o644)
-        try:
-            with os.fdopen(fd, "w", encoding="utf-8") as f:
-                f.write(content)
-                f.flush()
-                try:
-                    os.fsync(f.fileno())
-                except OSError:
-                    pass
-            if mode is not None:
-                try:
-                    os.chmod(str(tmp), mode)
-                except OSError:
-                    pass
-            os.replace(str(tmp), str(path))
-        except Exception:
-            try:
-                tmp.unlink()
-            except OSError:
-                pass
-            raise
+        """Atomic text write (tmp + fsync + os.replace); see atomic_io."""
+        from atomic_io import write_text_atomic
+        write_text_atomic(path, content, mode=mode)
 
     def _write_env_atomic(self, path: Path, content: str) -> None:
         """Atomic write of an .env file with 0600 permissions."""

@@ -128,10 +128,8 @@ def _maybe_restore_plan_from_backup(plan_path: Path) -> str | None:
             # Atomic copy: write tmp + rename. Don't go through atomic_write_plan
             # because we don't want to rotate (the .bak files we're restoring
             # FROM should be preserved as-is, not shifted).
-            tmp = plan_path.with_suffix(plan_path.suffix + ".tmp")
-            with open(tmp, "w", encoding="utf-8") as f:
-                json.dump(parsed, f, indent=2, default=str)
-            tmp.replace(plan_path)
+            from atomic_io import write_json_atomic
+            write_json_atomic(plan_path, parsed, default=str)
             return src.name
         return None
     except Exception:
@@ -1323,9 +1321,8 @@ def api_set_extra_workout_folder(body: dict):
         else:
             paths.pop("workout_dir", None)
         try:
-            tmp = paths_file.with_suffix(".json.tmp")
-            tmp.write_text(json.dumps(paths, indent=2), encoding="utf-8")
-            tmp.replace(paths_file)
+            from atomic_io import write_json_atomic
+            write_json_atomic(paths_file, paths)
         except OSError as e:
             _log.warning("extra workout folder save failed: %s", e)
             return JSONResponse({"error": "Could not save the setting — try again."}, 500)
@@ -1703,8 +1700,8 @@ def setup_save(body: dict):
             except (OSError, json.JSONDecodeError):
                 existing = {}
             existing.update(paths)
-            paths_file.parent.mkdir(parents=True, exist_ok=True)
-            paths_file.write_text(json.dumps(existing, indent=2), encoding="utf-8")
+            from atomic_io import write_json_atomic
+            write_json_atomic(paths_file, existing)
             _apply_profile_paths()
 
         # Training preferences (validated in phase 1).
@@ -1712,11 +1709,8 @@ def setup_save(body: dict):
             pm.save_prefs(prefs)
 
         # Mark setup complete — single global marker (per-profile marker dropped to avoid drift).
-        _setup_marker().parent.mkdir(parents=True, exist_ok=True)
-        _setup_marker().write_text(
-            json.dumps({"completed": clock.now().isoformat(), "version": "1.0.0"}, indent=2),
-            encoding="utf-8",
-        )
+        from atomic_io import write_json_atomic
+        write_json_atomic(_setup_marker(), {"completed": clock.now().isoformat(), "version": "1.0.0"})
 
         # AC4: wizard completion clears the migrate-created "bootstrapped"
         # flag so / stops redirecting to /setup for this profile.
@@ -3787,10 +3781,9 @@ def _mark_readiness_cap_reverted_today() -> None:
     try:
         from datetime import date as _d
         p = _readiness_revert_flag_path()
-        p.write_text(
-            json.dumps({"date": _d.today().isoformat(),
-                        "at": clock.now().isoformat()}),
-            encoding="utf-8",
+        from atomic_io import write_json_atomic
+        write_json_atomic(
+            p, {"date": _d.today().isoformat(), "at": clock.now().isoformat()}, indent=None,
         )
     except Exception as e:
         _log.warning(f"readiness revert flag write failed: {e}")
@@ -5325,8 +5318,8 @@ def _write_hrv_prompt_state(state: dict) -> None:
     """Persist the dismissal-flag JSON. Failure is logged-only."""
     p = _hrv_prompt_state_path()
     try:
-        p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_text(json.dumps(state, indent=2), encoding="utf-8")
+        from atomic_io import write_json_atomic
+        write_json_atomic(p, state)
     except OSError as e:
         _log.debug(f"_write_hrv_prompt_state write failed: {e}")
 
@@ -7568,10 +7561,10 @@ def _read_update_check_cache():
 def _write_update_check_cache(payload):
     p = _update_check_cache_path()
     try:
-        p.parent.mkdir(parents=True, exist_ok=True)
+        from atomic_io import write_json_atomic
         body = dict(payload)
         body["cache_written_at"] = clock.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-        p.write_text(json.dumps(body, indent=2), encoding="utf-8")
+        write_json_atomic(p, body)
     except Exception:
         pass
 
@@ -18280,7 +18273,8 @@ def _augment_icu_record_with_dfa(rec_path: Path, external_id: str,
     rec["dfa_algo_version"] = _DFA_ALGO_VERSION
 
     try:
-        rec_path.write_text(_json.dumps(rec, indent=2), encoding="utf-8")
+        from atomic_io import write_json_atomic
+        write_json_atomic(rec_path, rec)
     except OSError as e:
         _log.debug(f"_augment_icu_record_with_dfa: write back: {e}")
 
@@ -18673,8 +18667,8 @@ def _read_pr_toast_queue() -> list[dict]:
 def _write_pr_toast_queue(entries: list[dict]) -> None:
     p = _pr_toast_queue_path()
     try:
-        p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_text(json.dumps(entries, indent=2), encoding="utf-8")
+        from atomic_io import write_json_atomic
+        write_json_atomic(p, entries)
     except OSError as e:
         _log.warning(f"_write_pr_toast_queue: {e}")
 
@@ -18766,8 +18760,7 @@ async def api_ride_rpe(ride_id: str, request: Request):
     path = _rs._icu_rides_dir() / f"{ext}.json"
     if not path.exists():
         return JSONResponse({"error": "unknown ride"}, 404)
-    try:
-        rec = json.loads(path.read_text(encoding="utf-8"))
+    def _set_rpe(rec):
         if rpe is None:
             for k in ("rpe", "rpe_at", "rpe_scale"):
                 rec.pop(k, None)
@@ -18775,8 +18768,11 @@ async def api_ride_rpe(ride_id: str, request: Request):
             rec["rpe"] = rpe
             rec["rpe_at"] = clock.now().isoformat()
             rec["rpe_scale"] = "foster_cr10"
-        path.write_text(json.dumps(rec, indent=2), encoding="utf-8")
-    except (OSError, json.JSONDecodeError) as e:
+
+    try:
+        from atomic_io import update_json
+        update_json(path, _set_rpe, strict=True)
+    except (OSError, json.JSONDecodeError, ValueError) as e:
         _log.warning(f"rpe write failed for {ext}: {e}")
         return JSONResponse({"error": "write failed"}, 500)
     clear_cache()
@@ -18815,7 +18811,8 @@ def api_ride_prs(ride_id: str):
     try:
         rec["prs"] = prs
         path = _rs._icu_rides_dir() / f"{ext}.json"
-        path.write_text(json.dumps(rec, indent=2), encoding="utf-8")
+        from atomic_io import update_json
+        update_json(path, lambda stored: stored.__setitem__("prs", prs), strict=True)
     except Exception as e:
         _log.debug(f"api_ride_prs persist failed: {e}")
     return {"ride_id": ride_id, "prs": prs}
@@ -19934,16 +19931,17 @@ async def api_ride_ftp_test_review(ride_id: str, request: Request):
         _ftp_val = int(float(body.get("ftp") or 0)) or None
     except (TypeError, ValueError):
         _ftp_val = None  # grill pipeline/F5: garbage ftp must not 500
-    icu["ftp_test_review"] = {
+    review = {
         "action": action,
         "ftp": _ftp_val,
         "at": clock.now().isoformat(timespec="seconds"),
     }
     try:
+        from atomic_io import update_json
         ext = str(icu.get("external_id"))
         path = ride_storage._icu_rides_dir() / f"{ext}.json"
-        path.write_text(json.dumps(icu, indent=2), encoding="utf-8")
-    except OSError as e:
+        update_json(path, lambda stored: stored.__setitem__("ftp_test_review", review), strict=True)
+    except (OSError, ValueError) as e:
         _log.warning(f"ftp-test-review persist failed: {e}")
         return JSONResponse({"detail": "persist failed"}, 500)
     return {"ok": True, "persisted": True}
