@@ -102,8 +102,15 @@ def shutdown(budget_s: float = 8.0) -> dict:
     return {"stopped": sorted(stopped), "still_running": sorted(alive)}
 
 
-def reset_for_tests() -> None:
+def begin() -> None:
+    """Start a new run: clear the stop flag a previous shutdown set. Called at
+    application startup, so a process that starts the app more than once (tests,
+    an embedded server) is not left permanently stopping."""
     _stop.clear()
+
+
+def reset_for_tests() -> None:
+    begin()
     with _lock:
         _jobs.clear()
 
