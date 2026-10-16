@@ -490,6 +490,14 @@ async def plan_write_lock_async():
         _plan_write_lock.release()
 
 
+def run_under_plan_lock(fn):
+    """Run ``fn()`` holding the plan lock on the CALLING thread and return its
+    result. For worker threads (``run_in_threadpool``): the async lock is owned
+    by the event-loop thread, so work moved off the loop takes the lock here."""
+    with _plan_write_lock:
+        return fn()
+
+
 def _rotate_plan_backups(plan_path: "Path") -> None:
     """v1.6.2 — shift backups down: .bak6→.bak7, ..., .bak→.bak2, then live→.bak.
 
