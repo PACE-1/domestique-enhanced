@@ -20,6 +20,17 @@ from obs import error_codes, _log_error
 _cache = {}
 _cache_ts = {}
 
+# Bumped by every clear_cache(). A fill remembers the generation it started in
+# and publishes only if it is still current, so a load that began before an
+# invalidation (a profile switch, a settings change) can never repopulate the
+# cache with the previous owner's result (#6).
+_generation = 0
+
+
+def generation() -> int:
+    """The current invalidation generation; pass it back to ``put``."""
+    return _generation
+
 
 def _defensive_copy(value):
     """Return a shallow copy, so a caller cannot mutate what the cache serves.
@@ -72,6 +83,7 @@ def _fill(key, fn, ttl):
     now = time.time()
     if key in _cache and now - _cache_ts.get(key, 0) < ttl:
         return _defensive_copy(_cache[key])
+    gen = _generation
     try:
         result = fn()
     except Exception as e:
@@ -89,15 +101,46 @@ def _fill(key, fn, ttl):
             "wellness": error_codes.Codes.CACHE_WELLNESS,
         }.get(key, error_codes.Codes.CACHE_GENERIC)
         _log_error(cache_code, exc=e, cache_key=key)
-        _cache[key] = {}
-        if ttl > 30:
-            _cache_ts[key] = now - (ttl - 30)
-        else:
-            _cache_ts[key] = now
+        if gen == _generation:
+            _cache[key] = {}
+            if ttl > 30:
+                _cache_ts[key] = now - (ttl - 30)
+            else:
+                _cache_ts[key] = now
         return {}
-    _cache[key] = result
-    _cache_ts[key] = now
+    if gen == _generation:        # not invalidated while fn() ran
+        _cache[key] = result
+        _cache_ts[key] = now
     return _defensive_copy(result)
+
+
+def get(key, ttl):
+    """``(hit, value)``: the cached value when fresh within ``ttl`` seconds."""
+    if key in _cache and time.time() - _cache_ts.get(key, 0) < ttl:
+        return True, _defensive_copy(_cache[key])
+    return False, None
+
+
+def put(key, value, generation=None) -> bool:
+    """Publish ``value`` unless the cache was cleared since ``generation`` was
+    read. Returns whether it was stored."""
+    if generation is not None and generation != _generation:
+        return False
+    _cache[key] = value
+    _cache_ts[key] = time.time()
+    return True
+
+
+def drop(key) -> None:
+    _cache.pop(key, None)
+    _cache_ts.pop(key, None)
+
+
+def drop_prefix(prefix, keep=None) -> None:
+    """Drop every entry whose key starts with ``prefix`` except ``keep``."""
+    for k in list(_cache.keys()):
+        if k.startswith(prefix) and k != keep:
+            drop(k)
 
 _extra_clearers: list = []
 
@@ -113,6 +156,8 @@ def register_clearer(fn) -> None:
 
 
 def clear_cache():
+    global _generation
+    _generation += 1
     _cache.clear()
     _cache_ts.clear()
     # AC2c: the fatigue-resistance memo is keyed on (ride_id, ftp, window, kj)
