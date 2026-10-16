@@ -56,6 +56,15 @@ def test_forwarding_headers_do_not_bypass_the_gate(served):
     assert r.status_code == 401
 
 
+def test_identity_headers_from_an_oidc_proxy_do_not_authenticate(served):
+    # A proxy in front (Pocket ID, oauth2-proxy) identifies the rider with headers;
+    # the app trusts only the bearer token the proxy injects (docs/SERVER.md).
+    ident = {"X-Forwarded-User": "isaac", "Remote-User": "isaac", "X-Forwarded-Proto": "https"}
+    assert served.get("/api/version", headers=ident).status_code == 401
+    ok = served.get("/api/version", headers={**ident, "Authorization": f"Bearer {TOKEN}"})
+    assert ok.status_code == 200
+
+
 def test_healthz_is_open(served):
     assert served.get("/healthz").json() == {"ok": True}
 
