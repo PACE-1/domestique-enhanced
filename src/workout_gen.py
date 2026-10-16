@@ -23,7 +23,10 @@ workout that cannot say where it came from has no business in a training plan.
 """
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
+
+log = logging.getLogger("domestique.workout_gen")
 
 # Coggan %FTP edges, mirroring training_planner._acc_zone and zones.py. The
 # three-zone bands: z1 <76%, z2 76-105%, z3 >=106%.
@@ -337,8 +340,12 @@ def generate_row(session_type: str, window_min: float, target_band_min: float,
         path = d / fname
         if not path.exists():
             path.write_text(xml, encoding="utf-8")
-    except OSError:
-        return None            # read-only library: fall back to the pick
+    except OSError as e:
+        # Never silent: the plan falls back to the library's own pick, and
+        # that outcome is on record (#15).
+        log.warning("E_GENERATED_WORKOUT_UNWRITABLE: could not write %s to %s "
+                    "(%s); using the library pick", fname, d, e)
+        return None
 
     got = scan(path)
     if not got:

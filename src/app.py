@@ -462,8 +462,10 @@ def active_workout_dir() -> Path:
 def _workout_file(*parts, base: "Path | None" = None) -> "Path | None":
     """A workout file from the library: the built-in folder (every workout the
     app ships), then the rider's extra folder (3.13.1). The built-in one wins a
-    name both have, as in the library list. None when neither has it."""
-    roots = [base or active_workout_dir(), EXTRA_WORKOUT_DIR, _BUNDLED_WORKOUT_DIR]
+    name both have, as in the library list, then the profile's generated
+    workouts (#15). None when none has it."""
+    roots = [base or active_workout_dir(), EXTRA_WORKOUT_DIR, _BUNDLED_WORKOUT_DIR,
+             getattr(tp, "GENERATED_WORKOUT_DIR", None)]
     for root in [r for i, r in enumerate(roots) if r is not None and r not in roots[:i]]:
         p = _safe_path(root, *parts)
         if p is not None and p.is_file():
