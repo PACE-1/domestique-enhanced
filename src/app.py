@@ -1736,6 +1736,8 @@ def setup_save(body: dict):
 # working -- the dicts are the same objects, so in-place mutation is shared.
 from cache import (  # noqa: F401
     _cache, _cache_ts, cached, clear_cache, register_clearer,
+    get as _cache_get, put as _cache_put, drop_prefix as _cache_drop_prefix,
+    generation as _cache_generation,
 )
 
 # W2B-G5 fix: per-key lock map for the fatigue-resistance endpoint so
@@ -2092,10 +2094,12 @@ def api_profile_banister_validation(refresh: int = Query(0)):
     nls_fit τ values. PATCH G12: 24h lazy cache, no scheduled task.
     """
     cache_key = "banister_oos_default"
-    now = time.time()
     ttl = 24 * 3600  # 24h
-    if not refresh and cache_key in _cache and now - _cache_ts.get(cache_key, 0) < ttl:
-        return _cache[cache_key]
+    if not refresh:
+        _hit, _val = _cache_get(cache_key, ttl)
+        if _hit:
+            return _val
+    _gen = _cache_generation()
     try:
         import oos_validation
         result = oos_validation.validate_banister_oos("default")
@@ -2116,8 +2120,7 @@ def api_profile_banister_validation(refresh: int = Query(0)):
             "pmax_fitness_mae_pct": None,
             "tau_fits_used": {},
         }
-    _cache[cache_key] = result
-    _cache_ts[cache_key] = now
+    _cache_put(cache_key, result, generation=_gen)
     return result
 
 
@@ -2150,10 +2153,12 @@ def api_profile_power_curve(window_days: int = Query(90, ge=1, le=3650),
         _log.debug(f"power_curve latest_ride_id failed: {e}")
         latest = ""
     cache_key = f"power_curve_{_pid}_{int(window_days)}_{latest}"
-    now = time.time()
     ttl = 24 * 3600
-    if not refresh and cache_key in _cache and now - _cache_ts.get(cache_key, 0) < ttl:
-        return _cache[cache_key]
+    if not refresh:
+        _hit, _val = _cache_get(cache_key, ttl)
+        if _hit:
+            return _val
+    _gen = _cache_generation()
     try:
         result = power_curve.aggregate_power_curve(_pid,
                                                     window_days=int(window_days))
@@ -2218,17 +2223,13 @@ def api_profile_power_curve(window_days: int = Query(90, ge=1, le=3650),
     # self-heal pass above. ADD-only field — callers ignore it when absent.
     result["needs_backfill"] = bool(not (result.get("rider_curve") or []))
     # Lazy GC — prune stale power_curve_* entries with old latest_ride_ids.
-    for k in list(_cache.keys()):
-        if k.startswith(f"power_curve_{_pid}_{int(window_days)}_") and k != cache_key:
-            _cache.pop(k, None)
-            _cache_ts.pop(k, None)
+    _cache_drop_prefix(f"power_curve_{_pid}_{int(window_days)}_", keep=cache_key)
     # Only cache a populated curve for 24h. When the curve is still empty
     # (self-heal couldn't acquire the lock, or the backfill hydrated nothing
     # this pass), skip the cache so the next request retries instead of
     # serving a stale empty curve for a full day.
     if not result.get("needs_backfill"):
-        _cache[cache_key] = result
-        _cache_ts[cache_key] = now
+        _cache_put(cache_key, result, generation=_gen)
     return result
 
 
@@ -2713,7 +2714,6 @@ def api_profile_fatigue_resistance(window_days: int = Query(365, ge=1, le=3650),
         _current_ftp = 0
     cache_key = (f"fatigue_resistance_{_pid}_{int(window_days)}_"
                  f"{int(kj_threshold)}_{latest}")
-    now = time.time()
     ttl = 24 * 3600
     # v1.8.9 Bug 4 — bust the lru_cache + module cache on refresh=1.
     if refresh:
@@ -2725,9 +2725,10 @@ def api_profile_fatigue_resistance(window_days: int = Query(365, ge=1, le=3650),
     # so two simultaneous dashboard polls don't both compute, and so
     # lazy-GC + cache-write are atomic.
     with _fatigue_resistance_cache_lock(cache_key):
-        if not refresh and cache_key in _cache and \
-           now - _cache_ts.get(cache_key, 0) < ttl:
-            cached_result = dict(_cache[cache_key])
+        _hit, _val = (False, None) if refresh else _cache_get(cache_key, ttl)
+        _gen = _cache_generation()
+        if _hit:
+            cached_result = dict(_val)
             # v1.8.9 Bug 4 — surface a warm `compute_ms` so the UI can
             # show "Loaded from cache" speed. Warm path is effectively 0ms.
             cached_result["compute_ms"] = 0
@@ -2828,12 +2829,8 @@ def api_profile_fatigue_resistance(window_days: int = Query(365, ge=1, le=3650),
         if latest:
             prefix = (f"fatigue_resistance_{_pid}_{int(window_days)}_"
                       f"{int(kj_threshold)}_")
-            for k in list(_cache.keys()):
-                if k.startswith(prefix) and k != cache_key:
-                    _cache.pop(k, None)
-                    _cache_ts.pop(k, None)
-        _cache[cache_key] = result
-        _cache_ts[cache_key] = now
+            _cache_drop_prefix(prefix, keep=cache_key)
+        _cache_put(cache_key, result, generation=_gen)
         return result
 
 
@@ -4663,10 +4660,7 @@ async def api_wellness_import_hrv4training(file: UploadFile = File(...)):
         imported += 1
     conn.commit()
     # invalidate composite-readiness caches that span this date range
-    for k in list(_cache.keys()):
-        if k.startswith("readiness_composite_"):
-            _cache.pop(k, None)
-            _cache_ts.pop(k, None)
+    _cache_drop_prefix("readiness_composite_")
     return {"imported": imported, "skipped": skipped}
 
 
@@ -4698,10 +4692,7 @@ async def api_wellness_manual_hrv(request: Request):
             (d, rmssd),
         )
     conn.commit()
-    for k in list(_cache.keys()):
-        if k.startswith("readiness_composite_"):
-            _cache.pop(k, None)
-            _cache_ts.pop(k, None)
+    _cache_drop_prefix("readiness_composite_")
     return {"ok": True, "date": d, "hrv_manual_rmssd": rmssd}
 
 
