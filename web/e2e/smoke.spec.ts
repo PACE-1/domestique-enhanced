@@ -92,3 +92,12 @@ test("Home shows the plan, this week and fitness from the typed reads", async ({
   await expect(page.getByText("FTP", { exact: true })).toBeVisible()
   await expect(page.getByText(/Loading…/)).toHaveCount(0)
 })
+
+test("Plan lists the generated weeks and steps through them", async ({ page }) => {
+  await page.goto("#/plan")
+  await expect(page.getByRole("heading", { name: /^Week \d+/ })).toBeVisible()
+  await expect(page.getByText(/TSS planned/)).toBeVisible()
+  const next = page.getByRole("button", { name: "Next week" })
+  await next.click()
+  await expect(page.getByRole("heading", { name: /^Week \d+/ })).toBeVisible()
+})
