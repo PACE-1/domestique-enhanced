@@ -1,5 +1,8 @@
 # Initial code-bloat inventory
 
+For the current source count, complexity priorities and remaining completion
+criteria, see [the closeout review](closeout.md).
+
 Source baseline: `11cc77cb` (2026-10-15). Workstream: Forgejo #20; inventory: #21.
 
 This is the first bounded cleanup inventory. Historical audits are evidence to recheck, not current deletion instructions. The ledger separates confirmed private dead code from tested capabilities and unresolved external consumers.

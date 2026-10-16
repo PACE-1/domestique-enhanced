@@ -324,6 +324,13 @@ def _reset_icu_sync_singleton():
     import db as _db
     if _db._sync_stop.is_set():
         _db.shutdown_sync(timeout=5.0)
+    # #17 added a second process-wide shutdown flag. A TestClient lifespan
+    # sets it too; later backfill loops otherwise silently skip every ride.
+    # Drain cooperative jobs before resetting the registry for the next test.
+    import jobs as _jobs
+    if _jobs.stopping():
+        _jobs.shutdown(budget_s=5.0)
+        _jobs.reset_for_tests()
 
 
 @pytest.fixture(autouse=True)
