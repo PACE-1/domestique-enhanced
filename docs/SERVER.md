@@ -79,3 +79,36 @@ caches ship inside the image or AppImage and are read-only at run time.
 - **Rider folders** added in Settings are read, never written.
 
 Verified by `tests/test_generated_workouts_dir.py`.
+
+## Background work and shutdown (#17, #18)
+
+The app runs as one worker process. Everything below runs inside it.
+
+| Work | Started by | Limit | Stops on shutdown |
+|---|---|---|---|
+| Intervals.icu sync loop | `db.start_background_sync` | one thread, guarded by `_sync_lock` | `db.stop_sync` sets the stop event |
+| Lazy sync after boot, `domestique.icu_sync` | `jobs.start_thread` | one at a time | `jobs.shutdown` |
+| History backfill, `pc-backfill`, `backfill-history` | `jobs.start_thread` | single flight (`acquire_backfill_lock`, `already_running`) | `stopping()` checked in the loop |
+| DFA backfill, `dfa-backfill` | `jobs.start_thread` | single flight (`_dfa_backfill_lock`) | cancel hook plus `stopping()` |
+| DFA computation | `jobs.Slot` | one at a time; a timed-out run keeps the slot until it ends | bounded, not interrupted |
+| Calendar push debounce | one shared `threading.Timer` (30 s) | one pending timer | cancelled in lifespan shutdown |
+| Plan generation | worker thread under the plan lock | one at a time | finishes or the process exits |
+| Ride and HRV import | request handler | at most 2 at once; later requests wait before their body is read | the request ends with the process |
+
+Every thread here is a daemon, so a stuck one cannot hold up exit. Shutdown
+asks registered jobs to stop and waits up to `DOMESTIQUE_SHUTDOWN_BUDGET_S`
+(default 8 s, inside Docker's 10 s stop timeout), then logs what is still
+running.
+
+**After a restart.** Nothing is queued on disk. A job that was interrupted
+does not resume; it runs again on its next trigger (the daily sync, a page
+load that starts a backfill, or the rider pressing the button). Those jobs are
+safe to repeat: a DFA record is recomputed, a ride envelope is fetched again,
+and a calendar event is matched by its own id. There is no exactly-once
+guarantee for a call to intervals.icu that was cut off mid-request; the next
+run reconciles against what intervals.icu now holds.
+
+**Upload limits.** A FIT upload is capped at 50 MB (decompressed too) and an
+HRV CSV at 5 MB. A request must declare its `Content-Length` (411 otherwise)
+and is refused before it is read when the declared size is over the limit. A
+reverse proxy should still set its own body limit.
