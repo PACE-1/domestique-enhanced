@@ -80,6 +80,12 @@ caches ship inside the image or AppImage and are read-only at run time.
 
 Verified by `tests/test_generated_workouts_dir.py`.
 
+Verified end to end in Docker by `tools/verify_docker_readonly.sh`: the image
+runs with `--read-only` (only `/data` and `/tmp` writable), a plan generates
+(35 sessions with workout files), a FIT workout exports, and the log has no
+read-only write errors. The AppImage is read-only by nature (a squashfs mount);
+that path is covered by the AppImage smoke test, not by this script.
+
 ## Background work and shutdown (#17, #18)
 
 The app runs as one worker process. Everything below runs inside it.
