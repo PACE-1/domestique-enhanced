@@ -3,6 +3,7 @@ import { useSyncExternalStore } from "react"
 import { AppShell, NotMigrated, TABS, isTab } from "@/components/AppShell"
 import { Dfa } from "@/screens/Dfa"
 import { Home } from "@/screens/Home"
+import { Plan } from "@/screens/Plan"
 import { ProfilePicker } from "@/screens/ProfilePicker"
 import { ProfileSetup } from "@/screens/ProfileSetup"
 import { Setup } from "@/screens/Setup"
@@ -25,7 +26,7 @@ export function App() {
   const tab = isTab(route) ? route : "home"
   return (
     <AppShell tab={tab}>
-      {tab === "dfa" ? <Dfa /> : tab === "home" ? <Home /> : <NotMigrated label={TABS.find((t) => t.id === tab)!.label} />}
+      {tab === "dfa" ? <Dfa /> : tab === "home" ? <Home /> : tab === "plan" ? <Plan /> : <NotMigrated label={TABS.find((t) => t.id === tab)!.label} />}
     </AppShell>
   )
 }

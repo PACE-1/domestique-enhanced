@@ -1,0 +1,71 @@
+import { cleanup, render, screen, waitFor } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
+import { afterEach, describe, expect, it, vi } from "vitest"
+
+import { isoDay } from "@/lib/home"
+import { Plan } from "@/screens/Plan"
+
+const addDays = (n: number) => {
+  const d = new Date()
+  d.setDate(d.getDate() + n)
+  return isoDay(d)
+}
+const session = (day: string, over = {}) => ({
+  day, day_name: "", session_type: "z2", duration_min: 90, tss_estimate: 60, description: "", zwo_name: "", status: "pending", ...over,
+})
+const week = (n: number, startOffset: number, over = {}) => ({
+  week_num: n, start: addDays(startOffset), end: addDays(startOffset + 6), phase: "base", tss_target: 300, is_stepback: false,
+  sessions: [session(addDays(startOffset + 1), { zwo_name: `Ride ${n}` })], ...over,
+})
+const PLAN = {
+  plan_json: {
+    goal: { type: "ftp", hours_per_week: 8, event_name: "", event_date: null },
+    phases: [{ name: "base", weeks: 2 }, { name: "build1", weeks: 1 }],
+    weeks: [week(1, -9), week(2, -2), week(3, 5, { is_stepback: true, phase: "build1" })],
+  },
+}
+
+function mockPlan(res: () => Response) {
+  vi.stubGlobal("fetch", vi.fn(async () => res()))
+}
+afterEach(() => { cleanup(); vi.unstubAllGlobals() })
+
+describe("Plan", () => {
+  it("opens on the week that contains today and shows its sessions and load", async () => {
+    mockPlan(() => new Response(JSON.stringify(PLAN)))
+    render(<Plan />)
+    expect(await screen.findByText(/Week 2 · base/)).toBeTruthy()
+    expect(screen.getByText(/Ride 2/)).toBeTruthy()
+    expect(screen.getByText(/60 of 300 TSS planned/)).toBeTruthy()
+    expect(screen.getByText(/base \(2 wk\) → build1 \(1 wk\)/)).toBeTruthy()
+  })
+
+  it("moves between weeks and marks a recovery week", async () => {
+    mockPlan(() => new Response(JSON.stringify(PLAN)))
+    render(<Plan />)
+    await screen.findByText(/Week 2/)
+    await userEvent.click(screen.getByRole("button", { name: "Next week" }))
+    expect(await screen.findByText(/Week 3 · build1 · recovery/)).toBeTruthy()
+    expect((screen.getByRole("button", { name: "Next week" }) as HTMLButtonElement).disabled).toBe(true)
+    await userEvent.click(screen.getByRole("button", { name: "Previous week" }))
+    await userEvent.click(screen.getByRole("button", { name: "Previous week" }))
+    expect(await screen.findByText(/Week 1/)).toBeTruthy()
+    expect((screen.getByRole("button", { name: "Previous week" }) as HTMLButtonElement).disabled).toBe(true)
+  })
+
+  it("says so when there is no plan", async () => {
+    mockPlan(() => new Response(JSON.stringify({ plan_json: { goal: {}, phases: [], weeks: [] } })))
+    render(<Plan />)
+    expect(await screen.findByText("No training plan yet.")).toBeTruthy()
+  })
+
+  it("shows the error and retries", async () => {
+    let fail = true
+    mockPlan(() => (fail ? new Response(JSON.stringify({ error: "down" }), { status: 500 }) : new Response(JSON.stringify(PLAN))))
+    render(<Plan />)
+    expect((await screen.findByRole("alert")).textContent).toContain("down")
+    fail = false
+    await userEvent.click(screen.getByRole("button", { name: "Retry" }))
+    await waitFor(() => expect(screen.getByText(/Week 2/)).toBeTruthy())
+  })
+})
