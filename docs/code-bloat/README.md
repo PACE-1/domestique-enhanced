@@ -49,9 +49,9 @@ External cycling-stack clients mentioned in upstream notes are not in this check
 | `analytics.compute_dfa_threshold_analysis` | 96 | 1 | defer | #22 |
 | `app.legacy_card_state` | 21 | 1 | defer | #22 |
 | `clock.unfreeze` | 2 | 16 | retain | #22 |
-| `db.query_metrics_latest` | 7 | 0 | defer | #22 |
-| `db.upsert_blood_marker` | 8 | 0 | defer | #22 |
-| `db.query_blood_markers` | 8 | 0 | defer | #22 |
+| `db.query_metrics_latest` | 7 | 0 | removed batch 2 | #22 |
+| `db.upsert_blood_marker` | 8 | 0 | removed batch 2 | #22 |
+| `db.query_blood_markers` | 8 | 0 | removed batch 2 | #22 |
 | `error_codes.all_codes` | 3 | 1 | retain | #22 |
 | `fitness_estimation.compute_fitness_signature` | 44 | 1 | defer | #22 |
 | `fitness_estimation.aerobic_decoupling` | 100 | 3 | defer | #22 |
@@ -66,20 +66,20 @@ External cycling-stack clients mentioned in upstream notes are not in this check
 | `plan_invariants.check_acwr` | 29 | 4 | defer | #11 |
 | `plan_invariants.projected_ctl` | 19 | 2 | defer | #11 |
 | `readiness_composite.compute_training_severity` | 81 | 4 | defer | #22 |
-| `ride_report_png.render_ride_report_png` | 93 | 0 | defer | #22 |
+| `ride_report_png.render_ride_report_png` | 93 | 0 | removed batch 2 | #22 |
 | `ride_storage.recent_mean_weekly_tss` | 52 | 4 | defer | #23 |
 | `ride_storage.detect_wbal_overshoot` | 40 | 1 | defer | #22 |
-| `routes_lib._route_key_for` | 11 | 0 | defer | #22 |
+| `routes_lib._route_key_for` | 11 | 0 | removed batch 2 | #22 |
 | `scripts.title_from_zwo.title_from_zwo` | 49 | 1 | defer | #22 |
 | `strain_score.compute_sr_avg` | 34 | 1 | defer | #22 |
 | `tau_fitting.count_weighted_markers` | 21 | 1 | defer | #22 |
 | `tls_trust.backend_of` | 3 | 2 | retain | #22 |
-| `training.classify_acwr` | 12 | 0 | defer | #22 |
-| `training.classify_tsb` | 9 | 0 | defer | #22 |
-| `training.classify_ramp` | 9 | 0 | defer | #22 |
-| `training.classify_monotony` | 9 | 0 | defer | #22 |
+| `training.classify_acwr` | 12 | 0 | removed batch 2 | #22 |
+| `training.classify_tsb` | 9 | 0 | removed batch 2 | #22 |
+| `training.classify_ramp` | 9 | 0 | removed batch 2 | #22 |
+| `training.classify_monotony` | 9 | 0 | removed batch 2 | #22 |
 | `training_planner._taper_anchor` | 13 | 0 | remove batch 1 | #22 |
-| `training_planner.required_weekly_tss` | 9 | 0 | defer | #22 |
+| `training_planner.required_weekly_tss` | 9 | 0 | removed batch 2 | #22 |
 | `training_planner.schedule_double_threshold_pair` | 52 | 1 | defer | #22 |
 | `week_plan._install_seal` | 24 | 2 | defer | #11 |
 | `workout_facts.reset_cache` | 5 | 9 | retain | #22 |
@@ -117,3 +117,22 @@ Scope: stale `APP_VERSION`, unused private `_lthr_frac_at` and its private ramp-
 ## Implementation progress
 
 See [the verification receipt](verification.md) for implemented changes, measured deletion, test evidence and remaining validation. Baseline dispositions above describe the initial inventory; they are not claims that all deferred candidates have been resolved.
+
+## Second cleanup batch (#22)
+
+Removed after a whole-tree search (source, tests, packaging, scripts, docs,
+templates) found no caller, dynamic lookup or external consumer:
+
+| Removed | Lines | Evidence |
+|---|---:|---|
+| `src/ride_report_png.py` (whole module) | 228 | No importer anywhere. Its endpoint left in an earlier wave; the programme summary PNG has its own renderer. |
+| `src/static/vendor/html2canvas.min.js` | 198,689 bytes | Referenced only by the removed module's docstring, `NOTICE`, the static README and the changelog. No template or script loads it. `NOTICE` entry removed with it. |
+| `db.query_metrics_latest`, `db.upsert_blood_marker`, `db.query_blood_markers` | 31 | No caller. The `blood_markers` table schema stays so existing databases keep opening. |
+| `routes_lib._route_key_for` and its `app.py` re-export | 11 | The re-export carried `noqa: F401`; nothing used it. |
+| `training.classify_acwr/tsb/ramp/monotony` | 47 | No caller, no string-built lookup. |
+| `training_planner.required_weekly_tss` | 11 | No caller. |
+| `config.ACWR_*`, `RAMP_RATE_*`, `MONOTONY_*`, `TSB_RED` | 10 | Their only consumers were the four `classify_*` functions. |
+
+Retained candidates from the ledger stay deferred: they have tests or a
+planned owner (#11, #23), so they are not dead code.
+

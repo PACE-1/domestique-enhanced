@@ -812,7 +812,6 @@ from hr import (  # noqa: F401
 # objects, and rebinding app.X would leave routes_lib reading its own.
 from routes_lib import (  # noqa: F401
     _slugify_route_name,
-    _route_key_for,
     _canonical_surface,
     _load_surface_types_db,
     _route_surface_segments,

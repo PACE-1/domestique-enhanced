@@ -49,11 +49,6 @@ This product includes software developed by third parties:
   Build tool only; the bootloader exception explicitly permits distributing
   closed-source or differently-licensed applications built with it.
 
-- html2canvas (MIT License) — Niklas von Hertzen
-  https://html2canvas.hertzen.com/
-  Vendored at static/vendor/html2canvas.min.js for the RIDE REPORT
-  "Save to Desktop" screenshot feature.
-
 - fit-tool (MIT License)
   https://pypi.org/project/fit-tool/
   Used to emit .fit activity files for manual upload to Strava / Garmin /

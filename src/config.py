@@ -93,16 +93,6 @@ FTP_TEST_INTERVAL_WEEKS = 6
 TAPER_AUTO_LOCK = True
 PLAN_RECALC_INTERVAL_DAYS = 7
 
-# ── Training load thresholds ─────────────────────────────────────────────────
-ACWR_GREEN_LOW  = 0.85
-ACWR_GREEN_HIGH = 1.15
-ACWR_ORANGE_HIGH = 1.25
-RAMP_RATE_GREEN  = 7
-RAMP_RATE_ORANGE = 9
-MONOTONY_GREEN   = 1.5
-MONOTONY_RED     = 2.0
-TSB_RED          = -30
-
 # ── Sleep thresholds (hours) ─────────────────────────────────────────────────
 SLEEP_GREEN  = 7.5
 SLEEP_ORANGE = 6.5

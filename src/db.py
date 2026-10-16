@@ -1028,15 +1028,6 @@ def query_wkg_history(days: int = 365) -> list[dict]:
     return [dict(r) for r in rows]
 
 
-def query_metrics_latest() -> dict:
-    """Return latest value for each metric."""
-    db = get_db()
-    rows = db.execute(
-        "SELECT metric, value, date FROM athlete_metrics GROUP BY metric HAVING date = MAX(date)"
-    ).fetchall()
-    return {r["metric"]: {"value": r["value"], "date": r["date"]} for r in rows}
-
-
 # ── Daily Log (Morning Questionnaire) ────────────────────────────────────────
 
 def upsert_daily_log(dt: str, sleep_quality: int, fatigue: int, soreness: int,
@@ -1114,28 +1105,6 @@ def get_daily_log_today() -> dict | None:
         "SELECT * FROM daily_log WHERE date = ?", (clock.today().isoformat(),)
     ).fetchone()
     return dict(row) if row else None
-
-
-# ── Blood Markers ─────────────────────────────────────────────────────────────
-
-def upsert_blood_marker(dt: str, marker: str, value: float, unit: str = None, notes: str = None):
-    """Insert or update a blood marker result."""
-    db = get_db()
-    db.execute(
-        "INSERT OR REPLACE INTO blood_markers (date, marker, value, unit, notes) VALUES (?, ?, ?, ?, ?)",
-        (dt, marker, value, unit, notes),
-    )
-    db.commit()
-
-
-def query_blood_markers(days: int = 730) -> list[dict]:
-    """Return all blood marker entries."""
-    db = get_db()
-    oldest = (clock.today() - timedelta(days=days)).isoformat()
-    rows = db.execute(
-        "SELECT * FROM blood_markers WHERE date >= ? ORDER BY date DESC", (oldest,)
-    ).fetchall()
-    return [dict(r) for r in rows]
 
 
 # ── Background sync thread ──────────────────────────────────────────────────

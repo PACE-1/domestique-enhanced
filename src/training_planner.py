@@ -2871,17 +2871,6 @@ def forecast_ctl(current_ctl: float, daily_tss: list[float]) -> list[float]:
     return ctls
 
 
-def required_weekly_tss(current_ctl: float, target_ctl: float, weeks: int) -> float:
-    """Calculate average weekly TSS needed to reach target CTL."""
-    # CTL converges to daily_avg_tss over time
-    # Simplified: weekly_tss ≈ target_ctl * 7 when at steady state
-    # For ramp: need to overshoot slightly
-    if weeks <= 0:
-        return target_ctl * 7
-    daily_tss = max(0, 2 * (target_ctl - 0.5 * current_ctl))
-    return round(daily_tss * 7, 0)
-
-
 def safe_ramp_rate(current_ctl: float) -> float:
     """Couzens' rule: scale ramp by relative fitness."""
     return round(min(7, max(3, 5 * (current_ctl / 80))), 1)
