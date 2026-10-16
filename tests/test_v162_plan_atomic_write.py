@@ -65,7 +65,7 @@ def test_atomic_write_plan_crash_mid_write_preserves_live(tmp_path: Path) -> Non
     def boom(*args, **kwargs):
         raise IOError("simulated disk full")
 
-    with patch("training_planner.json.dump", side_effect=boom):
+    with patch("atomic_io.json.dumps", side_effect=boom):
         with pytest.raises(IOError):
             tp.atomic_write_plan(plan_path, new_plan)
 

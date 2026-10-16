@@ -235,9 +235,8 @@ def _write_cache_file(workout_dir: Path, facts: dict) -> None:
     """Atomic best-effort write (read-only dir just means no persistence)."""
     path = _cache_path(workout_dir)
     try:
-        tmp = path.with_suffix(".json.tmp")
-        tmp.write_text(_serialize(facts), encoding="utf-8")
-        tmp.replace(path)
+        from atomic_io import write_text_atomic
+        write_text_atomic(path, _serialize(facts))
     except OSError as e:
         log.debug("facts cache write skipped (%s)", e)
 

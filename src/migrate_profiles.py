@@ -244,9 +244,8 @@ def migrate_to_profiles() -> None:
     # device_prefs.json with anything. v4 profiles have an empty device_prefs.
     # (Pre-pivot this step used to preserve trainer_effect + road_feel_enabled;
     # both keys are removed entirely in v4 so the initial file is just {}.)
-    (default_dir / "device_prefs.json").write_text(
-        json.dumps({_V4_SCHEMA_SENTINEL: True}, indent=2), encoding="utf-8"
-    )
+    from atomic_io import write_json_atomic
+    write_json_atomic(default_dir / "device_prefs.json", {_V4_SCHEMA_SENTINEL: True})
 
     # ── 3. Extract athlete values from config.py SOURCE FILE
     # NOTE: Cannot use ``import config`` because the __getattr__ proxy routes
@@ -276,9 +275,7 @@ def migrate_to_profiles() -> None:
         except Exception:
             pass  # fall back to defaults
 
-    (default_dir / "athlete.json").write_text(
-        json.dumps(athlete, indent=2), encoding="utf-8"
-    )
+    write_json_atomic(default_dir / "athlete.json", athlete)
 
     # ── 4. COMMIT: atomically write registry (marks migration as complete) ──
     # Use "Rider" for empty/system-account $USER values (e.g. macOS helpers

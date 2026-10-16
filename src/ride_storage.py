@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import clock  # the one clock every module reads (see src/clock.py)
 import json
+from atomic_io import file_lock, update_json, write_json_atomic
 import logging
 import time
 from pathlib import Path
@@ -700,8 +701,7 @@ def backfill_icu_sports_from_db() -> int:
             sport = sport_by_id.get(str(data.get("external_id") or p.stem))
             if not sport:
                 continue
-            data["sport"] = sport
-            p.write_text(json.dumps(data, indent=2), encoding="utf-8")
+            update_json(p, lambda rec, _s=sport: rec.__setitem__("sport", _s), strict=True)
             healed += 1
         except Exception as e:  # noqa: BLE001 — skip the file, heal the rest
             log.debug(f"sport backfill: {p.name}: {e}")
@@ -754,67 +754,68 @@ def persist_icu_activity(activity: dict, carry_hydrated: bool = True) -> Path | 
     # augment budget then only recomputed a few, collapsing the DFA threshold
     # aggregate to "no thresholds detected". Carrying them forward keeps the
     # augment's sticky-skip working too (already-computed rides stay fast).
-    prior_prs = None
-    prior_dfa: dict = {}
-    if path.exists():
-        try:
-            prior = json.loads(path.read_text(encoding="utf-8"))
-            if isinstance(prior, dict):
-                if isinstance(prior.get("prs"), list):
-                    prior_prs = prior["prs"]
-                for k in _DFA_CARRY_KEYS:
-                    if prior.get(k) is not None:
-                        prior_dfa[k] = prior[k]
-                if carry_hydrated:
-                    for k in _BACKFILL_CARRY_KEYS:
+    with file_lock(path):  # prior read -> write is one step: a rider's RPE or review must not be lost
+        prior_prs = None
+        prior_dfa: dict = {}
+        if path.exists():
+            try:
+                prior = json.loads(path.read_text(encoding="utf-8"))
+                if isinstance(prior, dict):
+                    if isinstance(prior.get("prs"), list):
+                        prior_prs = prior["prs"]
+                    for k in _DFA_CARRY_KEYS:
                         if prior.get(k) is not None:
                             prior_dfa[k] = prior[k]
-                    # `efforts` IS a norm key (ICU intervals-derived), so
-                    # setdefault can't carry it — but the backfill's version
-                    # (derived from full 1 Hz streams) is strictly richer
-                    # than a fresh payload's empty list. Only prefer prior
-                    # when the fresh normalization produced nothing.
-                    if prior.get("efforts") and not norm.get("efforts"):
-                        norm["efforts"] = prior["efforts"]
-                    # v3.5.6 — same for `intervals` (the rider's Garmin laps).
-                    # Laps only arrive via the /intervals subpath on a DETAIL
-                    # fetch (fetch_activity_full); the activity-LIST payload the
-                    # hourly sync uses has none. So a re-sync used to overwrite
-                    # a lap-carrying envelope with an empty list and silently
-                    # destroy them — measured: a 61-lap ride went to 0 laps on
-                    # one forced sync. Laps are the primary signal for
-                    # block-by-block ride evaluation, so losing them is not
-                    # cosmetic. Prefer prior only when the fresh payload brought
-                    # nothing, so a genuine detail refresh still wins.
-                    if prior.get("intervals") and not norm.get("intervals"):
-                        norm["intervals"] = prior["intervals"]
-                # The rider's own RPE always survives — carried even when
-                # carry_hydrated is False (that flag exists so a fresh DETAIL
-                # fetch can replace stale ICU-derived data; it must never
-                # discard something only the rider could provide).
-                for k in _RIDER_INPUT_CARRY_KEYS:
-                    if prior.get(k) is not None:
-                        norm.setdefault(k, prior[k])
-                # W2a: locally-computed FTP-test detection (payload-wins) +
-                # the rider's review verdict (unconditional, like RPE).
-                for k in _FTP_TEST_CARRY_KEYS:
-                    if prior.get(k) is not None:
-                        norm.setdefault(k, prior[k])
-                for k in _FTP_TEST_REVIEW_CARRY_KEYS:
-                    if prior.get(k) is not None:
-                        norm.setdefault(k, prior[k])
-        except (json.JSONDecodeError, OSError) as e:
-            log.debug(f"persist_icu_activity({icu_id}) prior read: {e}")
-    if prior_prs is not None:
-        norm["prs"] = prior_prs
-    # Only fill DFA keys the fresh ICU payload didn't already provide.
-    for k, v in prior_dfa.items():
-        norm.setdefault(k, v)
-    try:
-        path.write_text(json.dumps(norm, indent=2), encoding="utf-8")
-    except OSError as e:
-        log.warning(f"persist_icu_activity({icu_id}) failed: {e}")
-        return None
+                    if carry_hydrated:
+                        for k in _BACKFILL_CARRY_KEYS:
+                            if prior.get(k) is not None:
+                                prior_dfa[k] = prior[k]
+                        # `efforts` IS a norm key (ICU intervals-derived), so
+                        # setdefault can't carry it — but the backfill's version
+                        # (derived from full 1 Hz streams) is strictly richer
+                        # than a fresh payload's empty list. Only prefer prior
+                        # when the fresh normalization produced nothing.
+                        if prior.get("efforts") and not norm.get("efforts"):
+                            norm["efforts"] = prior["efforts"]
+                        # v3.5.6 — same for `intervals` (the rider's Garmin laps).
+                        # Laps only arrive via the /intervals subpath on a DETAIL
+                        # fetch (fetch_activity_full); the activity-LIST payload the
+                        # hourly sync uses has none. So a re-sync used to overwrite
+                        # a lap-carrying envelope with an empty list and silently
+                        # destroy them — measured: a 61-lap ride went to 0 laps on
+                        # one forced sync. Laps are the primary signal for
+                        # block-by-block ride evaluation, so losing them is not
+                        # cosmetic. Prefer prior only when the fresh payload brought
+                        # nothing, so a genuine detail refresh still wins.
+                        if prior.get("intervals") and not norm.get("intervals"):
+                            norm["intervals"] = prior["intervals"]
+                    # The rider's own RPE always survives — carried even when
+                    # carry_hydrated is False (that flag exists so a fresh DETAIL
+                    # fetch can replace stale ICU-derived data; it must never
+                    # discard something only the rider could provide).
+                    for k in _RIDER_INPUT_CARRY_KEYS:
+                        if prior.get(k) is not None:
+                            norm.setdefault(k, prior[k])
+                    # W2a: locally-computed FTP-test detection (payload-wins) +
+                    # the rider's review verdict (unconditional, like RPE).
+                    for k in _FTP_TEST_CARRY_KEYS:
+                        if prior.get(k) is not None:
+                            norm.setdefault(k, prior[k])
+                    for k in _FTP_TEST_REVIEW_CARRY_KEYS:
+                        if prior.get(k) is not None:
+                            norm.setdefault(k, prior[k])
+            except (json.JSONDecodeError, OSError) as e:
+                log.debug(f"persist_icu_activity({icu_id}) prior read: {e}")
+        if prior_prs is not None:
+            norm["prs"] = prior_prs
+        # Only fill DFA keys the fresh ICU payload didn't already provide.
+        for k, v in prior_dfa.items():
+            norm.setdefault(k, v)
+        try:
+            write_json_atomic(path, norm)
+        except OSError as e:
+            log.warning(f"persist_icu_activity({icu_id}) failed: {e}")
+            return None
     # v1.3.0 PR-DETECTION final step (audit §4): compute PRs against the
     # 90-day rolling window after the envelope is on disk so compute_ride_prs
     # can read the just-written ride_id from cache. On failure keep
@@ -823,7 +824,8 @@ def persist_icu_activity(activity: dict, carry_hydrated: bool = True) -> Path | 
         import power_curve
         prs = power_curve.compute_ride_prs(norm["ride_id"])
         norm["prs"] = prs
-        path.write_text(json.dumps(norm, indent=2), encoding="utf-8")
+        # Merge into the current file: it may have gained rider input since the write above.
+        update_json(path, lambda rec: rec.__setitem__("prs", prs), strict=True)
     except Exception as e:
         log.debug(f"persist_icu_activity({icu_id}) PR compute failed: {e}")
     return path
@@ -888,14 +890,15 @@ def _persist_rider_input(external_id, values: dict) -> None:
         path = _icu_rides_dir() / f"{external_id}.json"
         if not path.exists():
             return
-        rec = json.loads(path.read_text(encoding="utf-8"))
-        changed = False
-        for k, v in values.items():
-            if rec.get(k) is None:
-                rec[k] = v
-                changed = True
-        if changed:
-            path.write_text(json.dumps(rec, indent=2), encoding="utf-8")
+        def _fill(rec):
+            changed = False
+            for k, v in values.items():
+                if rec.get(k) is None:
+                    rec[k] = v
+                    changed = True
+            return None if changed else False   # False: nothing to write
+
+        update_json(path, _fill, strict=True)
     except (OSError, json.JSONDecodeError, ValueError) as e:
         log.debug(f"_persist_rider_input({external_id}) skipped: {e}")
 
@@ -1249,16 +1252,17 @@ def write_fit_load_sidecar(fit_path: Path) -> dict | None:
     # function RECOMPUTES the whole file (a re-import calls it eagerly). Carry
     # rider input forward: it is the one thing no recompute can regenerate.
     # Same lesson as the laps/streams carry on the ICU path.
-    prior = read_fit_load_sidecar(fit_path)
-    if isinstance(prior, dict):
-        for k in _RIDER_INPUT_CARRY_KEYS:
-            if prior.get(k) is not None:
-                load.setdefault(k, prior[k])
-    load["reader_v"] = FIT_LOAD_READER_V
-    try:
-        side.write_text(json.dumps(load, indent=2), encoding="utf-8")
-    except OSError as e:
-        log.warning(f"write_fit_load_sidecar({fit_path.name}) failed: {e}")
+    with file_lock(side):
+        prior = read_fit_load_sidecar(fit_path)
+        if isinstance(prior, dict):
+            for k in _RIDER_INPUT_CARRY_KEYS:
+                if prior.get(k) is not None:
+                    load.setdefault(k, prior[k])
+        load["reader_v"] = FIT_LOAD_READER_V
+        try:
+            write_json_atomic(side, load)
+        except OSError as e:
+            log.warning(f"write_fit_load_sidecar({fit_path.name}) failed: {e}")
     return load
 
 
@@ -1272,17 +1276,21 @@ def set_fit_rpe(stem: str, rpe: int | None, rpe_at: str | None) -> bool:
     fit_path = _fit_rides_dir() / f"{stem}.fit"
     if not fit_path.exists():
         return False
-    load = read_fit_load_sidecar(fit_path) or write_fit_load_sidecar(fit_path) or {}
-    if rpe is None:
-        for k in ("rpe", "rpe_at", "rpe_scale"):
-            load.pop(k, None)
-    else:
-        load["rpe"] = int(rpe)
-        load["rpe_at"] = rpe_at
-        load["rpe_scale"] = "foster_cr10"
+    side = _fit_load_sidecar_path(fit_path)
+    if not read_fit_load_sidecar(fit_path):
+        write_fit_load_sidecar(fit_path)
+
+    def _set(load):
+        if rpe is None:
+            for k in ("rpe", "rpe_at", "rpe_scale"):
+                load.pop(k, None)
+        else:
+            load["rpe"] = int(rpe)
+            load["rpe_at"] = rpe_at
+            load["rpe_scale"] = "foster_cr10"
+
     try:
-        _fit_load_sidecar_path(fit_path).write_text(
-            json.dumps(load, indent=2), encoding="utf-8")
+        update_json(side, _set)
     except OSError as e:
         log.warning(f"set_fit_rpe({stem}) failed: {e}")
         return False
@@ -1788,21 +1796,18 @@ def persist_wellness(record: dict) -> Path | None:
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", rid):
         return None
     path = _wellness_dir() / f"{rid}.json"
-    merged: dict = {}
-    if path.exists():
-        try:
-            prior = json.loads(path.read_text(encoding="utf-8"))
-            if isinstance(prior, dict):
-                merged = prior
-        except (OSError, ValueError):
+    def _merge(merged):
+        if not isinstance(merged, dict):
             merged = {}
-    for k, v in record.items():
-        v = wellness_value(k, v)
-        if v is not None:
-            merged[k] = v
-    merged["id"] = rid
+        for k, v in record.items():
+            v = wellness_value(k, v)
+            if v is not None:
+                merged[k] = v
+        merged["id"] = rid
+        return merged
+
     try:
-        path.write_text(json.dumps(merged, indent=2), encoding="utf-8")
+        update_json(path, _merge)
     except OSError as e:
         log.warning(f"persist_wellness({rid}) failed: {e}")
         return None
