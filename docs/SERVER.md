@@ -127,6 +127,11 @@ The app runs as one worker process. Everything below runs inside it.
 | Plan generation | worker thread under the plan lock | one at a time | finishes or the process exits |
 | Ride and HRV import | request handler | at most 2 at once; later requests wait before their body is read | the request ends with the process |
 
+**Profile switch (#5).** A job remembers the profile it started under. After the
+rider switches profile, `jobs.stopping()` is true on that thread, so a backfill
+ends at its next check instead of writing into the new profile. A job started
+before any profile was active is not bound to one.
+
 Every thread here is a daemon, so a stuck one cannot hold up exit. Shutdown
 asks registered jobs to stop and waits up to `DOMESTIQUE_SHUTDOWN_BUDGET_S`
 (default 8 s, inside Docker's 10 s stop timeout), then logs what is still

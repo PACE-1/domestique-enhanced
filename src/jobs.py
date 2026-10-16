@@ -31,6 +31,7 @@ from typing import Any, Callable, Optional
 log = logging.getLogger("domestique.jobs")
 
 _stop = threading.Event()
+_owner = threading.local()   # the profile a job thread was started under
 _lock = threading.Lock()
 _jobs: "dict[int, _Job]" = {}
 
@@ -43,15 +44,32 @@ class _Job:
     started: float = field(default_factory=time.monotonic)
 
 
+def _active_profile_id() -> str:
+    try:
+        from profile_manager import ProfileManager
+        return ProfileManager.get().active_id or ""
+    except Exception:  # noqa: BLE001 - no profile layer (tests, early boot)
+        return ""
+
+
 def stopping() -> bool:
-    """True once shutdown was requested; long loops check this between units."""
-    return _stop.is_set()
+    """True once shutdown was requested, or - on a job thread - once the active
+    profile is no longer the one the job started under (#5): a backfill must not
+    carry on writing into the profile the rider switched to. Long loops check
+    this between units."""
+    if _stop.is_set():
+        return True
+    owner = getattr(_owner, "profile", None)
+    return bool(owner) and owner != _active_profile_id()
 
 
 def start_thread(target: Callable[..., Any], *, name: str, args: tuple = (),
                  cancel: Optional[Callable[[], None]] = None) -> threading.Thread:
     """Start a registered daemon thread. ``cancel`` is called on shutdown."""
+    profile = _active_profile_id()
+
     def _run() -> None:
+        _owner.profile = profile
         try:
             target(*args)
         finally:
