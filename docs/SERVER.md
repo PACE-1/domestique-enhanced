@@ -157,7 +157,7 @@ Verified on 2026-10-16 for version 3.13.1:
 - Local build in `ubuntu:22.04`: 264 MB artifact, native window mapped under
   Xvfb, `/api/version` correct, bundled library of 4,308 workouts intact,
   screenshot rendered.
-- GitHub Actions, `release.yml` run with `linux_only=true`: build and the
+- GitHub Actions, `release.yml` run without a tag: build and the
   smoke test passed, and the AppImage then ran on a stock `debian:12-slim` with
   only the derived host packages installed (`verify-linux-clean-container`).
 
