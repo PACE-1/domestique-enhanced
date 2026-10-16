@@ -420,8 +420,13 @@ def characterization_riders():
         out.append(Rider(f"cont/focus-{focus}", lambda f=focus: continuous((5, 6), 2.0, focus=f),
                          ("generate", "regenerate@3", "refit@3")))
     for wk in (5.0, 3.0):
+        # reforecast@21 restores a rest day, and since #35 a restored session
+        # under the 30-minute floor stays rest: the 3 h rider's week has no room,
+        # so there the case edits nothing and the self-test (rightly) rejects it.
+        drivers = (EVENT_DRIVERS if wk == 5.0
+                   else tuple(d for d in EVENT_DRIVERS if d != "reforecast@21"))
         out.append(Rider(f"event/wkend{wk:g}h", lambda w=wk: event(w),
-                         EVENT_DRIVERS + (ADAPTERS if wk == 5.0 else ()),
+                         drivers + (ADAPTERS if wk == 5.0 else ()),
                          ctl=50.0, rwt=380.0))
     for mode in ("fixed_core", "template"):
         out.append(Rider(f"blueprint/{mode}", lambda m=mode: event(4.0, weeks=10, mode=m),
