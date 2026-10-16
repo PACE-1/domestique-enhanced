@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from "react"
 
-import { Button } from "@/components/ui/button"
+import { AppShell, NotMigrated, TABS, isTab } from "@/components/AppShell"
+import { Dfa } from "@/screens/Dfa"
 import { ProfilePicker } from "@/screens/ProfilePicker"
 import { ProfileSetup } from "@/screens/ProfileSetup"
 import { Setup } from "@/screens/Setup"
@@ -10,7 +11,7 @@ const subscribe = (cb: () => void) => {
   window.addEventListener("hashchange", cb)
   return () => window.removeEventListener("hashchange", cb)
 }
-// The intervals.icu OAuth callback returns to /v2/?wizard=profile-setup&icu=..., with no hash.
+// The intervals.icu OAuth callback returns to /v2/?wizard=...&icu=..., with no hash.
 const currentRoute = () =>
   window.location.hash.replace(/^#\/?/, "") || (new URLSearchParams(window.location.search).get("wizard") ?? "")
 const useRoute = () => useSyncExternalStore(subscribe, currentRoute)
@@ -20,18 +21,11 @@ export function App() {
   if (route === "profile-picker") return <ProfilePicker />
   if (route === "profile-setup") return <ProfileSetup />
   if (route === "setup") return <Setup />
+  const tab = isTab(route) ? route : "home"
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <h1 className="font-medium">Domestique Enhanced</h1>
-        <Button className="w-fit" render={<a href="#/profile-picker" />}>
-          Profile picker
-        </Button>
-        <Button className="w-fit" variant="outline" render={<a href="/" />}>
-          Open legacy dashboard
-        </Button>
-      </div>
-    </div>
+    <AppShell tab={tab}>
+      {tab === "dfa" ? <Dfa /> : <NotMigrated label={TABS.find((t) => t.id === tab)!.label} />}
+    </AppShell>
   )
 }
 
