@@ -90,6 +90,7 @@ def test_inherited_data_root_and_credentials_cannot_escape_sandbox(tmp_path, mod
     suite = tmp_path / "suite"
     suite.mkdir()
     (suite / "conftest.py").symlink_to(Path(__file__).with_name("conftest.py"))
+    (suite / "_sandbox.py").symlink_to(Path(__file__).with_name("_sandbox.py"))
     report = tmp_path / "report.json"
     (suite / "test_probe.py").write_text('''
 import json, os
