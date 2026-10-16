@@ -571,6 +571,10 @@ _LAST_MIGRATION_RESULT: dict = {"show_toast": False}
 async def lifespan(app):
     import access as _access
     _access.check_startup()   # server mode without a token must not start (#13)
+    # #19: never run against data written by a newer layout; stamp it on first use.
+    import backup as _backup
+    from user_home import domestique_home as _home
+    _backup.check_data_format(_home())
     # ── Profile system: migrate + init ──────────────────────────────────
     # Order matters: ProfileManager.get() runs the v3 data-dir rename
     # (~/.chickencycling → ~/.domestique). After that runs, the legacy

@@ -1,0 +1,85 @@
+# Data directory, migrations, backup and restore
+
+This describes what the app stores, who owns each migration, and how to back up
+and restore it. It extends the migration code that already exists; it does not
+replace it.
+
+## Where data lives
+
+`DOMESTIQUE_HOME` if set (the Docker image uses `/data`), else `~/.domestique`.
+
+| Path | Contents | Owner |
+|---|---|---|
+| `profiles.json` | Profile registry, active profile, picker preference | `profile_manager` |
+| `profiles/<id>/athlete.json` | FTP, weight, HR numbers, preferences | `profile_manager` |
+| `profiles/<id>/.env` | intervals.icu credentials, mode 0600 | `profile_manager` |
+| `profiles/<id>/health_tracker.db` | SQLite (WAL): wellness, activities, daily log | `db` |
+| `profiles/<id>/plans/` | `current_plan.json` plus a rotating `.bak` chain | `training_planner` |
+| `profiles/<id>/rides/`, `rides/icu/`, `wellness/` | Imported FIT files, intervals.icu envelopes, load sidecars | `ride_storage` |
+| `profiles/<id>/generated_workouts/` | Planner-synthesised workouts | `workout_gen` |
+| `.data_format` | Data-layout version (see below) | `backup` |
+| `logs/`, `cache/`, `update_check_cache.json` | Rebuildable; not backed up | various |
+
+## Versions: product, data format, schema
+
+- **Product version** (`VERSION`) names a release. The fork's numbering is
+  independent of upstream's and must not be used to detect a downgrade.
+- **`DATA_FORMAT`** (`src/backup.py`, currently `1`) is the version of the data
+  layout. It is stamped in `.data_format`. At startup the app refuses to run
+  against data stamped with a higher number than it understands, so an older
+  build can never silently modify newer data. Raise it only with a migration.
+- **SQLite schema** has no version number: `db.init_db()` adds tables and
+  columns idempotently (`CREATE TABLE IF NOT EXISTS`, guarded `ALTER`).
+- **Profile layout** migrations are in `migrate_profiles.py`: the legacy
+  single-user layout into `profiles/default/`, and the v4 strip of removed
+  trainer fields (marked by the `schema_version_4_migrated` sentinel). Both are
+  safe to re-run.
+
+## Upgrades
+
+Supported: any earlier layout that `migrate_profiles` handles (legacy
+single-user, v3 profiles, v4) upgrades in place at startup. Migrations are
+idempotent and write through atomic file replacement, so an interrupted start is
+retried on the next start. Credentials, rider edits and imported rides are
+carried, never regenerated.
+
+**Rollback:** an older build refuses data stamped with a newer `DATA_FORMAT`.
+To go back, restore a backup taken before the upgrade.
+
+## Backup and restore
+
+```sh
+python -m backup create  backup.tar.gz [--home DIR]   # DIR defaults to DOMESTIQUE_HOME / ~/.domestique
+python -m backup verify  backup.tar.gz
+python -m backup restore backup.tar.gz [--home DIR] [--force]
+```
+
+- SQLite databases are copied with the engine's own snapshot, so committed WAL
+  content is included and `-wal`/`-shm` files are not copied.
+- Every file has a SHA-256 in the manifest; `restore` verifies all of them before
+  touching the target, refuses a backup from a newer data format, and refuses a
+  non-empty target without `--force`.
+- An existing target is never renamed (a Docker volume is a mount point): its
+  entries are moved aside, the restored ones moved in, and the old ones put back
+  if anything fails.
+- Excluded on purpose: logs, caches, temp files, the update-check cache.
+- For a snapshot that is consistent across files, stop the app first. A running
+  app gives per-file and per-database consistency, not a global one.
+
+### Docker
+
+```sh
+docker stop <container>
+docker run --rm -v domestique-data:/data -v "$PWD":/out <image> python -m backup create /out/backup.tar.gz --home /data
+# restore into a clean volume
+docker run --rm -v new-volume:/data -v "$PWD":/out <image> python -m backup restore /out/backup.tar.gz --home /data
+```
+
+`tools/verify_docker_restore.sh` runs this end to end: it seeds a profile in one
+volume, backs it up, restores into a clean volume, starts a server on it and
+compares what the API returns.
+
+### Linux desktop
+
+The same commands against `~/.domestique`; `tests/test_backup_restore.py`
+exercises create, verify and restore through the CLI into a fresh directory.
