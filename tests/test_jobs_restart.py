@@ -1,14 +1,26 @@
-"""#17 — the stop flag does not outlive the run that set it."""
+"""#17 - the stop flag does not outlive the run that set it."""
+import threading
+
 import jobs
 
 
-def test_a_new_app_run_clears_the_stop_flag_a_previous_shutdown_set():
-    """Starting the app twice in one process (test clients do) must not leave the
-    second run's backfills stopping at once."""
+def test_a_clean_shutdown_leaves_no_stop_flag_behind():
+    """Every test client that enters a lifespan context shuts jobs down; the next
+    test in the same process must not find backfills and syncs "stopping"."""
     import app as app_module
     from fastapi.testclient import TestClient
     with TestClient(app_module.app):
-        pass                                    # lifespan shutdown sets the flag
-    assert jobs.stopping() is True
-    with TestClient(app_module.app):
-        assert jobs.stopping() is False         # startup cleared it
+        pass
+    assert jobs.stopping() is False
+
+
+def test_a_straggler_keeps_the_flag_until_a_new_run_begins():
+    release = threading.Event()
+    jobs.reset_for_tests()
+    jobs.start_thread(lambda: release.wait(30), name="stubborn")
+    rep = jobs.shutdown(budget_s=0.2)
+    assert rep["still_running"] == ["stubborn"] and jobs.stopping() is True
+    release.set()
+    jobs.begin()
+    assert jobs.stopping() is False
+    jobs.reset_for_tests()
