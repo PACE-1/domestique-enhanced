@@ -17,7 +17,6 @@ planning artefacts.
 | `RESEARCH_TRAINING_PLANNER.md` | Science & research | reference | Source notes for the planner: Seiler / Mujika / Stoggl / Coggan / Friel / Allen. |
 | `upgrading.md` | User guide | current | How to update an installed app. |
 | `workout_sources.md`, `cycling_apps.md` | Library provenance | reference | Where the workout library comes from; free cycling apps that accept ZWO/FIT. |
-| `windows_build.md` | Build / packaging | historical | The 2026-05 plan for a Windows `.exe`. The release workflow is the source of truth. |
 | `workout_analysis.md` | Planning artefacts | historical | Original library audit before procedural generation filled the gaps. |
 | `TRAINING_SCREEN_PLAN.md` | Planning artefacts | **obsolete** | A live trainer screen with Bluetooth control. The trainer subsystem was removed in v4.0.0-alpha. |
 

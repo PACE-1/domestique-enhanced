@@ -7,7 +7,7 @@ Two verifiers, chosen by platform:
   with a root that lives in the Windows store. Some of those roots carry no CA
   markers at all (no basicConstraints, no keyUsage) or only an EKU. Windows
   accepts such a root — verified on a Windows runner against SChannel itself
-  (packaging/tls_intercept_probe_win.py) — while OpenSSL applies
+  (a probe removed with the Windows packaging; see git history) — while OpenSSL applies
   X509_check_ca() to the trust anchor and refuses it with "invalid CA
   certificate"; no verify flag relaxes that. Windows is not blind either: a
   root with basicConstraints CA:FALSE or a keyUsage without keyCertSign is

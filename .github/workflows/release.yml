@@ -1,6 +1,6 @@
 name: Build release artifacts
 
-# Builds a macOS DMG, a Windows EXE and a Linux AppImage on every tag push
+# Builds a macOS DMG and a Linux AppImage on every tag push
 # (v*.*.*) and uploads them to the matching GitHub Release. Runs also on
 # manual dispatch. Binaries live in Release assets — never in git — so the
 # repo stays lean.
@@ -15,10 +15,6 @@ on:
         description: "Tag to attach artifacts to (e.g. v2.0.0). Leave blank to just build."
         required: false
         default: ""
-      linux_only:
-        description: "Build only the Linux AppImage (skips the Windows job)."
-        type: boolean
-        default: false
 
 permissions:
   contents: write  # needed to upload to releases
@@ -103,401 +99,12 @@ jobs:
           tag_name: ${{ inputs.tag || github.ref_name }}
 
   # ───────────────────────────────────────────────────────────────────
-  # Windows EXE
-  # ───────────────────────────────────────────────────────────────────
-  build-windows:
-    name: Build Windows EXE
-    if: ${{ !inputs.linux_only }}
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pyinstaller
-
-      # v3.11.4: the intervals.icu TLS path must agree with Windows itself. A
-      # rider's 3.11.3 log showed OpenSSL refusing the antivirus root Windows
-      # trusts ("invalid CA certificate"). This installs an interceptor-style
-      # root in the runner's ROOT store, reproduces that refusal with the
-      # 3.11.3 context, then proves the OS-native verifier accepts it, still
-      # rejects untrusted roots + hostname mismatches, and reaches the real
-      # intervals.icu. Same Python + packages the EXE is frozen from.
-      - name: "TLS probe: OS-native trust agrees with Windows"
-        shell: pwsh
-        run: |
-          pip install cryptography
-          python packaging/tls_intercept_probe_win.py
-
-      # The OAuth client_secret lives in the gitignored .oauth.env (never in the
-      # repo), so the CI checkout doesn't have it — without this the spec skips
-      # bundling it and the Windows EXE ships an empty secret, making the
-      # intervals.icu token exchange fail ("exchange" error). Write it from a
-      # repo secret so the frozen build carries it. Fail loud if it's unset.
-      - name: Write OAuth client secret (.oauth.env)
-        shell: bash
-        env:
-          ICU_OAUTH_CLIENT_ID: ${{ secrets.ICU_OAUTH_CLIENT_ID }}
-          ICU_OAUTH_CLIENT_SECRET: ${{ secrets.ICU_OAUTH_CLIENT_SECRET }}
-        run: |
-          if [ -z "${ICU_OAUTH_CLIENT_SECRET}" ]; then
-            echo "::error::ICU_OAUTH_CLIENT_SECRET repo secret is not set — OAuth would ship broken."; exit 1
-          fi
-          printf 'ICU_OAUTH_CLIENT_ID=%s\nICU_OAUTH_CLIENT_SECRET=%s\n' \
-            "${ICU_OAUTH_CLIENT_ID:-511}" "${ICU_OAUTH_CLIENT_SECRET}" > .oauth.env
-          echo "wrote .oauth.env ($(wc -c < .oauth.env) bytes)"
-
-      # TODO: signtool codesign. Requires a Windows Authenticode certificate
-      # (EV or OV). Without signing, SmartScreen shows the "Unknown publisher"
-      # warning — end users must click "More info → Run anyway".
-      #   signtool sign /tr http://timestamp.digicert.com /td sha256 \
-      #     /fd sha256 /a dist\Domestique\Domestique.exe
-
-      - name: Build EXE
-        shell: cmd
-        run: |
-          call packaging\build_win.bat
-          dir dist\Domestique
-
-      # Watertight gate for the OAuth fix: prove the client_secret actually made
-      # it into the frozen bundle (not just that we wrote .oauth.env pre-build).
-      # A bundling regression fails CI here instead of shipping broken sign-in.
-      - name: "Verify OAuth secret bundled into the EXE"
-        shell: pwsh
-        run: |
-          $f = Get-ChildItem -Path dist\Domestique -Recurse -Filter '.oauth.env' -ErrorAction SilentlyContinue | Select-Object -First 1
-          if (-not $f) { Write-Error "::error::.oauth.env not bundled in the EXE — OAuth sign-in would fail"; exit 1 }
-          if ((Get-Content $f.FullName -Raw) -notmatch 'ICU_OAUTH_CLIENT_SECRET=\S') {
-            Write-Error "::error::bundled .oauth.env has an empty ICU_OAUTH_CLIENT_SECRET"; exit 1
-          }
-          Write-Host "OK: .oauth.env bundled with a non-empty secret at $($f.FullName)"
-
-      # Gate the build: a frozen EXE that won't start (or reports the wrong
-      # version) must fail CI here rather than ship. Runs the EXE headless via
-      # DOMESTIQUE_SERVER_ONLY=1 (no window/tray on the runner), polls the
-      # server, and asserts the served version matches the repo VERSION file.
-      - name: "Smoke-test: EXE starts + serves correct version"
-        shell: pwsh
-        run: |
-          $env:DOMESTIQUE_SERVER_ONLY = "1"
-          # v3.11.4: simulated antivirus interceptor for intervals.icu, started
-          # INSIDE this step — a server started in an earlier step did not live
-          # to see the EXE's request (run 33951474432: connection refused on
-          # :443). Installs a root of the shape the TLS probe found Windows
-          # accepts and OpenSSL refuses, points intervals.icu at 127.0.0.1 in
-          # the hosts file, and answers the token exchange on :443 the way
-          # intervals.icu answers a bad code (400). The end-to-end check below
-          # signs the frozen EXE in through it.
-          $fake = Start-Process -FilePath python -ArgumentList 'packaging/tls_intercept_probe_win.py','serve-fake-icu' `
-            -PassThru -RedirectStandardOutput fake_icu.out -RedirectStandardError fake_icu.err
-          $deadline = (Get-Date).AddSeconds(120)
-          while ((Get-Date) -lt $deadline) {
-            $fo = if (Test-Path fake_icu.out) { Get-Content fake_icu.out -Raw -ErrorAction SilentlyContinue } else { "" }
-            if ($fo -match 'READY') { break }
-            if ($fake.HasExited) { break }
-            Start-Sleep -Seconds 2
-          }
-          Get-Content fake_icu.out -ErrorAction SilentlyContinue | Write-Host
-          Get-Content fake_icu.err -ErrorAction SilentlyContinue | Write-Host
-          $fo = if (Test-Path fake_icu.out) { Get-Content fake_icu.out -Raw } else { "" }
-          if ($fake.HasExited -or -not ($fo -match 'READY')) { Write-Host "::error::simulated interceptor did not start"; exit 1 }
-          netstat -ano | Select-String ':443 ' | ForEach-Object { Write-Host "listening: $_" }
-
-          $expected = (Get-Content -Path VERSION -Raw).Trim()
-          Write-Host "Expected version from VERSION file: $expected"
-
-          $exePath = "dist\Domestique\Domestique.exe"
-
-          # --- Pre-flight: prove the EXE exists and show the build layout. -----
-          # A native PyInstaller crash exits pre-Python and writes nothing, so
-          # we record the layout up front to spot a missing/short EXE or a
-          # bootloader that failed to unpack its dependencies.
-          Write-Host "===== PRE-FLIGHT ====="
-          Write-Host "EXE present (Test-Path '$exePath'): $(Test-Path $exePath)"
-          Write-Host "----- dist\Domestique\ (top level) -----"
-          Get-ChildItem "dist\Domestique\" -ErrorAction SilentlyContinue |
-            Select-Object Name, Length | Format-Table -AutoSize | Out-String | Write-Host
-          # Anchor the Event Log query: we only want entries logged from now on.
-          $startTime = Get-Date
-          Write-Host "Smoke-test start time: $startTime"
-          Write-Host "===== END PRE-FLIGHT ====="
-
-          # Capture anything the EXE emits. The build is console=False so the
-          # windowed process has no console of its own. Start-Process
-          # -RedirectStandard* does NOT reliably capture a PyInstaller onedir
-          # bootloader's child stdout/stderr (the files come back empty), so we
-          # launch through cmd.exe and use OS-level redirection (> ... 2>&1),
-          # which the bootloader's inherited handles DO get written to. The
-          # merged stream lands in exe_out.txt. DOMESTIQUE_SERVER_ONLY is set
-          # above and cmd inherits it.
-          # NOTE: $proc is the cmd.exe wrapper, not the EXE itself — so
-          # $proc.ExitCode is cmd's code, not the app's. We rely on the
-          # /api/version poll + exe_out.txt contents for the verdict.
-          $proc = Start-Process -FilePath "cmd.exe" `
-            -ArgumentList '/c','"dist\Domestique\Domestique.exe" > exe_out.txt 2>&1' `
-            -PassThru
-
-          # Dump every diagnostic we can find into the CI log so a silent
-          # startup failure becomes a readable traceback in the next run. Each
-          # piece runs in its own try/catch so one failing collector never
-          # suppresses the others.
-          function Dump-Diagnostics {
-            Write-Host "===== DIAGNOSTICS: EXE startup failure ====="
-
-            # Process exit code — for a native (pre-Python) PyInstaller crash
-            # this is the single most valuable signal: e.g. 0xC0000135 (DLL not
-            # found), 0xC000007B (bad image / arch mismatch), 0xC0000409.
-            try {
-              if ($proc) {
-                Write-Host "proc.HasExited: $($proc.HasExited)"
-                if ($proc.HasExited) {
-                  Write-Host ("proc.ExitCode: {0} (hex: 0x{1:X8})" -f $proc.ExitCode, $proc.ExitCode)
-                } else {
-                  Write-Host "proc.ExitCode: (still running)"
-                }
-              } else {
-                Write-Host "proc: (null — never started)"
-              }
-            } catch { Write-Host "[exit-code collector failed] $($_.Exception.Message)" }
-
-            # Merged stdout+stderr captured via cmd.exe OS-level redirection —
-            # this is the reliable source for the Python-level traceback.
-            try {
-              Write-Host "=== EXE OUTPUT (exe_out.txt) ==="
-              if (Test-Path exe_out.txt) { Get-Content exe_out.txt | Write-Host } else { Write-Host "(no exe_out.txt)" }
-            } catch { Write-Host "[exe-output collector failed] $($_.Exception.Message)" }
-
-            # WIN-DIAG: dead-simple crash dump written by start_server's except
-            # clause (launcher.py) — depends on neither log_config nor stdout
-            # capture, so it survives when both of those come back empty.
-            try {
-              $crash = Join-Path $env:USERPROFILE ".domestique\startup_crash.txt"
-              Write-Host "=== startup_crash.txt ($crash) ==="
-              if (Test-Path $crash) { Get-Content $crash | Write-Host } else { Write-Host "(no startup_crash.txt)" }
-            } catch { Write-Host "[crash-dump collector failed] $($_.Exception.Message)" }
-
-            # Legacy Start-Process redirect targets — usually empty for an
-            # onedir bootloader, kept in case anything lands there.
-            try {
-              Write-Host "=== STDOUT ==="
-              if (Test-Path "stdout.txt") { Get-Content "stdout.txt" } else { Write-Host "(no stdout.txt)" }
-            } catch { Write-Host "[stdout collector failed] $($_.Exception.Message)" }
-            try {
-              Write-Host "=== STDERR ==="
-              if (Test-Path "stderr.txt") { Get-Content "stderr.txt" } else { Write-Host "(no stderr.txt)" }
-            } catch { Write-Host "[stderr collector failed] $($_.Exception.Message)" }
-
-            # Launcher log(s): ~/.domestique/logs/domestique_<ts>.log — this is
-            # where _log() mirrors the uvicorn/app-startup traceback.
-            try {
-              $logDir = Join-Path $env:USERPROFILE ".domestique\logs"
-              if (Test-Path $logDir) {
-                Write-Host "===== Launcher logs ($logDir) ====="
-                Get-ChildItem $logDir -Recurse | ForEach-Object {
-                  Write-Host "=== $($_.FullName) ==="
-                  Get-Content $_.FullName
-                }
-              } else {
-                Write-Host "(no launcher log dir at $logDir)"
-              }
-            } catch { Write-Host "[launcher-log collector failed] $($_.Exception.Message)" }
-
-            # Any crash log the runtime may have left next to the EXE.
-            try {
-              Get-ChildItem -Path . -Recurse -Filter "*.log" -ErrorAction SilentlyContinue | ForEach-Object {
-                Write-Host "=== crash/runtime log: $($_.FullName) ==="
-                Get-Content $_.FullName
-              }
-            } catch { Write-Host "[runtime-log collector failed] $($_.Exception.Message)" }
-
-            # Windows Application Event Log — the key signal for a native crash
-            # that left no file. Filter by start time, then surface Errors and
-            # anything mentioning the app/runtime/fault.
-            try {
-              Write-Host "=== Windows Application Event Log (errors + relevant since start) ==="
-              Get-WinEvent -FilterHashtable @{LogName='Application'; StartTime=$startTime} -ErrorAction SilentlyContinue |
-                Where-Object { $_.LevelDisplayName -eq 'Error' -or $_.Message -match 'Domestique|\.NET|Faulting|clr|0xc0000' } |
-                Select-Object -First 15 |
-                Format-List TimeCreated, ProviderName, Id, Message | Out-String | Write-Host
-            } catch { Write-Host "[event-log (by-message) collector failed] $($_.Exception.Message)" }
-
-            try {
-              Write-Host "=== Windows Application Event Log (by crash-reporting providers) ==="
-              Get-WinEvent -FilterHashtable @{LogName='Application'; StartTime=$startTime} -ErrorAction SilentlyContinue |
-                Where-Object { $_.ProviderName -match 'Application Error|.NET Runtime|Windows Error Reporting' } |
-                Select-Object -First 15 |
-                Format-List TimeCreated, ProviderName, Id, Message | Out-String | Write-Host
-            } catch { Write-Host "[event-log (by-provider) collector failed] $($_.Exception.Message)" }
-
-            Write-Host "===== END DIAGNOSTICS ====="
-          }
-
-          try {
-            # Give the bootloader time to either crash natively or start serving.
-            Start-Sleep -Seconds 12
-            if ($proc.HasExited) {
-              # $proc is the cmd.exe wrapper, so this exit code is cmd's, not the
-              # app's — print it for what it's worth, but the real traceback is in
-              # exe_out.txt (dumped by Dump-Diagnostics below).
-              Write-Host ("cmd wrapper EXITED EARLY with code: {0} (hex: 0x{1:X8})" -f $proc.ExitCode, $proc.ExitCode)
-              # Dump FIRST: GH Actions pwsh runs with $ErrorActionPreference=Stop,
-              # so Write-Error is TERMINATING and would jump to finally{} before
-              # the diagnostics ever print (this is why every prior dump was blank).
-              Dump-Diagnostics
-              Write-Host "::error::EXE exited before it could serve /api/version"
-              exit 1
-            }
-
-            $served = $null
-            $deadline = (Get-Date).AddSeconds(90)
-            while ((Get-Date) -lt $deadline) {
-              try {
-                $resp = Invoke-RestMethod -Uri "http://127.0.0.1:22400/api/version" -TimeoutSec 5
-                $served = $resp.version
-                Write-Host "Server responded; version=$served"
-                break
-              } catch {
-                Write-Host "Waiting for server to come up... ($($_.Exception.Message))"
-                Start-Sleep -Seconds 3
-              }
-            }
-            if ($null -eq $served) {
-              Dump-Diagnostics
-              Write-Host "::error::EXE never served /api/version within 90s"
-              exit 1
-            }
-            if ($served.Trim() -ne $expected) {
-              Dump-Diagnostics
-              Write-Host "::error::Version mismatch: served '$served' != VERSION '$expected'"
-              exit 1
-            }
-            # Linux-IP D4 (all platforms): the bundled workout library must
-            # survive packaging — a build that loses it boots fine and
-            # silently degrades every plan to endurance-only.
-            $hb = $null
-            try {
-              $hb = Invoke-RestMethod -Uri "http://127.0.0.1:22400/api/diag/health" -TimeoutSec 180
-            } catch {
-              Write-Host "diag/health request failed: $($_.Exception.Message)"
-              try {
-                $raw = Invoke-WebRequest -Uri "http://127.0.0.1:22400/api/diag/health" -TimeoutSec 30 -SkipHttpErrorCheck
-                Write-Host "status=$($raw.StatusCode) body=$($raw.Content)"
-              } catch { Write-Host "raw retry also failed: $($_.Exception.Message)" }
-              Dump-Diagnostics
-              Write-Host "::error::/api/diag/health unreachable — cannot verify the bundled library"
-              exit 1
-            }
-            $libcount = [int]$hb.checks.workout_library.count
-            if ($libcount -lt 4000) {
-              Dump-Diagnostics
-              Write-Host "::error::bundled workout library count=$libcount (<4000) — packaging lost the library"
-              exit 1
-            }
-            $hitn = [int]$hb.checks.pool_health.hit
-            if ($hitn -lt 1000) {
-              Dump-Diagnostics
-              Write-Host "::error::hit pool count=$hitn (<1000) — classification/facts fault inside the bundle"
-              exit 1
-            }
-            # v3.11.3: the OAuth secret must be LOADED by the frozen app, not just
-            # bundled — a rider reported "token exchange failed" on 3.11.2.
-            if (-not $hb.checks.icu_oauth.secret_loaded) {
-              Dump-Diagnostics
-              Write-Host "::error::frozen app did not load the OAuth client secret — sign-in would fail"
-              exit 1
-            }
-            # v3.11.4: the frozen EXE must verify intervals.icu with the OS
-            # verifier — the 3.11.3 rider's antivirus root is refused by OpenSSL.
-            $tlsb = "$($hb.checks.icu_oauth.tls_backend)"
-            if ($tlsb -ne "os-native") {
-              Dump-Diagnostics
-              Write-Host "::error::frozen app verifies TLS with '$tlsb' (expected os-native) — truststore not bundled/selected"
-              exit 1
-            }
-            # v3.11.4 end-to-end: the frozen EXE signs in THROUGH the simulated
-            # antivirus interceptor. Start -> state -> callback with a dummy
-            # code: the token POST must reach the (fake) intervals.icu and come
-            # back HTTP 400 (reason=exchange&status=400). reason=network is the
-            # rider's failure, still present.
-            python packaging/tls_intercept_probe_win.py e2e-oauth
-            if ($LASTEXITCODE -ne 0) {
-              Write-Host "----- interceptor (fake intervals.icu) -----"
-              Write-Host "interceptor alive: $(-not $fake.HasExited)"
-              netstat -ano | Select-String ':443 ' | ForEach-Object { Write-Host "port: $_" }
-              Get-Content fake_icu.err -ErrorAction SilentlyContinue | Write-Host
-              Dump-Diagnostics
-              Write-Host "::error::end-to-end sign-in through the simulated interceptor failed - see e2e output above"
-              exit 1
-            }
-            # v3.11.5: the plan self-heal counter must EXIST (contract) — 0 here because a fresh install has no plan.
-            $swf = $hb.checks.plan_readable.sessions_without_file
-            if ($null -eq $swf -or [int]$swf -ne 0) {
-              Dump-Diagnostics
-              Write-Host "::error::plan_readable.sessions_without_file = '$swf' (expected 0)"
-              exit 1
-            }
-            if ($null -eq $hb.checks.icu_oauth.can_upload_activities) {
-              Dump-Diagnostics
-              Write-Host "::error::icu_oauth.can_upload_activities missing from diag (v3.11.5 contract)"
-              exit 1
-            }
-            # 2026-09: the FIT a rider downloads must carry the workout's real step
-            # lengths -- exported by the frozen EXE, decoded independently (fitparse).
-            $fitOut = Join-Path $env:RUNNER_TEMP "probe.fit"
-            Invoke-WebRequest -Uri "http://127.0.0.1:22400/api/export/fit-workout?session_type=z2&duration_min=60&name=probe&zwo_file=endurance_steady_55pct_60min.zwo" -OutFile $fitOut -TimeoutSec 60
-            python -m pip install --quiet fitparse
-            python packaging/check_fit_durations.py $fitOut 3600
-            if ($LASTEXITCODE -ne 0) {
-              Dump-Diagnostics
-              Write-Host "::error::the frozen EXE exports FIT workouts with wrong step durations"
-              exit 1
-            }
-            Write-Host "Smoke-test passed: EXE serves version $served, library=$libcount, hit=$hitn, oauth_secret=loaded, tls=$tlsb, e2e-through-interceptor=ok, sessions_without_file=0"
-          } finally {
-            if ($fake -and -not $fake.HasExited) { Stop-Process -Id $fake.Id -Force -ErrorAction SilentlyContinue }
-            # $proc is the cmd.exe wrapper; the EXE is its child. Kill the whole
-            # tree (/T) so Domestique.exe doesn't outlive the wrapper.
-            if ($proc -and -not $proc.HasExited) {
-              taskkill /PID $proc.Id /T /F 2>$null
-              Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
-            }
-          }
-
-      - name: Package EXE as zip
-        shell: pwsh
-        run: |
-          Compress-Archive -Path dist\Domestique\* -DestinationPath Domestique-Windows.zip
-
-      - name: Upload EXE artifact (build-only)
-        if: github.event_name == 'workflow_dispatch'
-        uses: actions/upload-artifact@v4
-        with:
-          name: Domestique-Windows-EXE
-          path: Domestique-Windows.zip
-          retention-days: 7
-
-      - name: Attach EXE to release
-        if: startsWith(github.ref, 'refs/tags/v') || inputs.tag != ''
-        uses: softprops/action-gh-release@v2
-        with:
-          files: Domestique-Windows.zip
-          fail_on_unmatched_files: true
-          tag_name: ${{ inputs.tag || github.ref_name }}
-
-  # ───────────────────────────────────────────────────────────────────
   # Linux AppImage — ADDITIVE AND NON-BLOCKING
   #
-  # Nothing here may cost the macOS or Windows ship. No `needs:` couples this
-  # job to build-macos/build-windows in either direction, and
+  # Nothing here may cost the macOS ship. No `needs:` couples this
+  # job to build-macos in either direction, and
   # continue-on-error keeps a red Linux build from failing the workflow run —
-  # a broken AppImage must still leave a complete macOS+Windows release. The
+  # a broken AppImage must still leave a complete macOS release. The
   # price is that failures show as a warning rather than a red X, so every
   # gate below emits a ::error:: annotation that survives into the summary.
   #
@@ -595,7 +202,7 @@ jobs:
       - name: Trust the checkout
         run: git config --global --add safe.directory '*'
 
-      # Same reasoning as the Windows job: the OAuth client_secret lives in the
+      # Same reasoning as the macOS job: the OAuth client_secret lives in the
       # gitignored .oauth.env, so a CI checkout doesn't have it and the build
       # would ship an empty secret with a broken intervals.icu token exchange.
       - name: Write OAuth client secret (.oauth.env)
@@ -661,7 +268,7 @@ jobs:
           echo "EXPECTED_VERSION=$VERSION" >> "$GITHUB_ENV"
           ls -la dist_linux
 
-      # Gate the build the way the Windows job does, plus the assertion that is
+      # Gate the build the way the macOS job does, plus the assertion that is
       # the entire point of this release: a real, mapped, native window. Two
       # stages share one port, so stage A is killed and :22400 drained before
       # the app starts — otherwise _ensure_port_free_or_die kills it.
@@ -827,8 +434,7 @@ jobs:
           retention-days: 7
           if-no-files-found: warn
 
-      # Uploaded on every trigger (not just workflow_dispatch, unlike the
-      # Windows zip) because verify-linux-clean-container consumes it.
+      # Uploaded on every trigger (not just workflow_dispatch) because verify-linux-clean-container consumes it.
       - name: Upload AppImage artifact
         if: env.APPIMAGE != ''
         uses: actions/upload-artifact@v4
@@ -840,7 +446,7 @@ jobs:
       - name: Attach AppImage to release
         if: (startsWith(github.ref, 'refs/tags/v') || inputs.tag != '') && env.APPIMAGE != ''
         # Belt and braces on top of the job-level flag: a flaky asset upload
-        # must not be able to take the macOS/Windows release down with it.
+        # must not be able to take the macOS release down with it.
         continue-on-error: true
         uses: softprops/action-gh-release@v2
         with:
@@ -950,7 +556,7 @@ jobs:
               fi
               echo "OK: no unresolved libraries"
 
-              # Same gate the Windows job runs: prove the OAuth secret survived
+              # Same gate the macOS job runs: prove the OAuth secret survived
               # into the bundle rather than shipping broken sign-in.
               oauth="$(find squashfs-root -name .oauth.env -print -quit)"
               [ -n "$oauth" ] || { echo "::error::.oauth.env not bundled in the AppImage — OAuth sign-in would fail"; exit 1; }

@@ -8,7 +8,6 @@ See also:
 - [TRADEMARKS.md](docs/TRADEMARKS.md) — trademark policy.
 - [docs/cycling_apps.md](docs/cycling_apps.md) — comparison of free cycling apps accepting ZWO/FIT.
 - [docs/workout_sources.md](docs/workout_sources.md) — workout library provenance.
-- [docs/windows_build.md](docs/windows_build.md) — path to a signed-style Windows `.exe` build.
 - [NOTICE](NOTICE) — Open Food Facts ODbL 1.0 attribution for the nutrition database.
 
 
