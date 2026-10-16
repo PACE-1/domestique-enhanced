@@ -21,6 +21,7 @@ import sqlite3
 from datetime import datetime
 from pathlib import Path
 from user_home import domestique_home
+from atomic_io import write_json_atomic
 
 log = logging.getLogger(__name__)
 
@@ -67,52 +68,13 @@ def default_profile_name() -> str:
 
 
 def _write_registry_atomic(path: Path, data: dict) -> None:
-    """Write registry JSON using tmp + fsync + os.replace (atomic rename).
-
-    Mirrors ``ProfileManager._write_text_atomic`` but kept inline so the
-    migration does not depend on importing profile_manager (which would
-    trip over ``config.__getattr__`` before migration has run).
-    """
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(path.suffix + ".tmp")
-    fd = os.open(str(tmp), os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o644)
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8") as f:
-            f.write(json.dumps(data, indent=2))
-            f.flush()
-            try:
-                os.fsync(f.fileno())
-            except OSError:
-                pass
-        os.replace(str(tmp), str(path))
-    except Exception:
-        try:
-            tmp.unlink()
-        except OSError:
-            pass
-        raise
+    """Write migration metadata without importing profile_manager at startup."""
+    write_json_atomic(path, data)
 
 
 def _write_device_prefs_atomic(path: Path, data: dict) -> None:
-    """Atomically rewrite ``device_prefs.json`` (tmp + fsync + os.replace)."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(path.suffix + ".tmp")
-    fd = os.open(str(tmp), os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o644)
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8") as f:
-            f.write(json.dumps(data, indent=2))
-            f.flush()
-            try:
-                os.fsync(f.fileno())
-            except OSError:
-                pass
-        os.replace(str(tmp), str(path))
-    except Exception:
-        try:
-            tmp.unlink()
-        except OSError:
-            pass
-        raise
+    """Atomically rewrite ``device_prefs.json`` using the shared writer."""
+    write_json_atomic(path, data)
 
 
 def migrate_to_v4(profile_dir: Path) -> bool:
