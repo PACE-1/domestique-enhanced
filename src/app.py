@@ -58,6 +58,7 @@ from obs import (  # noqa: F401
 
 
 from fastapi import FastAPI, File, Form, Request, Query, UploadFile, HTTPException, Body
+import api_models
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -1053,7 +1054,7 @@ def setup_limits():
     return SETUP_LIMITS
 
 
-@app.get("/api/setup/defaults")
+@app.get("/api/setup/defaults", responses={200: {"model": api_models.SetupDefaults}})
 def setup_defaults():
     """Return current/detected config values to pre-fill the wizard."""
     workout_dir_default = ""
@@ -1410,7 +1411,7 @@ def _setup_path_allowed(p: Path) -> bool:
     return False
 
 
-@app.post("/api/setup/ensure-profile")
+@app.post("/api/setup/ensure-profile", responses={200: {"model": api_models.EnsureProfile}})
 def setup_ensure_profile():
     """The first-run wizard calls this before it links intervals.icu or saves:
     both write into the active profile, and after the last profile was deleted
@@ -1829,7 +1830,7 @@ def _validate_profile_id(profile_id: str) -> None:
         raise HTTPException(status_code=400, detail="invalid profile id")
 
 
-@app.get("/api/profiles")
+@app.get("/api/profiles", responses={200: {"model": api_models.ProfilesList}})
 def api_profiles():
     """List profiles. Each entry is enriched with ftp/weight/color from athlete.json
     so the UI doesn't have to make N extra requests. Returns 500 on failure.
@@ -1870,7 +1871,7 @@ def api_profiles():
         return JSONResponse({"error": "Failed to list profiles"}, 500)
 
 
-@app.post("/api/profiles/create")
+@app.post("/api/profiles/create", responses={200: {"model": api_models.ProfileCreated}})
 def api_profiles_create(body: dict):
     from profile_manager import ProfileManager
     pm = ProfileManager.get()
@@ -1891,7 +1892,7 @@ def api_profiles_create(body: dict):
     return resp
 
 
-@app.post("/api/profiles/switch")
+@app.post("/api/profiles/switch", responses={200: {"model": api_models.ProfileSwitched}})
 async def api_profiles_switch(request: Request):
     from profile_manager import ProfileManager
     body = await _get_json_body(request)
@@ -1918,7 +1919,7 @@ async def api_profiles_switch(request: Request):
     return {"ok": True, "active": pm.active_id}
 
 
-@app.put("/api/profiles/{profile_id}")
+@app.put("/api/profiles/{profile_id}", responses={200: {"model": api_models.Ok}})
 def api_profiles_update(profile_id: str, body: dict):
     from profile_manager import ProfileManager
     _validate_profile_id(profile_id)
@@ -1930,7 +1931,7 @@ def api_profiles_update(profile_id: str, body: dict):
     return {"ok": True}
 
 
-@app.delete("/api/profiles/{profile_id}")
+@app.delete("/api/profiles/{profile_id}", responses={200: {"model": api_models.Ok}})
 def api_profiles_delete(profile_id: str):
     from profile_manager import ProfileManager
     _validate_profile_id(profile_id)
@@ -2411,7 +2412,7 @@ def api_profile_backfill_history_status(task_id: str = Query(...)):
     return entry
 
 
-@app.get("/api/sync/progress")
+@app.get("/api/sync/progress", responses={200: {"model": api_models.SyncProgress}})
 def api_sync_progress():
     """v2.2.9 — live progress of the ICU activity sync for the homepage banner.
 
@@ -2612,7 +2613,7 @@ def _run_dfa_backfill_job(task_id: str, force: bool = False,
             pass
 
 
-@app.post("/api/profile/dfa-backfill")
+@app.post("/api/profile/dfa-backfill", responses={200: {"model": api_models.BackfillStarted}})
 def api_profile_dfa_backfill(force: int = Query(0), migrate: int = Query(0)):
     """v1.8.10 — kick off a DFA α1 retry pass over all ICU rides.
 
@@ -2654,7 +2655,7 @@ def api_profile_dfa_backfill(force: int = Query(0), migrate: int = Query(0)):
     return {"status": "started", "task_id": task_id}
 
 
-@app.get("/api/profile/dfa-backfill/status")
+@app.get("/api/profile/dfa-backfill/status", responses={200: {"model": api_models.BackfillStatus}})
 def api_profile_dfa_backfill_status(task_id: str = Query(...)):
     """v1.8.10 — poll DFA backfill task progress."""
     if not isinstance(task_id, str) or not task_id:
@@ -2940,7 +2941,7 @@ def api_profile_dfa_alpha1():
     }
 
 
-@app.get("/api/profile/dfa-rides")
+@app.get("/api/profile/dfa-rides", responses={200: {"model": api_models.DfaRides}})
 def api_profile_dfa_rides():
     """v1.8.14 — all HRV-bearing rides for the DFA α1 tab, plus a recent
     median HRVT1/HRVT2 aggregate. Scan-on-read over stored envelopes; NO
@@ -7958,7 +7959,7 @@ def api_icu_disconnect():
         return JSONResponse({"ok": False, "error": str(e)}, status_code=500)
 
 
-@app.get("/api/icu/connection")
+@app.get("/api/icu/connection", responses={200: {"model": api_models.IcuConnection}})
 def api_icu_connection():
     """Connection state for the UI: method = oauth / apikey / none.
 

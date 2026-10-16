@@ -195,7 +195,8 @@ function StatusLine({ status, onCancel }: { status: Status; onCancel: (taskId?: 
     return <p role="status" className={`text-xs ${status.error ? "text-destructive" : "text-muted-foreground"}`}>{status.text}</p>
   }
   if (status.kind === "sync") {
-    const { done = 0, total = 0 } = status.progress
+    const done = status.progress.done ?? 0
+    const total = status.progress.total ?? 0
     const pct = total > 0 ? Math.max(0, Math.min(100, Math.round((100 * done) / total))) : 0
     return (
       <div role="status" className="text-xs">
@@ -231,7 +232,7 @@ function StatusLine({ status, onCancel }: { status: Status; onCancel: (taskId?: 
       <div className="flex items-center justify-between gap-2">
         <span>{headline}</span>
         {state === "running" && (
-          <Button size="xs" variant="outline" title="Stop DFA backfill" onClick={() => onCancel(s.task_id)}>
+          <Button size="xs" variant="outline" title="Stop DFA backfill" onClick={() => onCancel(s.task_id ?? undefined)}>
             Cancel
           </Button>
         )}
@@ -439,8 +440,8 @@ function PerRide({ rides }: { rides: DfaRide[] }) {
                     {r.alpha1_avg != null ? Number(r.alpha1_avg).toFixed(2) : "—"}
                   </td>
                   <td className="p-2"><ZoneBar z={r.zone_minutes} /></td>
-                  <td className="p-2"><ThresholdCells t={r.hrvt1} note={r.hrvt1_note} /></td>
-                  <td className="p-2"><ThresholdCells t={r.hrvt2} note={r.hrvt2_note} /></td>
+                  <td className="p-2"><ThresholdCells t={r.hrvt1} note={r.hrvt1_note ?? undefined} /></td>
+                  <td className="p-2"><ThresholdCells t={r.hrvt2} note={r.hrvt2_note ?? undefined} /></td>
                 </tr>
               ))}
             </tbody>

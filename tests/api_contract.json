@@ -1,0 +1,1134 @@
+{
+  "components": {
+    "schemas": {
+      "BackfillStarted": {
+        "additionalProperties": true,
+        "properties": {
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Id"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "BackfillStarted",
+        "type": "object"
+      },
+      "BackfillStatus": {
+        "additionalProperties": true,
+        "properties": {
+          "augmented": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Augmented"
+          },
+          "candidates": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidates"
+          },
+          "computed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Computed"
+          },
+          "current": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current"
+          },
+          "failed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Failed"
+          },
+          "icu_deleted": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Icu Deleted"
+          },
+          "no_rr_data": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "No Rr Data"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Id"
+          }
+        },
+        "title": "BackfillStatus",
+        "type": "object"
+      },
+      "DfaAggregate": {
+        "additionalProperties": true,
+        "properties": {
+          "agg_max_decoupling": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agg Max Decoupling"
+          },
+          "agg_min_r2": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agg Min R2"
+          },
+          "hrvt1": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DfaThreshold"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "hrvt2": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DfaThreshold"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "n_excluded_decoupling": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N Excluded Decoupling"
+          },
+          "n_window": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N Window"
+          }
+        },
+        "title": "DfaAggregate",
+        "type": "object"
+      },
+      "DfaRide": {
+        "additionalProperties": true,
+        "properties": {
+          "algo_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Algo Version"
+          },
+          "alpha1_avg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alpha1 Avg"
+          },
+          "avg_hr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Hr"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date"
+          },
+          "duration_min": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Min"
+          },
+          "hrvt1": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DfaThreshold"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "hrvt1_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hrvt1 Note"
+          },
+          "hrvt2": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DfaThreshold"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "hrvt2_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hrvt2 Note"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "lt1_minutes": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lt1 Minutes"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "zone_minutes": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DfaZoneMinutes"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "DfaRide",
+        "type": "object"
+      },
+      "DfaRides": {
+        "additionalProperties": true,
+        "properties": {
+          "aggregate": {
+            "$ref": "#/components/schemas/DfaAggregate",
+            "default": {}
+          },
+          "n_computed": {
+            "default": 0,
+            "title": "N Computed",
+            "type": "integer"
+          },
+          "n_stale_version": {
+            "default": 0,
+            "title": "N Stale Version",
+            "type": "integer"
+          },
+          "n_total": {
+            "default": 0,
+            "title": "N Total",
+            "type": "integer"
+          },
+          "rides": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/DfaRide"
+            },
+            "title": "Rides",
+            "type": "array"
+          }
+        },
+        "title": "DfaRides",
+        "type": "object"
+      },
+      "DfaThreshold": {
+        "additionalProperties": true,
+        "properties": {
+          "date_span": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Span"
+          },
+          "hr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hr"
+          },
+          "n_hr": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N Hr"
+          },
+          "n_power": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N Power"
+          },
+          "power": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Power"
+          },
+          "r2_hr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "R2 Hr"
+          },
+          "r2_hr_median": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "R2 Hr Median"
+          },
+          "r2_power": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "R2 Power"
+          },
+          "r2_power_median": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "R2 Power Median"
+          }
+        },
+        "title": "DfaThreshold",
+        "type": "object"
+      },
+      "DfaZoneMinutes": {
+        "additionalProperties": true,
+        "properties": {
+          "z1": {
+            "default": 0,
+            "title": "Z1",
+            "type": "number"
+          },
+          "z2": {
+            "default": 0,
+            "title": "Z2",
+            "type": "number"
+          },
+          "z3": {
+            "default": 0,
+            "title": "Z3",
+            "type": "number"
+          }
+        },
+        "title": "DfaZoneMinutes",
+        "type": "object"
+      },
+      "EnsureProfile": {
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "EnsureProfile",
+        "type": "object"
+      },
+      "IcuConnection": {
+        "additionalProperties": true,
+        "properties": {
+          "athlete_id": {
+            "default": "",
+            "title": "Athlete Id",
+            "type": "string"
+          },
+          "connected": {
+            "default": false,
+            "title": "Connected",
+            "type": "boolean"
+          },
+          "method": {
+            "default": "none",
+            "title": "Method",
+            "type": "string"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          },
+          "needs_oauth_migration": {
+            "default": false,
+            "title": "Needs Oauth Migration",
+            "type": "boolean"
+          },
+          "oauth_available": {
+            "default": false,
+            "title": "Oauth Available",
+            "type": "boolean"
+          },
+          "write_ok": {
+            "default": false,
+            "title": "Write Ok",
+            "type": "boolean"
+          }
+        },
+        "title": "IcuConnection",
+        "type": "object"
+      },
+      "Ok": {
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "title": "Ok",
+        "type": "object"
+      },
+      "ProfileCreated": {
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "warning": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Warning"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "ProfileCreated",
+        "type": "object"
+      },
+      "ProfileEntry": {
+        "additionalProperties": true,
+        "properties": {
+          "bootstrapped": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bootstrapped"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "created": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created"
+          },
+          "ftp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "last_used": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Used"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          },
+          "weight_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight Kg"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "ProfileEntry",
+        "type": "object"
+      },
+      "ProfileSwitched": {
+        "additionalProperties": true,
+        "properties": {
+          "active": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "title": "ProfileSwitched",
+        "type": "object"
+      },
+      "ProfilesList": {
+        "additionalProperties": true,
+        "properties": {
+          "active": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active"
+          },
+          "active_color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Color"
+          },
+          "active_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Name"
+          },
+          "profiles": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ProfileEntry"
+            },
+            "title": "Profiles",
+            "type": "array"
+          }
+        },
+        "title": "ProfilesList",
+        "type": "object"
+      },
+      "SetupDefaults": {
+        "additionalProperties": true,
+        "properties": {
+          "ftp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp"
+          },
+          "gpx_dir": {
+            "default": "",
+            "title": "Gpx Dir",
+            "type": "string"
+          },
+          "icu_id": {
+            "default": "",
+            "title": "Icu Id",
+            "type": "string"
+          },
+          "lthr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lthr"
+          },
+          "max_hr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Hr"
+          },
+          "weight": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight"
+          },
+          "workout_dir": {
+            "default": "",
+            "title": "Workout Dir",
+            "type": "string"
+          }
+        },
+        "title": "SetupDefaults",
+        "type": "object"
+      },
+      "SyncProgress": {
+        "additionalProperties": true,
+        "properties": {
+          "added": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Added"
+          },
+          "done": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Done"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State"
+          },
+          "total": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total"
+          },
+          "ts": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ts"
+          },
+          "updated": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated"
+          }
+        },
+        "title": "SyncProgress",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "Domestique typed contracts",
+    "version": "1"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/icu/connection": {
+      "get": {
+        "operationId": "api_icu_connection_api_icu_connection_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IcuConnection"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/profile/dfa-backfill": {
+      "post": {
+        "operationId": "api_profile_dfa_backfill_api_profile_dfa_backfill_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackfillStarted"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/profile/dfa-backfill/status": {
+      "get": {
+        "operationId": "api_profile_dfa_backfill_status_api_profile_dfa_backfill_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackfillStatus"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/profile/dfa-rides": {
+      "get": {
+        "operationId": "api_profile_dfa_rides_api_profile_dfa_rides_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DfaRides"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/profiles": {
+      "get": {
+        "operationId": "api_profiles_api_profiles_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfilesList"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/profiles/create": {
+      "post": {
+        "operationId": "api_profiles_create_api_profiles_create_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileCreated"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/profiles/switch": {
+      "post": {
+        "operationId": "api_profiles_switch_api_profiles_switch_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileSwitched"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/profiles/{profile_id}": {
+      "delete": {
+        "operationId": "api_profiles_delete_api_profiles__profile_id__delete",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ok"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "operationId": "api_profiles_update_api_profiles__profile_id__put",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ok"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/setup/defaults": {
+      "get": {
+        "operationId": "setup_defaults_api_setup_defaults_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetupDefaults"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/setup/ensure-profile": {
+      "post": {
+        "operationId": "setup_ensure_profile_api_setup_ensure_profile_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnsureProfile"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/sync/progress": {
+      "get": {
+        "operationId": "api_sync_progress_api_sync_progress_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncProgress"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    }
+  }
+}
