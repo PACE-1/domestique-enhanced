@@ -97,13 +97,24 @@ def shutdown(budget_s: float = 8.0) -> dict:
         j.thread.join(timeout=max(0.0, deadline - time.monotonic()))
         (alive if j.thread.is_alive() else stopped).append(j.name)
     if alive:
+        # Stragglers keep seeing stopping() == True until the process ends or
+        # begin() starts a new run.
         log.warning("shutdown: %d job(s) still running after %.1fs: %s",
                     len(alive), budget_s, ", ".join(sorted(alive)))
+    else:
+        _stop.clear()     # everything stopped: a later run in this process starts clean
     return {"stopped": sorted(stopped), "still_running": sorted(alive)}
 
 
-def reset_for_tests() -> None:
+def begin() -> None:
+    """Start a new run: clear the stop flag a previous shutdown set. Called at
+    application startup, so a process that starts the app more than once (tests,
+    an embedded server) is not left permanently stopping."""
     _stop.clear()
+
+
+def reset_for_tests() -> None:
+    begin()
     with _lock:
         _jobs.clear()
 

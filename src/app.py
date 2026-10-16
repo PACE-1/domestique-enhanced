@@ -571,6 +571,8 @@ _LAST_MIGRATION_RESULT: dict = {"show_toast": False}
 async def lifespan(app):
     import access as _access
     _access.check_startup()   # server mode without a token must not start (#13)
+    import jobs as _jobs_boot
+    _jobs_boot.begin()        # a previous run's shutdown must not leave jobs "stopping" (#17)
     # #19: never run against data written by a newer layout; stamp it on first use.
     import backup as _backup
     from user_home import domestique_home as _home

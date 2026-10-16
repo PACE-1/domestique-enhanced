@@ -133,3 +133,4 @@ def test_server_exits_cleanly_on_sigterm_within_the_budget(tmp_path):
     finally:
         if p.poll() is None:
             p.kill()
+
