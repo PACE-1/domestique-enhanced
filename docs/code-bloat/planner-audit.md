@@ -53,9 +53,13 @@ stays `expectedFailure`, so the gap stays visible.
   `['2026-10-07', 'z2', 21, 16.0, ...]` became `[..., 'rest', 0, 0.0, ...]`
 - owner1: 80 cases, all unchanged
 
-The single owner0 difference is the one the cleanup batch already reported against
-the tracked golden. It was not blessed or edited and is not explained here; it is
-the first thing to investigate before any consolidation under #24.
+The single owner0 difference is explained (2026-10-16, bisected): `66bc75db`
+("A rest day is never restored as a few-minute ride", #35) made `reforecast`
+leave a day as rest when the restored session would be under the 30-minute
+session floor. The golden still held the old 21-minute restored ride. The change
+was an intended fix; the golden was re-blessed and the diff is exactly that one
+session (`z2, 21 min, 16 TSS` becomes `rest`). The characterization baseline is
+now clean: 49 builders, 80 owner0 and 80 owner1 cases, all unchanged.
 
 ## Entry points apply different policy passes
 
@@ -109,7 +113,6 @@ mapped.
 
 ## What stays open
 
-- Resolve the one owner0 characterization difference.
 - Runtime comparison of the per-entry-point policy gaps above.
 - The intensity-ceiling fix, as a separate reviewed algorithm change.
 - Measured comparison before adopting, deferring or removing the dormant week
