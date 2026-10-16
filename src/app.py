@@ -568,6 +568,8 @@ _LAST_MIGRATION_RESULT: dict = {"show_toast": False}
 
 @asynccontextmanager
 async def lifespan(app):
+    import access as _access
+    _access.check_startup()   # server mode without a token must not start (#13)
     # ── Profile system: migrate + init ──────────────────────────────────
     # Order matters: ProfileManager.get() runs the v3 data-dir rename
     # (~/.chickencycling → ~/.domestique). After that runs, the legacy
@@ -878,9 +880,75 @@ _ALLOWED_ORIGIN_PREFIXES = (
 async def origin_check(request, call_next):
     if request.method in ("POST", "DELETE", "PUT", "PATCH"):
         origin = request.headers.get("origin", "")
-        if origin and not any(origin.startswith(a) for a in _ALLOWED_ORIGIN_PREFIXES):
+        import access as _access
+        if origin and not _access.origin_allowed(origin, _ALLOWED_ORIGIN_PREFIXES):
             return StarletteJSONResponse({"error": "origin not allowed"}, status_code=403)
     return await call_next(request)
+
+
+# ── Access gate (server deployments, #13) ────────────────────────────────────
+# No-op unless DOMESTIQUE_ACCESS_TOKEN is set. Registered after origin_check,
+# so it runs first: an unauthenticated request never reaches any handler.
+@app.middleware("http")
+async def _access_gate(request, call_next):
+    import access as _access
+    token = _access.configured_token()
+    if not token or request.url.path in _access.OPEN_PATHS:
+        return await call_next(request)
+    if _access.is_authorized(token, request.headers.get("authorization", ""),
+                             request.cookies.get(_access.COOKIE, "")):
+        return await call_next(request)
+    if request.url.path.startswith("/api/") or request.method != "GET":
+        return StarletteJSONResponse({"error": "authentication required"}, status_code=401)
+    from starlette.responses import RedirectResponse as _Redirect
+    return _Redirect("/login", status_code=303)
+
+
+_LOGIN_PAGE = """<!doctype html><meta charset="utf-8"><title>Domestique - sign in</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>body{font:16px system-ui;background:#0a0a0a;color:#eee;display:grid;place-items:center;min-height:100vh;margin:0}
+form{display:grid;gap:12px;width:min(320px,90vw)}input,button{font:inherit;padding:10px;border-radius:8px;border:1px solid #444;background:#1a1a1a;color:#eee}
+button{background:#15803d;border-color:#15803d;cursor:pointer}p{color:#f87171;margin:0}</style>
+<form method="post" action="/login"><h1>Domestique</h1>%s
+<input type="password" name="token" placeholder="Access token" autofocus autocomplete="current-password">
+<button type="submit">Sign in</button></form>"""
+
+
+@app.get("/login", response_class=HTMLResponse)
+def login_page():
+    return HTMLResponse(_LOGIN_PAGE % "")
+
+
+@app.post("/login")
+async def login_submit(request: Request):
+    import access as _access
+    from urllib.parse import parse_qs
+    token = _access.configured_token()
+    form = parse_qs((await request.body()).decode("utf-8", "replace"))
+    given = (form.get("token") or [""])[0]
+    if not token or not _access.is_authorized(token, f"Bearer {given}", ""):
+        return HTMLResponse(_LOGIN_PAGE % "<p>Wrong token.</p>", status_code=401)
+    from starlette.responses import RedirectResponse as _Redirect
+    resp = _Redirect("/", status_code=303)
+    secure = (request.url.scheme == "https"
+              or request.headers.get("x-forwarded-proto", "").lower() == "https")
+    resp.set_cookie(_access.COOKIE, _access.session_value(token), httponly=True,
+                    samesite="strict", secure=secure, max_age=30 * 24 * 3600)
+    return resp
+
+
+@app.post("/logout")
+def logout():
+    import access as _access
+    from starlette.responses import RedirectResponse as _Redirect
+    resp = _Redirect("/login", status_code=303)
+    resp.delete_cookie(_access.COOKIE)
+    return resp
+
+
+@app.get("/healthz")
+def healthz():
+    return {"ok": True}
 
 
 # ── Security headers (defence-in-depth) ──────────────────────────────────────
