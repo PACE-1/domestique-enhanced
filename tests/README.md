@@ -47,6 +47,9 @@ An optional third argument compares diagnostic failures to a previous label.
 `GATE_RERUN_FAILURES=0` skips reruns without changing the result.
 
 For a focused iteration, run `python -m pytest tests/test_<feature>.py -q`.
+For a fast, app-free loop run `tools/run_pure_tests.sh` (about a minute for
+127 files); see [PURE.md](PURE.md). `tests/conftest.py` still applies to the
+full gate, and the sandbox it uses lives in `tests/_sandbox.py`.
 `pytest.ini` excludes hardware-marked tests by default. Keep expected failures,
 skips and platform-specific failures explicit; use a measured baseline rather
 than the old documentation's obsolete target of 783 passes.
