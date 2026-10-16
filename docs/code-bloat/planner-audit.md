@@ -59,7 +59,10 @@ leave a day as rest when the restored session would be under the 30-minute
 session floor. The golden still held the old 21-minute restored ride. The change
 was an intended fix; the golden was re-blessed and the diff is exactly that one
 session (`z2, 21 min, 16 TSS` becomes `rest`). The characterization baseline is
-now clean: 49 builders, 80 owner0 and 80 owner1 cases, all unchanged.
+now clean: 49 builders, 80 owner0 and 80 owner1 cases, all unchanged. Afterwards the
+`event/wkend3h/reforecast@21` case was removed (79 owner0 and 79 owner1): with the #35
+floor the 3 h rider's week has no room to restore a rest day, so the case edited
+nothing and the harness self-test rejected it. `--self-test` passes again.
 
 ## Entry points apply different policy passes
 
