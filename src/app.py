@@ -4610,6 +4610,21 @@ async def api_plan_auto_adjust(request: Request):
 _MAX_FIT_BYTES = 50 * 1024 * 1024
 _MAX_HRV_CSV_BYTES = 5 * 1024 * 1024
 _UPLOAD_CHUNK = 1024 * 1024
+# At most this many imports read, decompress and parse at once. The rest wait
+# before their body is read, so queued requests hold no FIT bytes in memory.
+_MAX_CONCURRENT_IMPORTS = 2
+_import_limiter = None
+
+
+def _import_slots():
+    """The shared limiter, created on first use inside a running event loop."""
+    global _import_limiter
+    if _import_limiter is None:
+        import anyio
+        _import_limiter = anyio.CapacityLimiter(_MAX_CONCURRENT_IMPORTS)
+    return _import_limiter
+
+
 # route path -> largest request body we accept (limit + multipart overhead)
 _UPLOAD_BODY_LIMITS = {
     "/api/ride/import": _MAX_FIT_BYTES + 1024 * 1024,
@@ -4656,10 +4671,14 @@ def _fit_payload(data: bytes) -> bytes:
 async def _upload_size_guard(request, call_next):
     limit = _UPLOAD_BODY_LIMITS.get(request.url.path)
     if limit is not None and request.method == "POST":
+        # A chunked body has no declared length, so Starlette would spool it
+        # to disk before any limit could apply. Browsers and curl always send
+        # a length for a file upload; ask the client to.
         try:
-            declared = int(request.headers.get("content-length") or 0)
-        except ValueError:
-            declared = 0
+            declared = int(request.headers["content-length"])
+        except (KeyError, ValueError):
+            return StarletteJSONResponse(
+                {"error": "Content-Length is required for uploads"}, status_code=411)
         if declared > limit:
             return StarletteJSONResponse(
                 {"error": f"upload too large (>{limit // (1024 * 1024)} MB)"},
@@ -4679,7 +4698,8 @@ async def api_wellness_import_hrv4training(file: UploadFile = File(...)):
     Returns {"imported": int, "skipped": int}.
     """
     import csv as _csv
-    raw = await _read_upload_limited(file, _MAX_HRV_CSV_BYTES, "HRV CSV")
+    async with _import_slots():
+        raw = await _read_upload_limited(file, _MAX_HRV_CSV_BYTES, "HRV CSV")
     try:
         text = raw.decode("utf-8-sig")  # tolerates BOM
     except UnicodeDecodeError:
@@ -17714,6 +17734,11 @@ async def api_ride_import(
 
     # Rides longer than ~24h would blow past 50 MB; it covers every real-world
     # case. Reading stops at the limit instead of buffering the whole upload.
+    async with _import_slots():
+        return await _import_fit_locked(fit_file)
+
+
+async def _import_fit_locked(fit_file: UploadFile):
     data = _fit_payload(await _read_upload_limited(fit_file, _MAX_FIT_BYTES, "file"))
 
     # Stable id: upload time in ISO form (filesystem-safe ":" replacement).

@@ -101,3 +101,74 @@ def test_small_hrv_csv_still_imports(client):
         files={"file": ("hrv.csv", b"date,rmssd\n2026-01-01,52.5\n", "text/csv")},
     )
     assert r.status_code == 200 and r.json()["imported"] == 1
+
+
+# ── concurrency (#18) ────────────────────────────────────────────────────────
+
+def _async_client():
+    import httpx
+    return httpx.AsyncClient(transport=httpx.ASGITransport(app=app_module.app), base_url="http://t")
+
+
+def _post_async(c, data, name="ride.fit"):
+    return c.post("/api/ride/import", files={"fit_file": (name, data, "application/octet-stream")})
+
+
+def test_simultaneous_uploads_in_one_second_get_distinct_ride_ids(client, tmp_path, monkeypatch):
+    from datetime import datetime, timezone
+    frozen = datetime(2026, 10, 16, 12, 0, 0, tzinfo=timezone.utc)
+    monkeypatch.setattr(app_module.clock, "now", lambda tz=None: frozen if tz is None else frozen.astimezone(tz))
+    monkeypatch.setattr(app_module, "_parse_fit_stats", lambda p: {"sample_count": 1})
+    data = _valid_fit(tmp_path)
+
+    async def run():
+        async with _async_client() as c:
+            return await asyncio.gather(*[_post_async(c, data) for _ in range(5)])
+
+    responses = asyncio.run(run())
+    assert [r.status_code for r in responses] == [200] * 5
+    assert len({r.json()["ride_id"] for r in responses}) == 5
+    assert len(list(client.rides.glob("*.fit"))) == 5
+    assert not list(client.rides.glob("*.part"))
+
+
+def test_only_a_few_imports_parse_at_once(client, tmp_path, monkeypatch):
+    import threading
+    import time
+    lock, state = threading.Lock(), {"now": 0, "max": 0}
+
+    def slow_parse(path):
+        with lock:
+            state["now"] += 1
+            state["max"] = max(state["max"], state["now"])
+        time.sleep(0.2)
+        with lock:
+            state["now"] -= 1
+        return {"sample_count": 1}
+
+    monkeypatch.setattr(app_module, "_parse_fit_stats", slow_parse)
+    app_module._import_limiter = None  # a limiter made on another event loop must not leak in
+    data = _valid_fit(tmp_path)
+
+    async def run():
+        async with _async_client() as c:
+            return await asyncio.gather(*[_post_async(c, data) for _ in range(6)])
+
+    responses = asyncio.run(run())
+    assert [r.status_code for r in responses] == [200] * 6
+    assert state["max"] == app_module._MAX_CONCURRENT_IMPORTS
+
+
+def test_upload_without_content_length_is_refused(client, tmp_path):
+    async def body():
+        yield b"--b\r\n"
+
+    async def run():
+        async with _async_client() as c:
+            return await c.post(
+                "/api/ride/import", content=body(),
+                headers={"content-type": "multipart/form-data; boundary=b"})
+
+    r = asyncio.run(run())
+    assert r.status_code == 411
+    assert not list(client.rides.glob("*"))
