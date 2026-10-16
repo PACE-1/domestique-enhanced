@@ -147,7 +147,8 @@ run reconciles against what intervals.icu now holds.
 
 **Upload limits.** A FIT upload is capped at 50 MB (decompressed too) and an
 HRV CSV at 5 MB. A request must declare its `Content-Length` (411 otherwise)
-and is refused before it is read when the declared size is over the limit. A
+and is refused before it is read when the declared size is over the limit. Parsing a FIT is abandoned after 60 s (504, nothing is listed); the worker
+thread ends when the parser does, and at most two imports run at once. A
 reverse proxy should still set its own body limit.
 
 ## Linux AppImage (#12)

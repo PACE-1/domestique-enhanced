@@ -4615,6 +4615,7 @@ _UPLOAD_CHUNK = 1024 * 1024
 # At most this many imports read, decompress and parse at once. The rest wait
 # before their body is read, so queued requests hold no FIT bytes in memory.
 _MAX_CONCURRENT_IMPORTS = 2
+_FIT_PARSE_TIMEOUT_S = 60.0   # a FIT is at most 50 MB; a parse past this is abandoned (#18)
 _import_limiter = None
 
 
@@ -17766,7 +17767,19 @@ async def _import_fit_locked(fit_file: UploadFile):
 
     # #4: parsing a FIT is CPU and file I/O; keep it off the event loop.
     from starlette.concurrency import run_in_threadpool
-    parsed = await run_in_threadpool(_parse_fit_stats, fit_path)
+    try:
+        parsed = await asyncio.wait_for(
+            run_in_threadpool(_parse_fit_stats, fit_path), _FIT_PARSE_TIMEOUT_S)
+    except asyncio.TimeoutError:
+        # Only the wait is abandoned; the worker thread ends when the parser does
+        # (at most _MAX_CONCURRENT_IMPORTS of them). The file is never listed.
+        try:
+            fit_path.unlink()
+        except OSError:
+            pass
+        raise HTTPException(
+            status_code=504,
+            detail=f"reading this FIT file took longer than {_FIT_PARSE_TIMEOUT_S:.0f} s")
     if parsed.get("error") == "parse_failed":
         # Rejected data is never listed as a ride.
         try:
