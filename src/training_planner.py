@@ -7451,9 +7451,6 @@ def sample_week_workouts(ctx: "week_plan.WeekContext", state: "week_plan.PlanSta
     is_stepback, week_in_phase = ctx.is_stepback, ctx.week_in_phase
     emphasis_profile, block_focus = ctx.emphasis_profile, ctx.block_focus
     goal_type = getattr(goal, "goal_type", "general")
-    available_days, rest_days = goal.available_days, goal.rest_days
-    daily_max_hours = goal.daily_max_hours
-    max_weekday_hours, max_weekend_hours = goal.max_weekday_hours, goal.max_weekend_hours
     library, used_names, pool_index = state.library, state.used_names, state.pool_index
     recent_hit_types = state.recent_hit_by_phase.setdefault(phase.name, [])
     seen_cc_dur_tuples, plan_pick_counts = state.seen_cc_dur_tuples, state.plan_pick_counts
@@ -7514,53 +7511,11 @@ def sample_week_workouts(ctx: "week_plan.WeekContext", state: "week_plan.PlanSta
             return (f.get("t130") or 0) <= 0
         endurance_pool = [w for w in endurance_pool if _deload_ok(w)]
 
-    # Resolve per-day max minutes
-    def _max_min_for(weekday: int) -> int:
-        if daily_max_hours and weekday in daily_max_hours:
-            return int(daily_max_hours[weekday] * 60)
-        return int((max_weekend_hours if weekday >= 5 else max_weekday_hours) * 60)
-
-    # Build slot list: (idx, date, day_name, weekday, max_min, is_rest)
-    slots: list[tuple[int, date, str, int, int, bool]] = []
-    for off in range(7):
-        d = week_start + timedelta(days=off)
-        wd = d.weekday()
-        is_rest = (wd in rest_days) or (wd not in available_days)
-        slots.append((off, d, d.strftime("%a"), wd, _max_min_for(wd), is_rest))
-
-    # 1. Identify HIT slots: pick `hit_count` slots, preferring Tue/Thu/Sat (the
-    # canonical 48h-spaced pattern for endurance athletes).
-    if is_stepback:
-        # Stepback weeks remain endurance-only — Issurin unloading.
-        hit_count = 0
-    else:
-        hit_count = rng.randint(budget.hit_count_min, budget.hit_count_max)
-
+    slots, hit_slot_idxs = week_plan.sampler_slots(ctx, budget, rng)
+    # Repair and solver passes use the same caps already resolved for each day.
+    max_minutes = {slot[3]: slot[4] for slot in slots}
+    _max_min_for = max_minutes.__getitem__
     non_rest = [s for s in slots if not s[5]]
-    # Cap HIT count by 48h-gap feasibility (need ≥1 non-rest day between HITs).
-    hit_count = min(hit_count, max(0, len(non_rest) // 2 + (1 if len(non_rest) % 2 else 0)))
-
-    preferred_hit_weekdays = [1, 3, 5]  # Tue, Thu, Sat
-    hit_slot_idxs: set[int] = set()
-    # First pass — preferred days that are non-rest
-    for wd in preferred_hit_weekdays:
-        if len(hit_slot_idxs) >= hit_count:
-            break
-        for s in non_rest:
-            if s[3] == wd and s[0] not in hit_slot_idxs:
-                # 48h gap check vs already-picked HIT slots
-                if all(abs(s[0] - i) >= 2 for i in hit_slot_idxs):
-                    hit_slot_idxs.add(s[0])
-                    break
-    # Backfill if still short — any non-rest day satisfying 48h gap
-    if len(hit_slot_idxs) < hit_count:
-        rest = [s for s in non_rest if s[0] not in hit_slot_idxs]
-        rng.shuffle(rest)
-        for s in rest:
-            if len(hit_slot_idxs) >= hit_count:
-                break
-            if all(abs(s[0] - i) >= 2 for i in hit_slot_idxs):
-                hit_slot_idxs.add(s[0])
 
     # 2. For each slot, sample a workout. Track remaining budget.
     remaining = {
