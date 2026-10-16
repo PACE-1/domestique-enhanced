@@ -13777,6 +13777,19 @@ def api_plan_daily_adapt():
         return {"action": "error", "detail": "Plan projection failed", "projection_only": True}
 
 
+def _find_week_idx(weeks: list, target: date) -> int | None:
+    """Index of the stored plan week whose start..end contains ``target``."""
+    for i, w in enumerate(weeks):
+        try:
+            w_start = date.fromisoformat(w["start"])
+            w_end = date.fromisoformat(w["end"])
+        except (KeyError, ValueError):
+            continue
+        if w_start <= target <= w_end:
+            return i
+    return None
+
+
 def _apply_move_session(
     plan: dict, src_iso: str, dst_iso: str, reset_status_to_pending: bool = False,
     auto: bool = False,
@@ -13825,19 +13838,8 @@ def _apply_move_session(
 
     weeks_data = plan.get("weeks", [])
 
-    def _find_week_idx(target: date) -> int | None:
-        for i, w in enumerate(weeks_data):
-            try:
-                w_start = date.fromisoformat(w["start"])
-                w_end = date.fromisoformat(w["end"])
-            except (KeyError, ValueError):
-                continue
-            if w_start <= target <= w_end:
-                return i
-        return None
-
-    src_week_idx = _find_week_idx(src_d)
-    dst_week_idx = _find_week_idx(dst_d)
+    src_week_idx = _find_week_idx(weeks_data, src_d)
+    dst_week_idx = _find_week_idx(weeks_data, dst_d)
     if src_week_idx is None or dst_week_idx is None:
         return None
 
@@ -14446,19 +14448,8 @@ async def api_plan_move_session(request: Request):
 
             weeks_data = plan.get("weeks", [])
 
-            def _find_week_idx(target: date) -> int | None:
-                for i, w in enumerate(weeks_data):
-                    try:
-                        w_start = date.fromisoformat(w["start"])
-                        w_end = date.fromisoformat(w["end"])
-                    except (KeyError, ValueError):
-                        continue
-                    if w_start <= target <= w_end:
-                        return i
-                return None
-
-            src_week_idx = _find_week_idx(src_d)
-            dst_week_idx = _find_week_idx(dst_d)
+            src_week_idx = _find_week_idx(weeks_data, src_d)
+            dst_week_idx = _find_week_idx(weeks_data, dst_d)
 
             # v4.3.0 B1 — Lazy-load + 422 fix.
             # Symptom: user dragged a session within the visible Mon-Sun week and
@@ -14476,8 +14467,8 @@ async def api_plan_move_session(request: Request):
                     with open(json_path, encoding="utf-8") as f:
                         plan_disk = json.load(f)
                     weeks_data = plan_disk.get("weeks", [])
-                    src_week_idx = _find_week_idx(src_d)
-                    dst_week_idx = _find_week_idx(dst_d)
+                    src_week_idx = _find_week_idx(weeks_data, src_d)
+                    dst_week_idx = _find_week_idx(weeks_data, dst_d)
                     if src_week_idx is not None or dst_week_idx is not None:
                         # Lazy-load found something — swap the in-memory plan to
                         # the disk version so all downstream writes see it.
@@ -17969,16 +17960,19 @@ def _read_last_sync_at() -> float | None:
         return None
 
 
-def _write_last_sync_at(ts: float) -> None:
-    p = _icu_sync_state_path()
+def _write_sync_stamp(p: Path | None, ts: float, what: str) -> None:
     if p is None:
-        _log.debug("_write_last_sync_at skipped: no active profile")
+        _log.debug(f"{what} skipped: no active profile")
         return
     try:
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(str(ts), encoding="utf-8")
     except OSError as e:
-        _log.debug(f"_write_last_sync_at failed: {e}")
+        _log.debug(f"{what} failed: {e}")
+
+
+def _write_last_sync_at(ts: float) -> None:
+    _write_sync_stamp(_icu_sync_state_path(), ts, "_write_last_sync_at")
 
 
 def _read_last_wellness_sync_at() -> float | None:
@@ -17992,15 +17986,7 @@ def _read_last_wellness_sync_at() -> float | None:
 
 
 def _write_last_wellness_sync_at(ts: float) -> None:
-    p = _icu_wellness_sync_state_path()
-    if p is None:
-        _log.debug("_write_last_wellness_sync_at skipped: no active profile")
-        return
-    try:
-        p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_text(str(ts), encoding="utf-8")
-    except OSError as e:
-        _log.debug(f"_write_last_wellness_sync_at failed: {e}")
+    _write_sync_stamp(_icu_wellness_sync_state_path(), ts, "_write_last_wellness_sync_at")
 
 
 def _sync_icu_wellness(force: bool = False, days: int = 90) -> dict:
