@@ -69,3 +69,20 @@ been executed; GitHub is where CI is validated.
 Inventory, candidate decisions and current measurement limits are recorded in
 [code-bloat/README.md](code-bloat/README.md). Product defect fixes, algorithm
 changes and structural cleanup must have separate evidence and commits.
+
+## Browser smoke tests
+
+`web/e2e/` drives the new UI in a real Chromium against a real backend on a
+throwaway data root (a temporary `HOME` and `DOMESTIQUE_HOME`; credentials blank,
+no network flag). It covers first-run setup, the new-profile wizard, profile
+switching by keyboard, deleting with the typed confirmation, keyboard navigation,
+and the DFA empty and error states.
+
+```sh
+cd web && pnpm install && pnpm build && pnpm exec playwright install chromium
+E2E_PYTHON=/path/to/python-with-server-requirements pnpm e2e
+```
+
+Plan generation and editing, FIT import and workout or plan export have no browser
+coverage yet because those workflows have not been migrated; add their specs with
+each migration (roadmap #9, #25).
