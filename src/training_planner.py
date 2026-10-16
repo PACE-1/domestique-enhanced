@@ -14725,6 +14725,9 @@ def extend_continuous_plan(
             count_weeks=_rolling_window)
         _enforce_ronnestad_floor(new_weeks, pool_index, plan_pick_counts)
     _enforce_weekly_hit_cap(new_weeks, library)
+    # #24: extend skipped the weekly TSS ceiling that generate, regenerate and
+    # recalculate apply, so appended weeks could exceed their own budget.
+    _enforce_weekly_volume_ceiling(new_weeks)
     # FTP-tests IP W1e: fresh-legs guard on the appended weeks too — the hard
     # floor passes above can land a HIT session the day before an appended
     # test, exactly the gap the generation path already closes. Appended weeks
