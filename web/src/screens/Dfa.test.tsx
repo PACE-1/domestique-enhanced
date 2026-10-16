@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest"
 import { r2Quality, type DfaRides } from "@/lib/dfa"
 import { Dfa } from "@/screens/Dfa"
 
-const WITH_THRESHOLDS: DfaRides = {
+const WITH_THRESHOLDS = {
   n_total: 2,
   n_computed: 2,
   aggregate: {
@@ -22,7 +22,7 @@ const WITH_THRESHOLDS: DfaRides = {
       hrvt2: null, hrvt2_note: "not crossed",
     },
   ],
-}
+} as unknown as DfaRides
 
 function mockApi(rides: DfaRides | number, over: Record<string, () => Response> = {}) {
   const calls: { url: string; method: string }[] = []
@@ -69,7 +69,7 @@ describe("Dfa tab", () => {
   })
 
   it("explains when no threshold was crossed", async () => {
-    mockApi({ n_total: 3, n_computed: 3, aggregate: {}, rides: [] })
+    mockApi({ n_total: 3, n_computed: 3, aggregate: {}, rides: [] } as unknown as DfaRides)
     render(<Dfa />)
     expect(await screen.findByText("No thresholds detected yet.")).toBeTruthy()
     expect(screen.getByText(/3 ride\(s\) have α1 computed/)).toBeTruthy()
@@ -87,7 +87,7 @@ describe("Dfa tab", () => {
   })
 
   it("upgrades stale rides with the migrate flag instead of a plain backfill", async () => {
-    const calls = mockApi({ ...WITH_THRESHOLDS, n_stale_version: 2 })
+    const calls = mockApi({ ...WITH_THRESHOLDS, n_stale_version: 2 } as DfaRides)
     render(<Dfa />)
     await waitFor(() =>
       expect(calls.some((c) => c.url === "/api/profile/dfa-backfill?migrate=1" && c.method === "POST")).toBe(true),

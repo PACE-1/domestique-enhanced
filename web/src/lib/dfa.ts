@@ -15,7 +15,7 @@ export function r2Quality(r2: number | null | undefined): { cls: string; label: 
   return { cls: "text-red-500", label: "low" }
 }
 
-export const isTerminal = (state?: string) => state === "done" || state === "cancelled" || state === "error"
+export const isTerminal = (state?: string | null) => state === "done" || state === "cancelled" || state === "error"
 
 export const getRides = () => api<DfaRides>("/api/profile/dfa-rides")
 export const startBackfill = (migrate = false) =>
