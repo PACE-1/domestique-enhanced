@@ -7361,7 +7361,10 @@ def api_migrations_last_run_result():
 #   { current, latest, update_available, release_url, download_url,
 #     asset_name, platform, checked_at, cached, error, release_body }
 _UPDATE_CHECK_CACHE_TTL_S = 6 * 60 * 60  # 6 hours
-_GITHUB_RELEASES_LATEST_URL = "https://api.github.com/repos/platypus45/domestique/releases/latest"
+# Release channel: this fork's own repository, never upstream (#16). Override with
+# DOMESTIQUE_RELEASE_REPO=<owner>/<repo>; upstream binaries are not offered as upgrades.
+_RELEASE_REPO = (os.environ.get("DOMESTIQUE_RELEASE_REPO") or "PACE-1/domestique-enhanced").strip().strip("/")
+_GITHUB_RELEASES_LATEST_URL = f"https://api.github.com/repos/{_RELEASE_REPO}/releases/latest"
 _RELEASE_BODY_MAX_CHARS = 8192
 _RELEASE_BODY_TRUNCATION_SUFFIX = "\n\n… (full release notes on GitHub)"
 
@@ -8497,7 +8500,7 @@ def api_update_check(force: int = Query(0)):
             "current": _VERSION,
             "latest": tag,
             "update_available": bool(update_available),
-            "release_url": rel.get("html_url") or ("https://github.com/platypus45/domestique/releases/tag/v" + tag),
+            "release_url": rel.get("html_url") or (f"https://github.com/{_RELEASE_REPO}/releases/tag/v" + tag),
             "download_url": download_url,
             "asset_name": asset_name,
             "platform": plat,

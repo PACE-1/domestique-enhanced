@@ -377,3 +377,27 @@ class TestReleaseBody(UpdateCheckBase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestForkReleaseChannel(UpdateCheckBase):
+    """#16: the fork checks its own releases, never upstream's."""
+
+    def test_default_channel_is_this_fork_not_upstream(self):
+        self.assertIn("PACE-1/domestique-enhanced", app_module._GITHUB_RELEASES_LATEST_URL)
+        self.assertNotIn("platypus45", app_module._GITHUB_RELEASES_LATEST_URL)
+
+    def test_check_requests_the_fork_url_and_falls_back_to_a_fork_release_page(self):
+        rel = _fake_release(tag="9.9.9")
+        rel.pop("html_url")  # force the fallback release URL
+        seen = []
+
+        def _get(url, **kw):
+            seen.append(url)
+            return _FakeResp(200, rel)
+
+        with patch("httpx.get", side_effect=_get):
+            data = self.client.get("/api/update/check?force=1").json()
+        self.assertEqual(seen, [app_module._GITHUB_RELEASES_LATEST_URL])
+        self.assertTrue(data["release_url"].startswith(
+            f"https://github.com/{app_module._RELEASE_REPO}/releases/tag/"))
+        self.assertNotIn("platypus45", data["release_url"])
