@@ -20056,463 +20056,57 @@ def api_ride_fit(ride_id: str):
 # v4.6.7 IMPL-SUM PROGRAMME-SUMMARY — end-of-plan recap
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def _ride_started_iso_date(ride: dict) -> str | None:
-    """Best-effort 'YYYY-MM-DD' from a list_rides() entry."""
-    s = ride.get("started_at") or ""
-    if isinstance(s, str) and len(s) >= 10:
-        return s[:10]
-    return None
+from programme_summary import _ride_started_iso_date  # noqa: F401 - compatibility
 
 
 def _build_programme_summary(plan: dict) -> dict:
-    """Compose the §4 programme-summary JSON shape.
+    """Read profile data and delegate recap calculations to programme_summary."""
+    import programme_summary as summary
 
-    Reads:
-      - plan dict (current_plan.json) for window + phases + planned TSS
-      - athlete_metrics ledger for FTP / VO2max snapshots at start/end
-      - ride_storage for actual rides in the window (decoupling, peaks,
-        zone-time, TSS aggregates)
-      - daily_log for Hooper trend
-      - analytics + training for polarization / monotony
-    """
-    weeks = plan.get("weeks") or []
-    if not weeks:
-        return {
-            "plan_id": "current",
-            "start_date": None, "end_date": None, "weeks": 0,
-            # The modal keys its empty state off "rides": zero rides must read
-            # as "nothing ridden yet", never as measured zeros.
-            "rides": 0,
-            "ftp_delta": {}, "eftp_delta": {}, "vo2max_delta": {},
-            "ctl_gain": {}, "intensity_dist": {}, "pol_index": {},
-            "monotony_max": None, "strain_max": None, "compliance": [],
-            "mean_max_curve": {"start": [], "end": []}, "hooper_trend": [],
-            "totals": {}, "decoupling_trend": [],
-            "citations": ["Stöggl 2014", "Foster 1998", "Treff 2019",
-                          "Hooper 1995", "Coggan/Allen TR&P"],
-        }
-    start_date = weeks[0].get("start") or weeks[0].get("day")
-    end_date = weeks[-1].get("end") or weeks[-1].get("day")
-    n_weeks = len(weeks)
+    if not plan.get("weeks"):
+        return summary.empty_summary()
+    start_date, end_date = summary.summary_window(plan, clock.today())
 
-    # A CONTINUOUS plan regenerates on a rolling basis, so "plan start" is
-    # whenever the last regeneration happened — possibly yesterday. Summarising
-    # from there produces a recap of nothing: a rider with a 213-TSS ride five
-    # days ago saw zeros everywhere because the window had just reset behind
-    # it. A rolling plan has no end to recap, so its summary is a trailing
-    # 28-day one instead, extended to the plan window when that is longer.
-    goal_type = str(((plan.get("goal") or {}).get("goal_type")) or "").lower()
-    is_continuous = goal_type == "continuous" or any(
-        (w.get("phase") or "") == "continuous" for w in weeks[:1])
-    if is_continuous and start_date:
-        from datetime import date as _date, timedelta as _td
-        trailing = (clock.today() - _td(days=28)).isoformat()
-        if trailing < start_date:
-            start_date = trailing
-        if end_date:
-            end_date = min(end_date, clock.today().isoformat())
-
-    # ── FTP / VO2max ledger lookups ────────────────────────────────────────
-    def _value_at_or_before(metric: str, target_date: str) -> float | None:
+    def value_at(metric, target_date, *, after=False):
+        if not target_date:
+            return None
         try:
             history = db.query_metric_history(metric, days=400)
         except Exception:
             return None
-        best = None
-        for r in history:
-            if r["date"] <= target_date:
-                best = r["value"]
-            else:
-                break
-        if best is None and history:
-            return float(history[0]["value"])
-        return float(best) if best is not None else None
+        return summary.metric_value_at(history, target_date, after=after)
 
-    def _value_at_or_after(metric: str, target_date: str) -> float | None:
-        try:
-            history = db.query_metric_history(metric, days=400)
-        except Exception:
-            return None
-        for r in history:
-            if r["date"] >= target_date:
-                return float(r["value"])
-        return float(history[-1]["value"]) if history else None
+    metric_values = {}
+    for metric in ("ftp", "vo2max"):
+        start = value_at(metric, start_date)
+        end = value_at(metric, end_date, after=True)
+        if end is None:
+            end = value_at(metric, end_date)
+        metric_values[metric] = (start, end)
 
-    ftp_start = _value_at_or_before("ftp", start_date) if start_date else None
-    ftp_end = _value_at_or_after("ftp", end_date) if end_date else None
-    if ftp_end is None:
-        ftp_end = _value_at_or_before("ftp", end_date) if end_date else None
-
-    vo2_start = _value_at_or_before("vo2max", start_date) if start_date else None
-    vo2_end = _value_at_or_after("vo2max", end_date) if end_date else None
-    if vo2_end is None:
-        vo2_end = _value_at_or_before("vo2max", end_date) if end_date else None
-
-    def _delta(a, b) -> dict:
-        if a is None or b is None:
-            return {"start": int(round(a)) if a else None,
-                    "end": int(round(b)) if b else None,
-                    "pct": None}
-        try:
-            pct = round(((b - a) / a) * 100.0, 1) if a else None
-        except (TypeError, ZeroDivisionError):
-            pct = None
-        return {"start": int(round(a)), "end": int(round(b)), "pct": pct}
-
-    def _delta_float(a, b) -> dict:
-        if a is None or b is None:
-            return {"start": a, "end": b, "pct": None}
-        try:
-            pct = round(((b - a) / a) * 100.0, 1) if a else None
-        except (TypeError, ZeroDivisionError):
-            pct = None
-        return {"start": round(a, 1), "end": round(b, 1), "pct": pct}
-
-    # ── Rides in window ────────────────────────────────────────────────────
     try:
-        import ride_storage as _rs
-        # load_all_rides, not list_rides: list_rides globs ride_*.json — FIT
-        # imports only. A rider whose rides all arrive by intervals.icu sync
-        # (the icu/i*.json cache) summed to zero rides here, so the recap
-        # showed zeros over a window with a 213-TSS ride sitting in it.
-        all_rides = _rs.load_all_rides()
+        import ride_storage
+        all_rides = ride_storage.load_all_rides()
     except Exception:
         all_rides = []
-    # load_all_rides mixes two record shapes: FIT imports nest their numbers
-    # under "summary", ICU sync records are flat. Every aggregate below reads
-    # the summary shape, so a flat record gets one synthesized — otherwise an
-    # ICU-only rider counts rides but sums zero km, zero hours, zero kJ.
-    for _r in all_rides:
-        if not _r.get("summary"):
-            _r["summary"] = {
-                "tss": _r.get("tss"),
-                "distance_km": _r.get("distance_km"),
-                "duration_sec": _r.get("duration_s") or _r.get("moving_s"),
-                "kj_mechanical": _r.get("kj"),
-                "elevation_gain_m": _r.get("elevation_m"),
-                "decoupling_pct": _r.get("decoupling_pct"),
-            }
-        # Same shape trap for zone time: FIT records call it "zones", ICU
-        # records "time_in_zone" — so the intensity-distribution and
-        # polarization charts stayed empty for a fully-synced rider. The "ss"
-        # entry is ICU's sweet-spot overlay spanning parts of z3/z4; summing
-        # it alongside the real zones would double-count those seconds.
-        if not _r.get("zones") and isinstance(_r.get("time_in_zone"), dict):
-            _r["zones"] = {k: v for k, v in _r["time_in_zone"].items()
-                           if k != "ss"}
-    in_window = []
-    for r in all_rides:
-        d = _ride_started_iso_date(r)
-        if d and start_date and end_date and start_date <= d <= end_date:
-            in_window.append(r)
+    rides = summary.rides_in_window(all_rides, start_date, end_date)
 
-    # ── eFTP Δ — Coggan 95% rule on best 20-min ────────────────────────────
-    def _best_20min_window(rides_subset: list[dict]) -> int | None:
-        best = 0
-        for r in rides_subset:
-            summary = r.get("summary") or {}
-            for k in ("peak_20min", "best_20min", "p20min"):
-                v = summary.get(k)
-                if v and v > best:
-                    best = float(v)
-            for eff in (r.get("efforts") or []):
-                lab = (eff.get("label") or eff.get("name") or "")
-                secs = eff.get("secs") or eff.get("seconds") or 0
-                w = eff.get("watts") or eff.get("power") or 0
-                if "20" in str(lab) and ("min" in str(lab).lower() or secs == 1200) and w > best:
-                    best = float(w)
-        return int(round(best)) if best > 0 else None
-
-    half = max(1, len(in_window) // 2)
-    early_rides = sorted(in_window, key=lambda r: r.get("started_at") or "")[:half]
-    late_rides = sorted(in_window, key=lambda r: r.get("started_at") or "")[half:]
-
-    eftp_start_w = None
-    eftp_end_w = None
-    p20_start = _best_20min_window(early_rides)
-    p20_end = _best_20min_window(late_rides)
-    if p20_start:
-        eftp_start_w = int(round(p20_start * 0.95))
-    if p20_end:
-        eftp_end_w = int(round(p20_end * 0.95))
-    if eftp_start_w is None:
-        eftp_start_w = int(round(ftp_start)) if ftp_start else None
-    if eftp_end_w is None:
-        eftp_end_w = int(round(ftp_end)) if ftp_end else None
-
-    # ── CTL gain ───────────────────────────────────────────────────────────
-    # intervals.icu's CTL on the first day and on the last (today's live when
-    # the window runs to today). It was a local EWMA over the FIT-only rides,
-    # None at the end and a guess at the start for a rider on intervals.icu.
     import fitness
-    ctl_start_val = fitness.stored_ctl_on(start_date) if start_date else None
-    if end_date and end_date < clock.today().isoformat():
-        ctl_end_val = fitness.stored_ctl_on(end_date)
-    else:
-        ctl_end_val = _fitness_state()["ctl"]
-
-    ctl_block = {
-        "start": ctl_start_val,
-        "end": ctl_end_val,
-        "delta": (round(ctl_end_val - ctl_start_val, 1)
-                  if (ctl_start_val is not None and ctl_end_val is not None)
-                  else None),
-    }
-
-    # ── Intensity distribution ─────────────────────────────────────────────
-    z1z2_secs = 0
-    z3_secs = 0
-    z4plus_secs = 0
-    for r in in_window:
-        tiz = r.get("zones") or {}
-        if isinstance(tiz, dict):
-            try:
-                z1z2_secs += int(tiz.get("z1") or 0) + int(tiz.get("z2") or 0)
-                z3_secs += int(tiz.get("z3") or 0)
-                z4plus_secs += (int(tiz.get("z4") or 0) + int(tiz.get("z5") or 0)
-                                + int(tiz.get("z6") or 0) + int(tiz.get("z7") or 0))
-            except (TypeError, ValueError):
-                pass
-    intensity_dist = {
-        "z1z2_min": int(round(z1z2_secs / 60.0)),
-        "z3_min": int(round(z3_secs / 60.0)),
-        "z4plus_min": int(round(z4plus_secs / 60.0)),
-    }
-
-    # ── Polarization index ─────────────────────────────────────────────────
-    from analytics import compute_polarization_block, classify_distribution
-    pol_indices = []
-    for r in in_window:
-        block = compute_polarization_block(r.get("zones") or {})
-        if block and block.get("polarization_index") is not None:
-            pol_indices.append(block["polarization_index"])
-    if pol_indices:
-        pol_mean = round(sum(pol_indices) / len(pol_indices), 2)
-        total_s = z1z2_secs + z3_secs + z4plus_secs
-        if total_s > 0:
-            z1z2_pct = 100.0 * z1z2_secs / total_s
-            z3_pct = 100.0 * z3_secs / total_s
-            z4_pct = 100.0 * z4plus_secs / total_s
-            klass = classify_distribution(z1z2_pct, z3_pct, z4_pct, pol_mean)
-        else:
-            klass = "—"
-        pol_block = {"mean": pol_mean, "class": klass}
-    else:
-        pol_block = {"mean": None, "class": "—"}
-
-    # ── Monotony / strain trend per week ───────────────────────────────────
-    import statistics as _stat
-    monotony_max = None
-    strain_max = None
-    if start_date and end_date:
+    ctl_start = fitness.stored_ctl_on(start_date) if start_date else None
+    ctl_end = (fitness.stored_ctl_on(end_date)
+               if end_date and end_date < clock.today().isoformat()
+               else _fitness_state()["ctl"])
+    sd, ed = summary.window_dates(start_date, end_date)
+    log_rows = []
+    if sd and ed:
         try:
-            import datetime as _dt
-            week_start = _dt.date.fromisoformat(start_date)
-            week_end_d = _dt.date.fromisoformat(end_date)
-            cursor = week_start
-            while cursor <= week_end_d:
-                daily = {}
-                for k in range(7):
-                    daily[(cursor + _dt.timedelta(days=k)).isoformat()] = 0.0
-                for r in in_window:
-                    d = _ride_started_iso_date(r)
-                    if d and d in daily:
-                        tss = (r.get("summary") or {}).get("tss") or 0
-                        daily[d] += float(tss)
-                loads = list(daily.values())
-                weekly_load = sum(loads)
-                if weekly_load > 0:
-                    try:
-                        sd = _stat.stdev(loads)
-                    except _stat.StatisticsError:
-                        sd = 0
-                    if sd > 0:
-                        m = _stat.mean(loads) / sd
-                        s = weekly_load * m
-                        if monotony_max is None or m > monotony_max:
-                            monotony_max = round(m, 2)
-                        if strain_max is None or s > strain_max:
-                            strain_max = round(s, 1)
-                cursor += _dt.timedelta(days=7)
+            log_rows = db.query_daily_log(days=max((ed - sd).days + 8, 14))
         except Exception:
             pass
-
-    # ── Compliance per phase ───────────────────────────────────────────────
-    compliance = []
-    phases = plan.get("phases") or []
-    for ph in phases:
-        ph_start = ph.get("start")
-        ph_end = ph.get("end")
-        if not ph_start or not ph_end:
-            continue
-        weekly_tss = float(ph.get("weekly_tss") or 0)
-        phase_weeks = int(ph.get("weeks") or 0) or max(
-            1, sum(1 for w in weeks if w.get("phase") == ph.get("name")))
-        planned = weekly_tss * phase_weeks
-        actual = 0.0
-        for r in in_window:
-            d = _ride_started_iso_date(r)
-            if d and ph_start <= d <= ph_end:
-                actual += float((r.get("summary") or {}).get("tss") or 0)
-        pct = int(round(100.0 * actual / planned)) if planned > 0 else 0
-        compliance.append({
-            "phase": ph.get("name"),
-            "planned_tss": round(planned, 1),
-            "actual_tss": round(actual, 1),
-            "pct": pct,
-        })
-
-    # ── Mean-max power curve (first 4w vs last 4w) ─────────────────────────
-    try:
-        import datetime as _dt
-        sd_d = _dt.date.fromisoformat(start_date) if start_date else None
-        ed_d = _dt.date.fromisoformat(end_date) if end_date else None
-    except (ValueError, TypeError):
-        sd_d = ed_d = None
-    early_4w = []
-    last_4w = []
-    if sd_d and ed_d:
-        early_cut = (sd_d + timedelta(days=28)).isoformat()
-        last_cut = (ed_d - timedelta(days=28)).isoformat()
-        for r in in_window:
-            d = _ride_started_iso_date(r)
-            if not d:
-                continue
-            if d <= early_cut:
-                early_4w.append(r)
-            if d >= last_cut:
-                last_4w.append(r)
-
-    def _peaks(rides_subset: list[dict]) -> list[dict]:
-        targets = [(5, 5), (60, 60), (300, 300), (1200, 1200), (3600, 3600)]
-        out = []
-        for tgt_sec, label_sec in targets:
-            best = 0
-            for r in rides_subset:
-                summary = r.get("summary") or {}
-                for k in (f"peak_{tgt_sec}s", f"best_{tgt_sec}s",
-                          f"peak_{tgt_sec // 60}m", f"best_{tgt_sec // 60}m"):
-                    v = summary.get(k)
-                    if v and float(v) > best:
-                        best = float(v)
-                for eff in (r.get("efforts") or []):
-                    secs = eff.get("secs") or eff.get("seconds") or 0
-                    w = eff.get("watts") or eff.get("power") or 0
-                    if abs(secs - tgt_sec) <= max(2, tgt_sec * 0.05) and w > best:
-                        best = float(w)
-            out.append({"dur": label_sec, "watts": int(round(best)) if best > 0 else None})
-        return out
-
-    mm = {"start": _peaks(early_4w), "end": _peaks(last_4w)}
-
-    # ── Hooper trend per week ──────────────────────────────────────────────
-    hooper_trend: list[dict] = []
-    try:
-        if sd_d and ed_d:
-            total_days = (ed_d - sd_d).days + 1
-            log_rows = db.query_daily_log(days=max(total_days + 7, 14))
-            by_date = {row["date"]: row.get("hooper_index") for row in log_rows}
-            week_idx = 0
-            cur = sd_d
-            while cur <= ed_d:
-                vals = []
-                for k in range(7):
-                    di = (cur + timedelta(days=k)).isoformat()
-                    v = by_date.get(di)
-                    if v is not None:
-                        try:
-                            vals.append(float(v))
-                        except (TypeError, ValueError):
-                            pass
-                if vals:
-                    hooper_trend.append({
-                        "week": week_idx + 1,
-                        "mean": round(sum(vals) / len(vals), 1),
-                    })
-                week_idx += 1
-                cur += timedelta(days=7)
-    except Exception:
-        hooper_trend = []
-
-    # ── Totals ─────────────────────────────────────────────────────────────
-    total_km = 0.0
-    total_sec = 0
-    total_kj = 0.0
-    total_elev = 0.0
-    for r in in_window:
-        s = r.get("summary") or {}
-        total_km += float(s.get("distance_km") or 0)
-        total_sec += int(s.get("duration_sec") or 0)
-        kj = s.get("kj_mechanical") or s.get("calories") or s.get("total_kj") or 0
-        try:
-            total_kj += float(kj)
-        except (TypeError, ValueError):
-            pass
-        total_elev += float(s.get("elevation_gain_m") or 0)
-    totals = {
-        "km": int(round(total_km)),
-        "hours": round(total_sec / 3600.0, 1),
-        "kj": int(round(total_kj)),
-        "elev_m": int(round(total_elev)),
-    }
-
-    # ── Decoupling trend per week ──────────────────────────────────────────
-    decoupling_trend: list[dict] = []
-    if sd_d and ed_d:
-        cur = sd_d
-        wk_idx = 0
-        while cur <= ed_d:
-            vals = []
-            for r in in_window:
-                d = _ride_started_iso_date(r)
-                if not d:
-                    continue
-                d_iter = date.fromisoformat(d)
-                if cur <= d_iter <= cur + timedelta(days=6):
-                    dec = (r.get("summary") or {}).get("decoupling_pct")
-                    if dec is None:
-                        dec = r.get("decoupling_pct")
-                    if dec is not None:
-                        try:
-                            vals.append(float(dec))
-                        except (TypeError, ValueError):
-                            pass
-            if vals:
-                decoupling_trend.append({
-                    "week": wk_idx + 1,
-                    "mean_pct": round(sum(vals) / len(vals), 1),
-                })
-            wk_idx += 1
-            cur += timedelta(days=7)
-
-    return {
-        "plan_id": "current",
-        "start_date": start_date,
-        "end_date": end_date,
-        "weeks": n_weeks,
-        "rides": len(in_window),
-        "ftp_delta": _delta(ftp_start, ftp_end),
-        "eftp_delta": _delta(eftp_start_w, eftp_end_w),
-        "vo2max_delta": _delta_float(vo2_start, vo2_end),
-        "ctl_gain": ctl_block,
-        "intensity_dist": intensity_dist,
-        "pol_index": pol_block,
-        "monotony_max": monotony_max,
-        "strain_max": strain_max,
-        "compliance": compliance,
-        "mean_max_curve": mm,
-        "hooper_trend": hooper_trend,
-        "totals": totals,
-        "decoupling_trend": decoupling_trend,
-        "citations": [
-            "Stöggl & Sperlich 2014 (Front Physiol)",
-            "Foster 1998 (MSSE)",
-            "Treff et al. 2019 (Front Physiol)",
-            "Hooper & Mackinnon 1995",
-            "Coggan & Allen TR&P 3rd ed.",
-            "Seiler 2010 (IJSPP)",
-        ],
-    }
+    return summary.build_summary(
+        plan, rides, start_date=start_date, end_date=end_date,
+        metric_values=metric_values, ctl_start_val=ctl_start,
+        ctl_end_val=ctl_end, log_rows=log_rows)
 
 
 @app.get("/api/programme/summary")
