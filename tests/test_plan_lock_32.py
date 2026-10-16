@@ -30,6 +30,9 @@ APP = Path(__file__).resolve().parent.parent / "src" / "app.py"
 # RLock, so the caller holds it across the call). Each entry names the caller.
 _WRITES_UNDER_CALLER_LOCK = {
     "_advance_continuous_deload": "_maybe_auto_reforecast",
+    # #4: generation runs on a worker thread via tp.run_under_plan_lock, which
+    # takes the lock on that thread (test_generate_takes_the_lock_on_its_worker).
+    "_generate_locked": "api_plan_generate",
 }
 
 
@@ -59,6 +62,14 @@ def test_every_plan_write_in_app_is_under_the_plan_lock():
         if not locked and fn not in _WRITES_UNDER_CALLER_LOCK:
             unlocked.append(f"{fn} (line {call.lineno})")
     assert unlocked == [], "plan writes outside tp.plan_write_lock(): " + ", ".join(unlocked)
+
+
+def test_generate_takes_the_lock_on_its_worker():
+    """The unlocked-looking _generate_locked is only ever run through
+    tp.run_under_plan_lock; if that call goes away this fails."""
+    src = APP.read_text(encoding="utf-8")
+    assert "run_in_threadpool(tp.run_under_plan_lock, _generate_locked)" in src
+    assert "def _generate_locked" in src
 
 
 def test_no_await_inside_a_plan_lock():

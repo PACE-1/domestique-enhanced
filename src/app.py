@@ -11671,7 +11671,12 @@ async def api_plan_generate(request: Request):
         availability_overrides: dict[str, float] = {}
         old_availability_full: dict = {}  # v1.8.21 — keep type info for block-preserve
         _existing_plan = None
-        async with tp.plan_write_lock_async():  # #32: read-modify-write under the plan lock
+        # #4: generation is CPU-heavy and was running on the event loop. The whole
+        # read-modify-write now runs on a worker thread that takes the plan lock
+        # itself (the async lock is owned by the loop thread and must not span an
+        # await), so other requests stay responsive while a plan is built.
+        def _generate_locked():
+            nonlocal _existing_plan, availability_overrides, old_availability_full
             if json_path.exists():
                 try:
                     with open(json_path, encoding="utf-8") as f:
@@ -11852,6 +11857,10 @@ async def api_plan_generate(request: Request):
                 )
 
             tp.atomic_write_plan(json_path, plan_dict)
+            return plan_dict, plan_path
+
+        from starlette.concurrency import run_in_threadpool
+        plan_dict, plan_path = await run_in_threadpool(tp.run_under_plan_lock, _generate_locked)
 
         # v1.4.0 — single enrichment helper (replaces the inline duplicate).
         # Adds card_state / card_state_v2 / content_class / display_name /
@@ -17704,7 +17713,9 @@ async def api_ride_import(
             pass
         raise HTTPException(status_code=500, detail="failed to persist FIT")
 
-    parsed = _parse_fit_stats(fit_path)
+    # #4: parsing a FIT is CPU and file I/O; keep it off the event loop.
+    from starlette.concurrency import run_in_threadpool
+    parsed = await run_in_threadpool(_parse_fit_stats, fit_path)
     if parsed.get("error") == "parse_failed":
         # Rejected data is never listed as a ride.
         try:
@@ -17722,7 +17733,7 @@ async def api_ride_import(
     # failure never blocks the import; readers stay untouched.
     try:
         import ride_storage as _rs_w4
-        _load = _rs_w4.write_fit_load_sidecar(fit_path)
+        _load = await run_in_threadpool(_rs_w4.write_fit_load_sidecar, fit_path)
         if isinstance(_load, dict) and _load.get("tss") is not None:
             # Surface in the import response; never clobber a TSS the FIT
             # itself carried (pre-existing behavior for power rides).
@@ -17755,7 +17766,8 @@ async def api_ride_import(
                 f"EVENT=icu_fit_upload_skipped id={ride_id} reason=scope_missing "
                 f"(reconnect intervals.icu to grant ACTIVITY:WRITE)")
         else:
-            res = upload_fit_to_icu(fit_path, retry=1)
+            # A blocking network call with retries: never on the event loop.
+            res = await run_in_threadpool(upload_fit_to_icu, fit_path, 1)
             if _oauth and res.get("detail") == "auth_failed":
                 res["needs_reconnect"] = True   # revoked / stale grant
         icu_upload = res
@@ -17774,7 +17786,6 @@ async def api_ride_import(
     # v1.0.3 — best-effort auto-reforecast: a FIT import = 1 new ride.
     # Helper swallows all exceptions; the import response stays unchanged.
     # Off the event loop: it waits for the plan lock (3.13.0 grill).
-    from starlette.concurrency import run_in_threadpool
     await run_in_threadpool(_maybe_auto_reforecast, "default", 1)
 
     return {
