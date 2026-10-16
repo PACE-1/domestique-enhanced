@@ -1,3 +1,5 @@
+> **Historical document** (last changed 2026-09-10). It records what was found or planned then; the code has moved on. Check the current source before treating anything here as a live defect or instruction. Index: [docs/README.md](../../docs/README.md).
+
 # Domestique — runtime state, concurrency and persistence (lens STA)
 
 Code: `ca6091f9` (scratch worktree `rev-state`). Every finding below was measured

@@ -56,12 +56,15 @@ The full gate preserves failures and writes logs/status under
 `/tmp/domestique-gate`; a passing diagnostic rerun cannot turn it green.
 The historical list is not a failure allow-list.
 
-The Forgejo workflow in `.forgejo/workflows/tests.yml` installs the headless
-profile and runs that same gate on an `ubuntu-latest` runner. No runners were
-visible to the repository account when it was added, so remote execution is
-not yet validated. Configure an appropriate runner before relying on CI.
-Keep the existing upstream GitHub workflow until its platform/support role is
-decided rather than silently dropping supported platforms.
+Pull requests run `.github/workflows/tests.yml` on GitHub-hosted runners: the
+same gate on `ubuntu-latest` with the locked headless profile, and a `web` job
+(`pnpm typecheck`, `lint`, `test`, `build`). The upstream macOS job is kept for
+manual `workflow_dispatch` runs only; no decision has been recorded to retire
+macOS testing, and it takes about 70 minutes on a hosted Mac.
+
+`.forgejo/workflows/tests.yml` runs the same Linux gate for the Forgejo mirror.
+No Forgejo runner was visible to the repository account, so that copy has not
+been executed; GitHub is where CI is validated.
 
 Inventory, candidate decisions and current measurement limits are recorded in
 [code-bloat/README.md](code-bloat/README.md). Product defect fixes, algorithm

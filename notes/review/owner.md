@@ -1,3 +1,5 @@
+> **Historical document** (last changed 2026-09-10). It records what was found or planned then; the code has moved on. Check the current source before treating anything here as a live defect or instruction. Index: [docs/README.md](../../docs/README.md).
+
 # Owner lens: who writes a session, and does the single owner own it?
 
 Reviewer: owner-lens (1 of 5). Code: `ca6091f9` in the scratch worktree

@@ -1,3 +1,5 @@
+> **Historical document** (last changed 2026-05-04). It records what was found or planned then; the code has moved on. Check the current source before treating anything here as a live defect or instruction. Index: [docs/README.md](README.md).
+
 # Windows .exe build plan
 
 **Status as of v1.0.0:** macOS DMG ships; Windows badge in the README claims Windows support but no `.exe` is produced. This document is the path to closing that gap.

@@ -1,3 +1,5 @@
+> **Historical document** (last changed 2026-09-10). It records what was found or planned then; the code has moved on. Check the current source before treating anything here as a live defect or instruction. Index: [docs/README.md](../../docs/README.md).
+
 # Adversarial review — one concept, many implementations (branch head ca6091f9)
 
 Lens: where one concept is implemented more than once, and whether the copies DISAGREE

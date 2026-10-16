@@ -1,3 +1,5 @@
+> **Historical document** (last changed 2026-09-14). It records what was found or planned then; the code has moved on. Check the current source before treating anything here as a live defect or instruction. Index: [docs/README.md](../docs/README.md).
+
 # One week view — the contract (DRAFT, 2026-09-14, revised after the audit)
 
 Status (2026-09-14, night): Wave 1 implemented, gated and reviewed three

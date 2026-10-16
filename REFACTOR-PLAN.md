@@ -1,3 +1,5 @@
+> **Historical document** (last changed 2026-09-10). It records what was found or planned then; the code has moved on. Check the current source before treating anything here as a live defect or instruction. Index: [docs/README.md](docs/README.md).
+
 # Backend decomposition plan
 
 Working notes for `refactor/backend-architecture`. Written as the analysis
