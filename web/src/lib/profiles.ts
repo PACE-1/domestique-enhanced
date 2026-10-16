@@ -1,12 +1,7 @@
+import type { Profile } from "@/api/types"
 import { api } from "@/lib/api"
 
-export interface Profile {
-  id: string
-  name: string
-  color?: string
-  ftp?: number
-  weight_kg?: number
-}
+export type { Profile }
 
 export const PALETTE = [
   "#4f9cf7", "#6366f1", "#22c55e", "#f59e0b", "#ef4444",

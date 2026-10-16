@@ -1,3 +1,4 @@
+import type { IcuConnection } from "@/api/types"
 import { api } from "@/lib/api"
 
 export const COLORS = ["#3b82f6", "#22c55e", "#f97316", "#a855f7", "#ef4444", "#eab308", "#06b6d4", "#ec4899"]
@@ -47,11 +48,7 @@ export const activateProfile = (id: string) =>
 export const saveSetup = (payload: Record<string, number | string>) =>
   api("/api/setup/save", { method: "POST", json: payload })
 
-export interface IcuConnection {
-  method?: string
-  name?: string
-  athlete_id?: string
-}
+export type { IcuConnection } from "@/api/types"
 export const getIcuConnection = () => api<IcuConnection>("/api/icu/connection")
 
 const WIZARD_KEY = "ps_wizard"
