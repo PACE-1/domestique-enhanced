@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import clock  # the one clock every module reads (see src/clock.py)
 import json
+import os
 from atomic_io import file_lock, update_json, write_json_atomic
 import logging
 import time
@@ -587,7 +588,8 @@ _PRUNE_MAX_PER_PASS = 20
 
 def prune_deleted_icu_records(fetched_ids: "set[str]",
                               window_days: int) -> int:
-    """Delete local ICU records whose activity no longer exists upstream.
+    """Remove local ICU records whose activity no longer exists upstream.
+    The file is moved to ``icu/_pruned/`` rather than deleted (#31).
 
     Sync only ever UPSERTED, so an activity deleted on intervals.icu lived on
     here forever — the reported case was a ride uploaded twice (Karoo and
@@ -646,7 +648,12 @@ def prune_deleted_icu_records(fetched_ids: "set[str]",
     pruned = 0
     for f, rid, started in stale:
         try:
-            f.unlink()
+            # Moved aside, not destroyed (#31): if intervals.icu merely stopped
+            # listing a ride (a data-source block), the file is still here to
+            # restore. Readers only glob icu/*.json, so the subfolder is invisible.
+            kept = icu_dir / "_pruned"
+            kept.mkdir(exist_ok=True)
+            os.replace(f, kept / f.name)
         except OSError as e:
             log.debug("prune_deleted_icu_records(%s) skipped: %s", rid, e)
             continue

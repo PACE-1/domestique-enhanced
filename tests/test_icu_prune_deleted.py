@@ -88,3 +88,13 @@ def test_unreadable_record_is_skipped_not_deleted(icu_dir):
     n = rs.prune_deleted_icu_records(set(), window_days=90)
     assert n == 0
     assert (icu_dir / "i700.json").exists()
+
+
+def test_pruned_ride_is_kept_aside_and_not_listed(icu_dir):
+    # #31: a ride intervals.icu stops listing is moved, not destroyed, so a
+    # data-source block cannot cost the rider their history.
+    _rec(icu_dir, "i900", days_ago=2)
+    assert rs.prune_deleted_icu_records(set(), window_days=90) == 1
+    assert not (icu_dir / "i900.json").exists()
+    assert (icu_dir / "_pruned" / "i900.json").exists()
+    assert not [f for f in icu_dir.glob("*.json")]   # nothing for readers to list
