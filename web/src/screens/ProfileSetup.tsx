@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { IcuComparison, LinkedCard, StepDots } from "@/components/wizard"
 import { icuLinkFailureText } from "@/lib/icuReasons"
 import {
   COLORS,
@@ -23,15 +24,6 @@ import {
   type Limits,
   type TargetMode,
 } from "@/lib/setup"
-
-const COMPARISON: [string, string, string, boolean][] = [
-  ["Your rides", "Arrive by themselves from the apps and devices you connect to it", "You import each ride's FIT file", false],
-  ["Fitness & form", "Fitness, fatigue and form updated every day", "Computed from the rides you import", false],
-  ["Readiness", "HRV and sleep from your watch, every morning", "HRV typed in by hand", false],
-  ["Workouts", "Pushed to your device via the intervals.icu calendar", "Download each one as ZWO or FIT", false],
-  ["Your plan", "The full plan, adapting to what you ride", "The full plan, adapting to what you import", true],
-  ["Account", "Free account; connect Garmin, Wahoo, Zwift or Strava to it once", "Nothing to sign up for", true],
-]
 
 const NUMBER_FIELDS: { key: FieldKey; label: string; limit: keyof Limits; min: number; max: number; step?: number }[] = [
   { key: "ftp", label: "FTP (watts)", limit: "ftp", min: 50, max: 600 },
@@ -158,11 +150,7 @@ export function ProfileSetup() {
     <div className="mx-auto flex min-h-svh max-w-xl flex-col justify-center px-6 py-10">
       <h1 className="text-center text-2xl font-bold">Domestique</h1>
       <p className="mb-4 text-center text-muted-foreground">Set up a new rider profile in 3 steps.</p>
-      <div className="mb-6 flex justify-center gap-2" aria-label={`Step ${step} of 3`}>
-        {[1, 2, 3].map((n) => (
-          <span key={n} className={`h-2 w-8 rounded-full ${n <= step ? "bg-primary" : "bg-muted"}`} />
-        ))}
-      </div>
+      <StepDots step={step} total={3} />
       <Card>
         <CardContent className="grid gap-4">
           {step === 1 && (
@@ -287,22 +275,7 @@ export function ProfileSetup() {
               </p>
               {linkState !== "linked" && (
                 <>
-                  <div className="grid grid-cols-[auto_1fr_1fr] gap-x-3 gap-y-2 text-left text-sm">
-                    <span />
-                    <span className="font-semibold">With intervals.icu <em className="text-xs font-normal">Recommended</em></span>
-                    <span className="font-semibold">Without</span>
-                    {COMPARISON.map(([label, withIcu, without, youDo]) => (
-                      <div key={label} className="contents">
-                        <span className="text-muted-foreground">{label}</span>
-                        <span>✓ {withIcu}</span>
-                        <span>{youDo ? "✓" : "✎"} {without}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    How linking works: 1 Sign in on intervals.icu in your browser · 2 Approve once · 3 You are
-                    back here, linked. You can always connect later in Settings.
-                  </p>
+                  <IcuComparison />
                 </>
               )}
               <div role="status" aria-live="polite" className="min-h-5 text-sm">
@@ -310,16 +283,7 @@ export function ProfileSetup() {
                   <span className="text-destructive">Couldn’t link your account — {linkError}</span>
                 )}
                 {linkState === "linked" && (
-                  <div className="rounded-lg border p-3">
-                    <div className="font-semibold">✓ Connected to intervals.icu</div>
-                    <div>{connection?.name || "Your account"}</div>
-                    {connection?.athlete_id && (
-                      <div className="text-xs text-muted-foreground">athlete {connection.athlete_id}</div>
-                    )}
-                    <div className="text-xs text-muted-foreground">
-                      Your fitness, fatigue and recent rides come in when you finish.
-                    </div>
-                  </div>
+                  <LinkedCard connection={connection} next="Your fitness, fatigue and recent rides come in when you finish." />
                 )}
               </div>
               <Status status={status} />

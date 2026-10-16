@@ -3,6 +3,7 @@ import { useSyncExternalStore } from "react"
 import { Button } from "@/components/ui/button"
 import { ProfilePicker } from "@/screens/ProfilePicker"
 import { ProfileSetup } from "@/screens/ProfileSetup"
+import { Setup } from "@/screens/Setup"
 
 // ponytail: hash routing, no router dependency. Swap for react-router when nested routes or loaders are needed.
 const subscribe = (cb: () => void) => {
@@ -18,6 +19,7 @@ export function App() {
   const route = useRoute()
   if (route === "profile-picker") return <ProfilePicker />
   if (route === "profile-setup") return <ProfileSetup />
+  if (route === "setup") return <Setup />
   return (
     <div className="flex min-h-svh p-6">
       <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
