@@ -4,6 +4,7 @@ import type { PlanRead, PlanWeek } from "@/api/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { PlanGenerate } from "@/screens/PlanGenerate"
+import { PlanTimeOff } from "@/screens/PlanTimeOff"
 import { currentWeek, dismissSession, fmtMinutes, getPlan, isoDay, moveSession, plannedTss, SWAP_TYPES, swapSessionType, weekSessions } from "@/lib/home"
 
 type Load = { state: "loading" } | { state: "ok"; plan: PlanRead } | { state: "error"; message: string }
@@ -28,6 +29,7 @@ export function Plan() {
   const [actionError, setActionError] = useState("")
   const [moving, setMoving] = useState<{ day: string; to: string } | null>(null)
   const [replacing, setReplacing] = useState(false)
+  const [timeOff, setTimeOff] = useState(false)
   const [swapping, setSwapping] = useState<{ day: string; type: string; minutes: number } | null>(null)
   const today = isoDay()
 
@@ -234,6 +236,14 @@ export function Plan() {
           )}
         </CardContent>
       </Card>
+
+      {timeOff ? (
+        <PlanTimeOff onDone={() => { setTimeOff(false); run() }} onCancel={() => setTimeOff(false)} />
+      ) : (
+        <Button variant="outline" size="sm" onClick={() => setTimeOff(true)}>
+          Time off…
+        </Button>
+      )}
 
       {replacing ? (
         <PlanGenerate hasPlan onDone={() => { setReplacing(false); setIndex(null); run() }} />

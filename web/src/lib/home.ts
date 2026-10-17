@@ -1,4 +1,4 @@
-import type { PlanJson, PlanRead, PlanSession, PlanWeek, ProgrammeSummary, RiderStats, SessionDismissed, SessionMoved, SessionSwapped } from "@/api/types"
+import type { PlanJson, PlanRead, PlanRegenerated, PlanSession, PlanWeek, ProgrammeSummary, RiderStats, SessionDismissed, SessionMoved, SessionSwapped, UnavailableMarked } from "@/api/types"
 import { api } from "@/lib/api"
 
 export const getPlan = () => api<PlanRead>("/api/plan")
@@ -44,6 +44,18 @@ export interface GenerateRequest {
 /** Build a new plan from the form. The server replaces the stored plan. */
 export const generatePlan = (req: GenerateRequest) =>
   api<PlanRead>("/api/plan/generate", { method: "POST", json: req })
+
+export type TimeOffType = "holiday" | "injury" | "illness"
+
+/** Record a stretch of days off. The plan is rebuilt around it by `regeneratePlan`. */
+export const markUnavailable = (start: string, end: string, type: TimeOffType) =>
+  api<UnavailableMarked>("/api/plan/mark-unavailable", {
+    method: "POST",
+    json: { start, end, type, daily_tss: type === "holiday" ? 25 : 0 },
+  })
+
+/** Rebuild the rest of the plan from today (honours recorded time off). */
+export const regeneratePlan = () => api<PlanRegenerated>("/api/plan/regenerate", { method: "POST", json: {} })
 
 export const getStats = () => api<RiderStats>("/api/rider-stats")
 

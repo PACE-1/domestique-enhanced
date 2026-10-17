@@ -806,6 +806,40 @@
         "title": "PlanRead",
         "type": "object"
       },
+      "PlanRegenerated": {
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "plan_json": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlanJson"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "regen_info": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Regen Info"
+          }
+        },
+        "title": "PlanRegenerated",
+        "type": "object"
+      },
       "PlanSession": {
         "additionalProperties": true,
         "properties": {
@@ -1739,6 +1773,68 @@
         },
         "title": "SyncProgress",
         "type": "object"
+      },
+      "UnavailableMarked": {
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "period": {
+            "$ref": "#/components/schemas/UnavailablePeriod"
+          },
+          "plan_json": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlanJson"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "period"
+        ],
+        "title": "UnavailableMarked",
+        "type": "object"
+      },
+      "UnavailablePeriod": {
+        "additionalProperties": true,
+        "properties": {
+          "daily_tss": {
+            "default": 0,
+            "title": "Daily Tss",
+            "type": "number"
+          },
+          "end": {
+            "title": "End",
+            "type": "string"
+          },
+          "reason": {
+            "default": "",
+            "title": "Reason",
+            "type": "string"
+          },
+          "start": {
+            "title": "Start",
+            "type": "string"
+          },
+          "type": {
+            "default": "holiday",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "UnavailablePeriod",
+        "type": "object"
       }
     }
   },
@@ -1816,6 +1912,23 @@
         }
       }
     },
+    "/api/plan/mark-unavailable": {
+      "post": {
+        "operationId": "api_mark_unavailable_api_plan_mark_unavailable_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnavailableMarked"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/plan/move-session": {
       "post": {
         "operationId": "api_plan_move_session_api_plan_move_session_post",
@@ -1825,6 +1938,23 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SessionMoved"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/plan/regenerate": {
+      "post": {
+        "operationId": "api_plan_regenerate_dynamic_api_plan_regenerate_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanRegenerated"
                 }
               }
             },
