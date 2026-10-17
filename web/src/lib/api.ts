@@ -31,5 +31,5 @@ export async function apiFull<T>(path: string, { json, form, ...init }: Options 
     }
     throw new ApiError(res.status, message || `HTTP ${res.status}`)
   }
-  return { data: (await res.json()) as T, headers: res.headers }
+  return { data: (res.status === 204 ? undefined : await res.json()) as T, headers: res.headers }
 }

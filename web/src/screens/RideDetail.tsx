@@ -3,9 +3,10 @@ import { useCallback, useState } from "react"
 import type { FtpTestAnalysis, RideDetail as Ride } from "@/api/types"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { fmtMinutes } from "@/lib/home"
-import { deleteRide, fitUrl, getFtpAnalysis, getRide, isFitRide, reviewFtp, setRpe, updateFtp, ZONE_NAMES } from "@/lib/rides"
+import { deleteRide, fitUrl, getFtpAnalysis, getRide, isFitRide, reviewFtp, setRace, setRpe, updateFtp, ZONE_NAMES } from "@/lib/rides"
 import type { Series } from "@/lib/analysis"
 import { LineChart } from "@/screens/Chart"
 import { Panel, Row, useLoad } from "@/screens/panel"
@@ -87,6 +88,34 @@ function Rpe({ id, initial }: { id: string; initial: number | null }) {
       {bad && <p>The rating must be between 0 and 10.</p>}
       {msg && <p role="status">{msg}</p>}
       {error && <p role="alert">Couldn’t save the rating: {error}</p>}
+    </div>
+  )
+}
+
+/** Race-tagged rides weigh more when the app fits your own fitness and fatigue time constants. */
+function RaceFlag({ activityId, initial }: { activityId: string; initial: boolean }) {
+  const [on, setOn] = useState(initial)
+  const [msg, setMsg] = useState("")
+  const [error, setError] = useState("")
+  const toggle = async (next: boolean) => {
+    setError("")
+    setMsg("")
+    try {
+      await setRace(activityId, next)
+      setOn(next)
+      setMsg(next ? "Marked as a race." : "No longer marked as a race.")
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e))
+    }
+  }
+  return (
+    <div className="text-sm">
+      <Label className="gap-2">
+        <Checkbox checked={on} onCheckedChange={(v) => toggle(v === true)} />
+        Mark as a race
+      </Label>
+      {msg && <p role="status">{msg}</p>}
+      {error && <p role="alert">Couldn’t save that: {error}</p>}
     </div>
   )
 }
@@ -240,6 +269,7 @@ function Body({ r }: { r: Ride }) {
         </div>
       )}
       <Rpe id={r.ride_id} initial={typeof r.rpe === "number" ? r.rpe : null} />
+      {r.activity_id && <RaceFlag activityId={r.activity_id} initial={r.is_race === true} />}
       <div className="flex flex-wrap items-center gap-2">
         <a href={fitUrl(r.ride_id)} download className={buttonVariants({ size: "sm", variant: "outline" })}>
           Download .fit

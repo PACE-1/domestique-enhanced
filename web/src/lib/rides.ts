@@ -36,3 +36,7 @@ export const updateFtp = (ftp: number, method: string, source: string, applied: 
 export const getPrQueue = (drain: boolean) => api<PrToastQueue>(`/api/profile/pr-toast-queue?drain=${drain ? 1 : 0}`)
 
 export const ZONE_NAMES: Record<string, string> = { z1: "Z1 Recovery", z2: "Z2 Endurance", z3: "Z3 Tempo", z4: "Z4 Threshold", z5: "Z5 VO2max", z6: "Z6 Anaerobic", z7: "Z7 Neuromuscular", ss: "Sweet spot" }
+
+/** Race-tagged rides count more when the app fits your own training-load time constants. */
+export const setRace = (activityId: string, isRace: boolean) =>
+  api<void>(`/api/activity/${encodeURIComponent(activityId)}/race`, { method: "POST", json: { is_race: isRace } })

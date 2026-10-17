@@ -90,6 +90,21 @@ describe("RideDetail", () => {
     expect(screen.queryByText("FTP test")).toBeNull()
   })
 
+  it("marks a ride as a race and reports a failure", async () => {
+    let status = 204
+    const calls = mock(routes({
+      "/api/ride/icu_9/detail": () => json({ ...RIDE, activity_id: "i123", is_race: false }),
+      "/api/activity/i123/race": () => new Response(status === 204 ? null : JSON.stringify({ error: "activity not found" }), { status }),
+    }))
+    render(<RideDetail id="icu_9" />)
+    await userEvent.click(await screen.findByRole("checkbox", { name: "Mark as a race" }))
+    expect((await screen.findByRole("status")).textContent).toContain("Marked as a race.")
+    expect(calls.find((c) => c.url === "/api/activity/i123/race")?.body).toEqual({ is_race: true })
+    status = 404
+    await userEvent.click(screen.getByRole("checkbox", { name: "Mark as a race" }))
+    expect((await screen.findByRole("alert")).textContent).toContain("activity not found")
+  })
+
   it("saves, validates and clears the effort rating", async () => {
     const calls = mock(routes({ "/api/ride/icu_9/rpe": () => json({ ok: true }) }))
     render(<RideDetail id="icu_9" />)

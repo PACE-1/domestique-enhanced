@@ -322,6 +322,151 @@
         "title": "BackfillStatus",
         "type": "object"
       },
+      "BanisterValidation": {
+        "additionalProperties": true,
+        "properties": {
+          "comparison": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comparison"
+          },
+          "ctl_mae_tss": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ctl Mae Tss"
+          },
+          "ctl_mae_tss_ci_high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ctl Mae Tss Ci High"
+          },
+          "ctl_mae_tss_ci_low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ctl Mae Tss Ci Low"
+          },
+          "fit_status": {
+            "default": "insufficient_data",
+            "title": "Fit Status",
+            "type": "string"
+          },
+          "ftp_mae_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp Mae Pct"
+          },
+          "ftp_mae_pct_ci_high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp Mae Pct Ci High"
+          },
+          "ftp_mae_pct_ci_low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp Mae Pct Ci Low"
+          },
+          "ftp_mae_w": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp Mae W"
+          },
+          "holdout_weeks": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Holdout Weeks"
+          },
+          "horizon_weeks": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Horizon Weeks"
+          },
+          "n_markers_in_holdout": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N Markers In Holdout"
+          },
+          "tau_fits_used": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tau Fits Used"
+          }
+        },
+        "title": "BanisterValidation",
+        "type": "object"
+      },
       "CalendarDay": {
         "additionalProperties": true,
         "properties": {
@@ -1585,6 +1730,91 @@
           "path"
         ],
         "title": "ExtraFolder",
+        "type": "object"
+      },
+      "FatigueResistance": {
+        "additionalProperties": true,
+        "properties": {
+          "by_duration": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "By Duration",
+            "type": "array"
+          },
+          "fit_status": {
+            "default": "insufficient_data",
+            "title": "Fit Status",
+            "type": "string"
+          },
+          "kj_threshold": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kj Threshold"
+          },
+          "n_long_rides": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N Long Rides"
+          },
+          "n_long_rides_with_streams": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N Long Rides With Streams"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "robustness_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Robustness Score"
+          },
+          "scatter": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Scatter",
+            "type": "array"
+          }
+        },
+        "title": "FatigueResistance",
         "type": "object"
       },
       "Fitness3dStatus": {
@@ -4117,6 +4347,17 @@
       "RideDetail": {
         "additionalProperties": true,
         "properties": {
+          "activity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Activity Id"
+          },
           "avg_cadence": {
             "anyOf": [
               {
@@ -4255,6 +4496,17 @@
             },
             "title": "Intervals",
             "type": "array"
+          },
+          "is_race": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Race"
           },
           "kcal": {
             "anyOf": [
@@ -5397,6 +5649,117 @@
           }
         },
         "title": "SyncStatus",
+        "type": "object"
+      },
+      "TauFits": {
+        "additionalProperties": true,
+        "properties": {
+          "atl_tau_ci_high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Atl Tau Ci High"
+          },
+          "atl_tau_ci_low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Atl Tau Ci Low"
+          },
+          "atl_tau_fit": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Atl Tau Fit"
+          },
+          "conventional": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conventional"
+          },
+          "ctl_tau_ci_high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ctl Tau Ci High"
+          },
+          "ctl_tau_ci_low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ctl Tau Ci Low"
+          },
+          "ctl_tau_fit": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ctl Tau Fit"
+          },
+          "fit_residual_r2": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fit Residual R2"
+          },
+          "fit_status": {
+            "default": "insufficient_data",
+            "title": "Fit Status",
+            "type": "string"
+          },
+          "n_markers": {
+            "default": 0,
+            "title": "N Markers",
+            "type": "integer"
+          },
+          "weighted_n": {
+            "default": 0,
+            "title": "Weighted N",
+            "type": "number"
+          }
+        },
+        "title": "TauFits",
         "type": "object"
       },
       "TierDownApplied": {
@@ -6917,6 +7280,23 @@
         }
       }
     },
+    "/api/profile/banister-validation": {
+      "get": {
+        "operationId": "api_profile_banister_validation_api_profile_banister_validation_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BanisterValidation"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/profile/dfa-backfill": {
       "post": {
         "operationId": "api_profile_dfa_backfill_api_profile_dfa_backfill_post",
@@ -6968,6 +7348,23 @@
         }
       }
     },
+    "/api/profile/fatigue-resistance": {
+      "get": {
+        "operationId": "api_profile_fatigue_resistance_api_profile_fatigue_resistance_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FatigueResistance"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/profile/ftp-history": {
       "get": {
         "operationId": "api_profile_ftp_history_api_profile_ftp_history_get",
@@ -7011,6 +7408,23 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PrToastQueue"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/profile/tau-fits": {
+      "get": {
+        "operationId": "api_profile_tau_fits_api_profile_tau_fits_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TauFits"
                 }
               }
             },

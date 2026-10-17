@@ -701,6 +701,8 @@ class RideDetail(RideSummary):
     decoupling_pct: Optional[float] = None
     dfa_alpha1: Optional[float] = None
     rpe: Optional[int] = None
+    is_race: Optional[bool] = None
+    activity_id: Optional[str] = None     # key of the race flag; None when the ride has no activity row
     time_in_zone: Optional[dict] = None   # {"z1": seconds, … "z7"}
     intervals: list[dict] = []
     efforts: list[dict] = []
@@ -1039,3 +1041,44 @@ class DailyAdapt(_Model):
     projection_only: bool = True
     projected_adaptations: list[dict] = []
 
+
+
+class TauFits(_Model):
+    fit_status: str = "insufficient_data"   # success | low_confidence | insufficient_data
+    n_markers: int = 0
+    weighted_n: float = 0
+    ctl_tau_fit: Optional[float] = None
+    atl_tau_fit: Optional[float] = None
+    ctl_tau_ci_low: Optional[float] = None
+    ctl_tau_ci_high: Optional[float] = None
+    atl_tau_ci_low: Optional[float] = None
+    atl_tau_ci_high: Optional[float] = None
+    fit_residual_r2: Optional[float] = None
+    conventional: Optional[dict] = None
+
+
+class BanisterValidation(_Model):
+    fit_status: str = "insufficient_data"
+    comparison: Optional[str] = None        # better_than_literature | in_line | worse_than_literature
+    tau_fits_used: Optional[dict] = None
+    n_markers_in_holdout: Optional[int] = None
+    holdout_weeks: Optional[int] = None
+    horizon_weeks: Optional[int] = None
+    ftp_mae_w: Optional[float] = None
+    ftp_mae_pct: Optional[float] = None
+    ftp_mae_pct_ci_low: Optional[float] = None
+    ftp_mae_pct_ci_high: Optional[float] = None
+    ctl_mae_tss: Optional[float] = None
+    ctl_mae_tss_ci_low: Optional[float] = None
+    ctl_mae_tss_ci_high: Optional[float] = None
+
+
+class FatigueResistance(_Model):
+    fit_status: str = "insufficient_data"
+    reason: Optional[str] = None
+    kj_threshold: Optional[int] = None
+    n_long_rides: Optional[int] = None
+    n_long_rides_with_streams: Optional[int] = None
+    robustness_score: Optional[float] = None
+    by_duration: list[dict] = []
+    scatter: list[dict] = []

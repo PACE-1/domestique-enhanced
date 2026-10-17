@@ -11,6 +11,7 @@ import { Panel, useLoad } from "@/screens/panel"
 import { Label } from "@/components/ui/label"
 import { NativeSelect } from "@/components/ui/native-select"
 import { RideTools } from "@/screens/RideTools"
+import { BanisterCard, FatigueCard, TauFitsCard } from "@/screens/TrainingModels"
 
 const Range = ({ value, onChange, label }: { value: number; onChange: (n: number) => void; label: string }) => (
   <Label className="flex items-center gap-2 text-sm">
@@ -153,6 +154,9 @@ export function Analysis() {
       <Fitness />
       <Power />
       <EnergySystems />
+      <FatigueCard />
+      <TauFitsCard />
+      <BanisterCard />
       <div className="lg:col-span-2">
         <Rides />
       </div>

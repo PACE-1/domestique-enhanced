@@ -580,6 +580,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/profile/banister-validation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_profile_banister_validation_api_profile_banister_validation_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/profile/dfa-backfill": {
         parameters: {
             query?: never;
@@ -628,6 +644,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/profile/fatigue-resistance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_profile_fatigue_resistance_api_profile_fatigue_resistance_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/profile/ftp-history": {
         parameters: {
             query?: never;
@@ -668,6 +700,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["api_profile_pr_toast_queue_api_profile_pr_toast_queue_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/profile/tau-fits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_profile_tau_fits_api_profile_tau_fits_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1494,6 +1542,42 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** BanisterValidation */
+        BanisterValidation: {
+            /** Comparison */
+            comparison?: string | null;
+            /** Ctl Mae Tss */
+            ctl_mae_tss?: number | null;
+            /** Ctl Mae Tss Ci High */
+            ctl_mae_tss_ci_high?: number | null;
+            /** Ctl Mae Tss Ci Low */
+            ctl_mae_tss_ci_low?: number | null;
+            /**
+             * Fit Status
+             * @default insufficient_data
+             */
+            fit_status: string;
+            /** Ftp Mae Pct */
+            ftp_mae_pct?: number | null;
+            /** Ftp Mae Pct Ci High */
+            ftp_mae_pct_ci_high?: number | null;
+            /** Ftp Mae Pct Ci Low */
+            ftp_mae_pct_ci_low?: number | null;
+            /** Ftp Mae W */
+            ftp_mae_w?: number | null;
+            /** Holdout Weeks */
+            holdout_weeks?: number | null;
+            /** Horizon Weeks */
+            horizon_weeks?: number | null;
+            /** N Markers In Holdout */
+            n_markers_in_holdout?: number | null;
+            /** Tau Fits Used */
+            tau_fits_used?: {
+                [key: string]: unknown;
+            } | null;
+        } & {
+            [key: string]: unknown;
+        };
         /** CalendarDay */
         CalendarDay: {
             /** Actual */
@@ -1982,6 +2066,40 @@ export interface components {
             files: number;
             /** Path */
             path: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** FatigueResistance */
+        FatigueResistance: {
+            /**
+             * By Duration
+             * @default []
+             */
+            by_duration: {
+                [key: string]: unknown;
+            }[];
+            /**
+             * Fit Status
+             * @default insufficient_data
+             */
+            fit_status: string;
+            /** Kj Threshold */
+            kj_threshold?: number | null;
+            /** N Long Rides */
+            n_long_rides?: number | null;
+            /** N Long Rides With Streams */
+            n_long_rides_with_streams?: number | null;
+            /** Reason */
+            reason?: string | null;
+            /** Robustness Score */
+            robustness_score?: number | null;
+            /**
+             * Scatter
+             * @default []
+             */
+            scatter: {
+                [key: string]: unknown;
+            }[];
         } & {
             [key: string]: unknown;
         };
@@ -3242,6 +3360,8 @@ export interface components {
         };
         /** RideDetail */
         RideDetail: {
+            /** Activity Id */
+            activity_id?: string | null;
             /** Avg Cadence */
             avg_cadence?: number | null;
             /** Avg Hr */
@@ -3278,6 +3398,8 @@ export interface components {
             intervals: {
                 [key: string]: unknown;
             }[];
+            /** Is Race */
+            is_race?: boolean | null;
             /** Kcal */
             kcal?: number | null;
             /** Kj */
@@ -3754,6 +3876,44 @@ export interface components {
              * @default 0
              */
             wellness_records: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** TauFits */
+        TauFits: {
+            /** Atl Tau Ci High */
+            atl_tau_ci_high?: number | null;
+            /** Atl Tau Ci Low */
+            atl_tau_ci_low?: number | null;
+            /** Atl Tau Fit */
+            atl_tau_fit?: number | null;
+            /** Conventional */
+            conventional?: {
+                [key: string]: unknown;
+            } | null;
+            /** Ctl Tau Ci High */
+            ctl_tau_ci_high?: number | null;
+            /** Ctl Tau Ci Low */
+            ctl_tau_ci_low?: number | null;
+            /** Ctl Tau Fit */
+            ctl_tau_fit?: number | null;
+            /** Fit Residual R2 */
+            fit_residual_r2?: number | null;
+            /**
+             * Fit Status
+             * @default insufficient_data
+             */
+            fit_status: string;
+            /**
+             * N Markers
+             * @default 0
+             */
+            n_markers: number;
+            /**
+             * Weighted N
+             * @default 0
+             */
+            weighted_n: number;
         } & {
             [key: string]: unknown;
         };
@@ -4893,6 +5053,26 @@ export interface operations {
             };
         };
     };
+    api_profile_banister_validation_api_profile_banister_validation_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BanisterValidation"];
+                };
+            };
+        };
+    };
     api_profile_dfa_backfill_api_profile_dfa_backfill_post: {
         parameters: {
             query?: never;
@@ -4953,6 +5133,26 @@ export interface operations {
             };
         };
     };
+    api_profile_fatigue_resistance_api_profile_fatigue_resistance_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FatigueResistance"];
+                };
+            };
+        };
+    };
     api_profile_ftp_history_api_profile_ftp_history_get: {
         parameters: {
             query?: never;
@@ -5009,6 +5209,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PrToastQueue"];
+                };
+            };
+        };
+    };
+    api_profile_tau_fits_api_profile_tau_fits_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TauFits"];
                 };
             };
         };

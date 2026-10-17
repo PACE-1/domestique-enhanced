@@ -2086,7 +2086,7 @@ def api_profile_update_ftp(body: dict):
             "ftp_test_history": pm.ftp_test_history}
 
 
-@app.get("/api/profile/tau-fits")
+@app.get("/api/profile/tau-fits", responses={200: {"model": api_models.TauFits}})
 def api_profile_tau_fits(refresh: int = Query(0)):
     """v1.0.7 IMPL-TAU-FIT-WIRING — return current per-athlete τ fit + CIs.
 
@@ -2127,7 +2127,7 @@ def api_profile_tau_fits(refresh: int = Query(0)):
     return result
 
 
-@app.get("/api/profile/banister-validation")
+@app.get("/api/profile/banister-validation", responses={200: {"model": api_models.BanisterValidation}})
 def api_profile_banister_validation(refresh: int = Query(0)):
     """v1.2.0 IMPL-OOS-VALIDATION — out-of-sample Banister model accuracy.
 
@@ -2720,7 +2720,7 @@ def api_profile_dfa_backfill_cancel(task_id: str = Query(...)):
     return {"status": "cancel_requested", "task_id": task_id}
 
 
-@app.get("/api/profile/fatigue-resistance")
+@app.get("/api/profile/fatigue-resistance", responses={200: {"model": api_models.FatigueResistance}})
 def api_profile_fatigue_resistance(window_days: int = Query(365, ge=1, le=3650),
                                      kj_threshold: int = Query(1500),
                                      refresh: int = Query(0)):
