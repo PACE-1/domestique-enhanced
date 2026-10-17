@@ -153,7 +153,7 @@ export function Dfa() {
   return (
     <div className="grid gap-3">
       <Card>
-        <CardContent className="grid gap-2">
+        <CardContent className="grid gap-2 p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h2 className="font-semibold">
@@ -275,7 +275,7 @@ function Aggregate({ data }: { data: DfaRides }) {
   if (!t1 && !t2) {
     return (
       <Card>
-        <CardContent className="text-sm leading-relaxed text-muted-foreground">
+        <CardContent className="p-4 text-sm leading-relaxed text-muted-foreground">
           <b className="text-foreground">No thresholds detected yet.</b> DFA threshold zones need a ride that{" "}
           <b className="text-foreground">sweeps through</b> the threshold — a progressive effort or a ramp where α1 falls
           past 0.75 (aerobic) / 0.50 (anaerobic). Steady endurance rides keep α1 above 0.75, so they never cross it.{" "}
@@ -288,7 +288,7 @@ function Aggregate({ data }: { data: DfaRides }) {
   const dropped = Number(agg.n_excluded_decoupling || 0)
   return (
     <Card>
-      <CardContent className="grid gap-2">
+      <CardContent className="grid gap-2 p-4">
         <div className="flex items-center gap-1.5">
           <h3 className="font-semibold">Estimated thresholds &amp; zones</h3>
           <InfoIcon />
@@ -407,14 +407,14 @@ function PerRide({ rides }: { rides: DfaRide[] }) {
   if (!rides.length) {
     return (
       <Card>
-        <CardContent className="text-sm text-muted-foreground">No rides with HRV data yet.</CardContent>
+        <CardContent className="p-4 text-sm text-muted-foreground">No rides with HRV data yet.</CardContent>
       </Card>
     )
   }
   const a1Class = (v?: number | null) => (v == null ? "" : v >= 0.75 ? "text-green-500" : v >= 0.5 ? "text-yellow-500" : "text-red-500")
   return (
     <Card>
-      <CardContent className="grid gap-2">
+      <CardContent className="grid gap-2 p-4">
         <div className="flex items-center gap-1.5">
           <h3 className="font-semibold">Per-ride DFA α1</h3>
           <InfoIcon />

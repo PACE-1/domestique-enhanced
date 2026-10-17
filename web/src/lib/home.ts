@@ -186,6 +186,16 @@ export interface DailyLogInput {
   mood: number
   notes?: string
 }
+/**
+ * The rider rates 1 (worst) to 5 (best). The server keeps the Hooper scale, 1 (best) to 7 (worst),
+ * because its fatigue thresholds come from that research scale. The mapping is symmetric around the
+ * middle and keeps both ends: 5 to 1, 4 to 3, 3 to 4, 2 to 5, 1 to 7.
+ */
+const TO_HOOPER: Record<number, number> = { 5: 1, 4: 3, 3: 4, 2: 5, 1: 7 }
+const FROM_HOOPER: Record<number, number> = { 1: 5, 2: 4, 3: 4, 4: 3, 5: 2, 6: 2, 7: 1 }
+export const rateToHooper = (rating: number) => TO_HOOPER[rating] ?? 4
+export const hooperToRate = (hooper: number) => FROM_HOOPER[hooper] ?? 3
+
 export const saveDailyLog = (entry: DailyLogInput) => api<DailyLogSaved>("/api/daily-log", { method: "POST", json: entry })
 
 /** 0 is this ISO week, -1 the one before. */
