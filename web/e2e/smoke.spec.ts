@@ -347,7 +347,11 @@ test("Settings refuses a folder outside the home folder and offers to connect in
   await page.getByLabel(/Folder with your own/).fill("/definitely/outside/home")
   await page.getByRole("button", { name: "Add folder" }).click()
   await expect(page.getByRole("alert").filter({ hasText: /inside your home folder/ })).toBeVisible()
-  await expect(page.getByRole("link", { name: "Connect intervals.icu" })).toHaveAttribute("href", /\/oauth\/icu\/start\?return_to=/)
+  // This server has no OAuth secret, so the only way to connect is an API key.
+  await expect(page.getByRole("link", { name: "Connect intervals.icu" })).toHaveCount(0)
+  await page.getByRole("button", { name: "Connect with an API key" }).click()
+  await page.getByLabel("API key").fill("not-a-real-key")
+  await expect(page.getByRole("button", { name: "Connect", exact: true })).toBeEnabled()
   await expect(page.getByText("Connect intervals.icu first.")).toBeVisible()
 })
 

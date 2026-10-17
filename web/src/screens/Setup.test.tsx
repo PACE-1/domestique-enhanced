@@ -117,3 +117,20 @@ describe("Setup wizard", () => {
     expect(screen.getByRole("button", { name: "Try again" })).toBeTruthy()
   })
 })
+
+describe("Setup: intervals.icu with an API key", () => {
+  it("offers only the key form when no OAuth secret is bundled, and links the account once the key works", async () => {
+    let linked = false
+    const calls = mockApi({
+      "/api/icu/connection": () => new Response(JSON.stringify(linked ? { method: "apikey", connected: true, name: "Isaac", oauth_available: false } : { method: "none", oauth_available: false })),
+      "/api/setup/test-icu": () => new Response(JSON.stringify({ ok: true, name: "Isaac", athlete_id: "i42" })),
+      "/api/setup/save": () => ((linked = true), new Response(JSON.stringify({ ok: true }))),
+    })
+    render(<Setup />)
+    await userEvent.type(await screen.findByLabelText("API key"), "sekret")
+    expect(screen.queryByRole("button", { name: "Sign in to intervals.icu" })).toBeNull()
+    await userEvent.click(screen.getByRole("button", { name: "Connect" }))
+    await waitFor(() => expect(calls.some((c) => c.url === "/api/setup/save" && c.body?.icu_api_key === "sekret")).toBe(true))
+    expect(calls.some((c) => c.url === "/api/setup/ensure-profile")).toBe(true)
+  })
+})

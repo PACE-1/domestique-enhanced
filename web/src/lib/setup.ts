@@ -66,3 +66,17 @@ export const clearWizard = () => sessionStorage.removeItem(WIZARD_KEY)
 
 // The callback appends ?icu=... to return_to, and a query inside a #fragment is lost, so return to /v2/?wizard=.
 export const ICU_RETURN_TO = "/v2/?wizard=profile-setup"
+
+export interface IcuKeyCheck {
+  ok: boolean
+  error?: string
+  name?: string
+  athlete_id?: string
+}
+/** Asks intervals.icu whether the key works. The athlete ID may be blank: the server finds it from the key. */
+export const testIcuKey = (athleteId: string, apiKey: string) =>
+  api<IcuKeyCheck>("/api/setup/test-icu", { method: "POST", json: { athlete_id: athleteId.trim(), api_key: apiKey.trim() } })
+
+/** Stores the athlete ID and API key on the active profile and restarts sync. */
+export const saveIcuKey = (athleteId: string, apiKey: string) =>
+  api("/api/setup/save", { method: "POST", json: { icu_athlete_id: athleteId.trim(), icu_api_key: apiKey.trim() } })

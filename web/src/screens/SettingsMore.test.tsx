@@ -193,7 +193,7 @@ describe("Settings connection", () => {
     const calls = mock({
       "/api/settings": () => json({ weight: 70, ftp: 250, lthr: 170, max_hr: 190, target_mode: "power", power_zones: [], hr_zones: [] }),
       "/api/setup/limits": () => json({}),
-      "/api/icu/connection": () => json({ connected, name: "Isaac", write_ok: true }),
+      "/api/icu/connection": () => json({ connected, name: "Isaac", write_ok: true, oauth_available: true, method: connected ? "oauth" : "none" }),
       "/api/icu/disconnect": () => ((connected = false), json({ ok: true })),
       "/api/sync/status": () => json({ wellness_records: 0, activity_records: 0 }),
       "/api/version": () => json({ app: "domestique", version: "1.0.0", data_dir: "/d" }),
@@ -207,5 +207,47 @@ describe("Settings connection", () => {
     expect(calls.some((c) => c.url === "/api/icu/disconnect")).toBe(false)
     await userEvent.click(screen.getByRole("button", { name: "Yes, disconnect" }))
     expect(await screen.findByRole("link", { name: "Connect intervals.icu" })).toBeTruthy()
+  })
+})
+
+describe("Connect with an API key", () => {
+  const base = (conn: () => Response, extra: Record<string, (b: unknown) => Response> = {}) => mock({
+    "/api/settings": () => json({ weight: 70, ftp: 250, lthr: 170, max_hr: 190, target_mode: "power", power_zones: [], hr_zones: [] }),
+    "/api/setup/limits": () => json({}),
+    "/api/icu/connection": conn,
+    "/api/sync/status": () => json({ wellness_records: 0, activity_records: 0 }),
+    "/api/version": () => json({ app: "domestique", version: "1.0.1", data_dir: "/d" }),
+    "/api/profile/ftp-history": () => json({ ftp_current: 250, history: [] }),
+    "/api/icu/push": () => json({ connected: false, write_ok: false, sync_enabled: false, horizon_days: 14 }),
+    "/api/settings/workout-folders": () => json({ builtin: { count: 1 }, extra: null }),
+    ...extra,
+  })
+
+  it("checks the key, saves it, and hides the sign-in link when no OAuth secret is bundled", async () => {
+    let connected = false
+    const calls = base(() => json({ connected, method: connected ? "apikey" : "none", name: "Isaac", oauth_available: false }), {
+      "/api/setup/test-icu": () => json({ ok: true, name: "Isaac", athlete_id: "i42" }),
+      "/api/setup/save": () => ((connected = true), json({ ok: true })),
+    })
+    render(<Settings />)
+    await userEvent.click(await screen.findByRole("button", { name: "Connect with an API key" }))
+    expect(screen.queryByRole("link", { name: "Connect intervals.icu" })).toBeNull()
+    await userEvent.type(screen.getByLabelText("API key"), "  sekret  ")
+    await userEvent.click(screen.getByRole("button", { name: "Connect" }))
+    expect(await screen.findByText(/Connected as Isaac/)).toBeTruthy()
+    expect(calls.find((c) => c.url === "/api/setup/test-icu")?.body).toEqual({ athlete_id: "", api_key: "sekret" })
+    expect(calls.find((c) => c.url === "/api/setup/save")?.body).toEqual({ icu_athlete_id: "i42", icu_api_key: "sekret" })
+  })
+
+  it("shows intervals.icu's reason when the key is refused and saves nothing", async () => {
+    const calls = base(() => json({ connected: false, method: "none", oauth_available: true }), {
+      "/api/setup/test-icu": () => json({ ok: false, error: "Invalid API key." }),
+    })
+    render(<Settings />)
+    await userEvent.click(await screen.findByRole("button", { name: "Connect with an API key" }))
+    await userEvent.type(screen.getByLabelText("API key"), "bad")
+    await userEvent.click(screen.getByRole("button", { name: "Connect" }))
+    expect((await screen.findByRole("alert")).textContent).toContain("Invalid API key.")
+    expect(calls.some((c) => c.url === "/api/setup/save")).toBe(false)
   })
 })

@@ -47,3 +47,12 @@ def test_dfa_snapshot_and_week_summary_and_auto_recalc_validate(c):
     assert w.week_start < w.week_end and w.week_offset == -1
     r = api_models.PlanAutoRecalc.model_validate(c.post("/api/plan/auto-recalc").json())
     assert r.action == "no_plan"
+
+
+def test_oauth_is_offered_only_when_a_client_secret_is_bundled(c, monkeypatch):
+    import config
+    monkeypatch.setattr(config, "ICU_OAUTH_CLIENT_ID", "511", raising=False)
+    monkeypatch.setattr(config, "ICU_OAUTH_CLIENT_SECRET", "", raising=False)
+    assert c.get("/api/icu/connection").json()["oauth_available"] is False
+    monkeypatch.setattr(config, "ICU_OAUTH_CLIENT_SECRET", "s", raising=False)
+    assert c.get("/api/icu/connection").json()["oauth_available"] is True
