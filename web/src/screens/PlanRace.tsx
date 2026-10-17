@@ -1,6 +1,9 @@
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { NativeSelect } from "@/components/ui/native-select"
+import { Input } from "@/components/ui/input"
 import { addRace, isoDay } from "@/lib/home"
 
 /** Add a B or C race to the existing plan. The server reshapes the weeks around it. */
@@ -28,21 +31,21 @@ export function PlanRace({ onDone, onCancel }: { onDone: () => void; onCancel: (
 
   return (
     <div className="flex flex-wrap items-end gap-2 text-sm">
-      <label className="flex flex-col gap-1">
+      <Label className="flex-col items-start gap-1">
         Race date
-        <input type="date" className="rounded-md border px-2 py-1" min={today} value={date} onChange={(e) => setDate(e.target.value)} />
-      </label>
-      <label className="flex flex-col gap-1">
+        <Input type="date"  min={today} value={date} onChange={(e) => setDate(e.target.value)} />
+      </Label>
+      <Label className="flex-col items-start gap-1">
         Name
-        <input className="rounded-md border px-2 py-1" value={name} onChange={(e) => setName(e.target.value)} />
-      </label>
-      <label className="flex flex-col gap-1">
+        <Input  value={name} onChange={(e) => setName(e.target.value)} />
+      </Label>
+      <Label className="flex-col items-start gap-1">
         Priority
-        <select className="rounded-md border px-2 py-1" value={priority} onChange={(e) => setPriority(e.target.value as "B" | "C")}>
+        <NativeSelect  value={priority} onChange={(e) => setPriority(e.target.value as "B" | "C")}>
           <option value="B">B (taper a little)</option>
           <option value="C">C (train through)</option>
-        </select>
-      </label>
+        </NativeSelect>
+      </Label>
       <Button size="sm" disabled={busy || !!why} onClick={submit}>
         {busy ? "Saving…" : "Add race and reshape plan"}
       </Button>

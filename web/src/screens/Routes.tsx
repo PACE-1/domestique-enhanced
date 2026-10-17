@@ -3,6 +3,10 @@ import { useEffect, useState } from "react"
 import type { RegionsList, RouteSummary, RoutesList } from "@/api/types"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
+import { NativeSelect } from "@/components/ui/native-select"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
 import { courseUrl, getRegions, listRoutes, ROUTE_PAGE, type RouteQuery } from "@/lib/routes"
 
 /** Elevation against distance. `points` are [km, metres] pairs. */
@@ -94,13 +98,13 @@ export function Routes() {
         <CardContent className="space-y-3 p-4">
           <h2 className="text-sm font-semibold">Routes and climbs</h2>
           <div className="flex flex-wrap items-end gap-2 text-sm">
-            <label className="flex flex-col gap-1">
+            <Label className="flex-col items-start gap-1">
               Search
-              <input type="search" className="rounded-md border px-2 py-1" value={q.search} onChange={(e) => setQ({ ...q, search: e.target.value })} />
-            </label>
-            <label className="flex flex-col gap-1">
+              <Input type="search"  value={q.search} onChange={(e) => setQ({ ...q, search: e.target.value })} />
+            </Label>
+            <Label className="flex-col items-start gap-1">
               Region
-              <select className="rounded-md border px-2 py-1" value={q.region} onChange={(e) => setQ({ ...q, region: e.target.value })}>
+              <NativeSelect  value={q.region} onChange={(e) => setQ({ ...q, region: e.target.value })}>
                 <option value="">All regions</option>
                 {regions?.worlds.map((w) => (
                   <option key={w.region} value={w.region}>
@@ -112,20 +116,20 @@ export function Routes() {
                     {w.title} ({w.count})
                   </option>
                 ))}
-              </select>
-            </label>
-            <label className="flex flex-col gap-1">
+              </NativeSelect>
+            </Label>
+            <Label className="flex-col items-start gap-1">
               From (km)
-              <input type="number" min={0} className="w-24 rounded-md border px-2 py-1" value={q.minKm ?? ""} onChange={(e) => setQ({ ...q, minKm: num(e.target.value) })} />
-            </label>
-            <label className="flex flex-col gap-1">
+              <Input type="number" min={0} className="w-24" value={q.minKm ?? ""} onChange={(e) => setQ({ ...q, minKm: num(e.target.value) })} />
+            </Label>
+            <Label className="flex-col items-start gap-1">
               To (km)
-              <input type="number" min={0} className="w-24 rounded-md border px-2 py-1" value={q.maxKm ?? ""} onChange={(e) => setQ({ ...q, maxKm: num(e.target.value) })} />
-            </label>
-            <label className="flex items-center gap-2 pb-1">
-              <input type="checkbox" checked={q.loopOnly} onChange={(e) => setQ({ ...q, loopOnly: e.target.checked })} />
+              <Input type="number" min={0} className="w-24" value={q.maxKm ?? ""} onChange={(e) => setQ({ ...q, maxKm: num(e.target.value) })} />
+            </Label>
+            <Label className="flex items-center gap-2 pb-1">
+              <Checkbox checked={q.loopOnly} onCheckedChange={(on) => setQ({ ...q, loopOnly: on })} />
               Loops only
-            </label>
+            </Label>
           </div>
           {badRange && <p className="text-sm">“From” is longer than “To”.</p>}
         </CardContent>

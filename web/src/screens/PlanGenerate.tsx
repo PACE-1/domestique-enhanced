@@ -2,6 +2,10 @@ import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
+import { NativeSelect } from "@/components/ui/native-select"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
 import { generatePlan, isoDay, type GenerateRequest } from "@/lib/home"
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
@@ -57,34 +61,34 @@ export function PlanGenerate({ hasPlan, onDone }: { hasPlan: boolean; onDone: ()
         <h2 className="text-sm font-semibold">{hasPlan ? "Replace the plan" : "Create a plan"}</h2>
         {hasPlan && <p className="text-sm text-muted-foreground">This replaces the current plan, including sessions you moved or changed.</p>}
         <div className="grid gap-3 sm:grid-cols-2">
-          <label className="text-sm">
+          <Label className="text-sm">
             Goal
-            <select className="mt-1 block w-full rounded-md border px-2 py-1" value={goal} onChange={(e) => setGoal(e.target.value as GenerateRequest["goal"])}>
+            <NativeSelect className="mt-1 block w-full" value={goal} onChange={(e) => setGoal(e.target.value as GenerateRequest["goal"])}>
               {GOALS.map(([id, label]) => (
                 <option key={id} value={id}>
                   {label}
                 </option>
               ))}
-            </select>
-          </label>
-          <label className="text-sm">
+            </NativeSelect>
+          </Label>
+          <Label className="text-sm">
             Hours per week
-            <input type="number" className="mt-1 block w-full rounded-md border px-2 py-1" min={1} max={40} step={0.5} value={hours} onChange={(e) => setHours(Number(e.target.value))} />
-          </label>
-          <label className="text-sm">
+            <Input type="number" className="mt-1 block w-full" min={1} max={40} step={0.5} value={hours} onChange={(e) => setHours(Number(e.target.value))} />
+          </Label>
+          <Label className="text-sm">
             Plan length (weeks)
-            <input type="number" className="mt-1 block w-full rounded-md border px-2 py-1" min={4} max={52} value={weeks} onChange={(e) => setWeeks(Number(e.target.value))} />
-          </label>
+            <Input type="number" className="mt-1 block w-full" min={4} max={52} value={weeks} onChange={(e) => setWeeks(Number(e.target.value))} />
+          </Label>
           {goal === "event" && (
             <>
-              <label className="text-sm">
+              <Label className="text-sm">
                 Event name
-                <input className="mt-1 block w-full rounded-md border px-2 py-1" value={eventName} onChange={(e) => setEventName(e.target.value)} />
-              </label>
-              <label className="text-sm">
+                <Input className="mt-1 block w-full" value={eventName} onChange={(e) => setEventName(e.target.value)} />
+              </Label>
+              <Label className="text-sm">
                 Event date
-                <input type="date" className="mt-1 block w-full rounded-md border px-2 py-1" min={today} value={eventDate} onChange={(e) => setEventDate(e.target.value)} />
-              </label>
+                <Input type="date" className="mt-1 block w-full" min={today} value={eventDate} onChange={(e) => setEventDate(e.target.value)} />
+              </Label>
             </>
           )}
         </div>
@@ -92,14 +96,13 @@ export function PlanGenerate({ hasPlan, onDone }: { hasPlan: boolean; onDone: ()
           <legend className="mb-1">Rest days</legend>
           <div className="flex flex-wrap gap-3">
             {DAYS.map((d, i) => (
-              <label key={d} className="flex items-center gap-1">
-                <input
-                  type="checkbox"
+              <Label key={d} className="flex items-center gap-1">
+                <Checkbox
                   checked={rest.includes(i)}
-                  onChange={(e) => setRest(e.target.checked ? [...rest, i].sort() : rest.filter((x) => x !== i))}
+                  onCheckedChange={(on) => setRest(on ? [...rest, i].sort() : rest.filter((x) => x !== i))}
                 />
                 {d}
-              </label>
+              </Label>
             ))}
           </div>
         </fieldset>

@@ -1,6 +1,9 @@
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { NativeSelect } from "@/components/ui/native-select"
+import { Input } from "@/components/ui/input"
 import { isoDay, markUnavailable, regeneratePlan, type TimeOffType } from "@/lib/home"
 
 const TYPES: [TimeOffType, string][] = [
@@ -49,24 +52,24 @@ export function PlanTimeOff({ onDone, onCancel }: { onDone: () => void; onCancel
 
   return (
     <div className="flex flex-wrap items-end gap-2 text-sm">
-      <label className="flex flex-col gap-1">
+      <Label className="flex-col items-start gap-1">
         First day
-        <input type="date" className="rounded-md border px-2 py-1" min={today} value={start} onChange={(e) => setStart(e.target.value)} />
-      </label>
-      <label className="flex flex-col gap-1">
+        <Input type="date"  min={today} value={start} onChange={(e) => setStart(e.target.value)} />
+      </Label>
+      <Label className="flex-col items-start gap-1">
         Last day
-        <input type="date" className="rounded-md border px-2 py-1" min={start || today} value={end} onChange={(e) => setEnd(e.target.value)} />
-      </label>
-      <label className="flex flex-col gap-1">
+        <Input type="date"  min={start || today} value={end} onChange={(e) => setEnd(e.target.value)} />
+      </Label>
+      <Label className="flex-col items-start gap-1">
         Reason
-        <select className="rounded-md border px-2 py-1" value={type} onChange={(e) => setType(e.target.value as TimeOffType)}>
+        <NativeSelect  value={type} onChange={(e) => setType(e.target.value as TimeOffType)}>
           {TYPES.map(([id, label]) => (
             <option key={id} value={id}>
               {label}
             </option>
           ))}
-        </select>
-      </label>
+        </NativeSelect>
+      </Label>
       <Button size="sm" disabled={busy || !!why} onClick={submit}>
         {busy ? "Saving…" : "Save and rebuild plan"}
       </Button>

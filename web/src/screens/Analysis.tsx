@@ -5,18 +5,20 @@ import { fmtDuration, getFitness, getPowerCurve, getRides, RANGES, type Series }
 import { fmtMinutes } from "@/lib/home"
 import { LineChart } from "@/screens/Chart"
 import { Panel, useLoad } from "@/screens/panel"
+import { Label } from "@/components/ui/label"
+import { NativeSelect } from "@/components/ui/native-select"
 
 const Range = ({ value, onChange, label }: { value: number; onChange: (n: number) => void; label: string }) => (
-  <label className="flex items-center gap-2 text-sm">
+  <Label className="flex items-center gap-2 text-sm">
     {label}
-    <select className="rounded-md border px-2 py-1" value={value} onChange={(e) => onChange(Number(e.target.value))}>
+    <NativeSelect  value={value} onChange={(e) => onChange(Number(e.target.value))}>
       {RANGES.map(([d, t]) => (
         <option key={d} value={d}>
           {t}
         </option>
       ))}
-    </select>
-  </label>
+    </NativeSelect>
+  </Label>
 )
 
 function Fitness() {
@@ -30,9 +32,9 @@ function Fitness() {
           rows.flatMap((r, i) => (r[key] == null ? [] : [{ x: i, y: r[key] as number }]))
         const last = [...rows].reverse().find((r) => r.ctl != null)
         const series: Series[] = [
-          { name: "Fitness (CTL)", color: "#2563eb", points: pts("ctl") },
-          { name: "Fatigue (ATL)", color: "#dc2626", points: pts("atl") },
-          { name: "Form (TSB)", color: "#16a34a", points: pts("tsb") },
+          { name: "Fitness (CTL)", color: "var(--chart-2)", points: pts("ctl") },
+          { name: "Fatigue (ATL)", color: "var(--chart-5)", points: pts("atl") },
+          { name: "Form (TSB)", color: "var(--primary)", points: pts("tsb") },
         ]
         return (
           <div className="space-y-3">
@@ -76,8 +78,8 @@ function Power() {
             </div>
           )
         const series: Series[] = [
-          { name: "Your best", color: "#2563eb", points: rider.map((p) => ({ x: Math.log(p.duration_s), y: p.watts })) },
-          { name: "Reference (current weight)", color: "#9ca3af", points: c.pg_2011_baseline.map((p) => ({ x: Math.log(p.duration_s), y: p.watts_at_current_weight })) },
+          { name: "Your best", color: "var(--chart-2)", points: rider.map((p) => ({ x: Math.log(p.duration_s), y: p.watts })) },
+          { name: "Reference (current weight)", color: "var(--muted-foreground)", points: c.pg_2011_baseline.map((p) => ({ x: Math.log(p.duration_s), y: p.watts_at_current_weight })) },
         ]
         const at = (s: number) => rider.find((p) => p.duration_s === s)
         return (

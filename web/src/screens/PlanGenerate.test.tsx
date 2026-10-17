@@ -35,7 +35,7 @@ describe("PlanGenerate", () => {
     const hours = screen.getByLabelText("Hours per week")
     await userEvent.clear(hours)
     await userEvent.type(hours, "10")
-    await userEvent.click(screen.getByLabelText("Sun"))
+    await userEvent.click(screen.getByRole("checkbox", { name: "Sun" }))
     await userEvent.click(screen.getByRole("button", { name: "Create plan" }))
     await waitFor(() => expect(done).toHaveBeenCalled())
     expect(posts).toEqual([{ goal: "ftp", hours_per_week: 10, plan_weeks: 12, rest_days: [0, 6] }])

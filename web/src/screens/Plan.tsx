@@ -3,6 +3,8 @@ import { useCallback, useEffect, useState } from "react"
 import type { PlanRead, PlanWeek } from "@/api/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { NativeSelect } from "@/components/ui/native-select"
+import { Input } from "@/components/ui/input"
 import { PlanGenerate } from "@/screens/PlanGenerate"
 import { PlanAvailability } from "@/screens/PlanAvailability"
 import { PlanRace } from "@/screens/PlanRace"
@@ -156,8 +158,8 @@ export function Plan() {
                 const dismissed = s.status === "dismissed"
                 const canToggle = !s.is_race && !s.status.startsWith("done")
                 return (
-                  <li key={k} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
-                    <span className={s.day === today ? "font-medium" : ""} aria-current={s.day === today ? "date" : undefined}>
+                  <li key={k} className="flex flex-wrap items-center gap-2 py-2 text-sm">
+                    <span className={`min-w-56 flex-1 ${s.day === today ? "font-medium" : ""}`} aria-current={s.day === today ? "date" : undefined}>
                       {dayLabel(s.day)} · {s.zwo_name || s.session_type}
                     </span>
                     <span className="text-muted-foreground">
@@ -192,9 +194,9 @@ export function Plan() {
                       <PlanRedraw day={s.day} onDone={async () => { setRedrawing(null); setLoad({ state: "ok", plan: await getPlan() }) }} onCancel={() => setRedrawing(null)} />
                     )}
                     {canToggle && !dismissed && s.session_type === "ftp_test" && (
-                      <select
+                      <NativeSelect
                         aria-label={`Test type ${dayLabel(s.day)}`}
-                        className="rounded-md border px-2 py-1 text-sm"
+                        className="text-sm"
                         value={String((s as { ftp_test_type?: string }).ftp_test_type ?? "")}
                         disabled={busy === s.day}
                         onChange={(e) => change(s.day, () => setFtpTestType(s.day, e.target.value))}
@@ -207,13 +209,13 @@ export function Plan() {
                             {label}
                           </option>
                         ))}
-                      </select>
+                      </NativeSelect>
                     )}
                     {swapping?.day === s.day && (
                       <span className="flex flex-wrap items-center gap-2">
-                        <select
+                        <NativeSelect
                           aria-label="New type"
-                          className="rounded-md border px-2 py-1 text-sm"
+                          className="text-sm"
                           value={swapping.type}
                           onChange={(e) => setSwapping({ ...swapping, type: e.target.value })}
                         >
@@ -222,11 +224,11 @@ export function Plan() {
                               {label}
                             </option>
                           ))}
-                        </select>
-                        <input
+                        </NativeSelect>
+                        <Input
                           type="number"
                           aria-label="Minutes"
-                          className="w-20 rounded-md border px-2 py-1 text-sm"
+                          className="w-20 text-sm"
                           min={30}
                           max={300}
                           value={swapping.minutes}
@@ -242,10 +244,10 @@ export function Plan() {
                     )}
                     {moving?.day === s.day && (
                       <span className="flex items-center gap-2">
-                        <input
+                        <Input
                           type="date"
                           aria-label="Move to"
-                          className="rounded-md border px-2 py-1 text-sm"
+                          className="text-sm"
                           min={today}
                           value={moving.to}
                           onChange={(e) => setMoving({ day: s.day, to: e.target.value })}

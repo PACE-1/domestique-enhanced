@@ -1,6 +1,8 @@
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
 import { saveAvailability, type Availability } from "@/lib/home"
 
 const addDays = (iso: string, n: number) => {
@@ -56,19 +58,19 @@ export function PlanAvailability({
       <p className="text-muted-foreground">Hours you can ride. Leave blank to keep the day as planned; 0 means no riding.</p>
       <div className="flex flex-wrap gap-2">
         {days.map((d) => (
-          <label key={d} className="flex flex-col gap-1">
+          <Label key={d} className="flex flex-col gap-1">
             {dayLabel(d)}
-            <input
+            <Input
               type="number"
               min={0}
               max={12}
               step={0.5}
-              className="w-20 rounded-md border px-2 py-1"
+              className="w-20"
               aria-label={`Hours ${dayLabel(d)}`}
               value={hours[d]}
               onChange={(e) => setHours({ ...hours, [d]: e.target.value })}
             />
-          </label>
+          </Label>
         ))}
       </div>
       {days.length === 0 && <p>This week is over.</p>}

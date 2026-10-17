@@ -9,7 +9,7 @@ export function LineChart({ series, summary, unit }: { series: Series[]; summary
       <svg role="img" aria-label={summary} viewBox="0 0 300 100" className="h-32 w-full">
         {g.zeroY !== null && <line x1={0} x2={300} y1={g.zeroY} y2={g.zeroY} className="stroke-muted-foreground/40" strokeDasharray="3 3" />}
         {g.paths.map((p) => (
-          <path key={p.name} d={p.d} fill="none" stroke={p.color} strokeWidth={1.5} />
+          <path key={p.name} d={p.d} fill="none" style={{ stroke: p.color }} strokeWidth={1.5} />
         ))}
       </svg>
       <figcaption className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">

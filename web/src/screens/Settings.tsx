@@ -2,6 +2,9 @@ import { useCallback, useEffect, useState } from "react"
 
 import type { IcuConnection, SettingsRead, SyncStatus, UpdateCheck, VersionInfo, ZoneBand } from "@/api/types"
 import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { NativeSelect } from "@/components/ui/native-select"
+import { Input } from "@/components/ui/input"
 import { checkUpdate, diff, formFrom, getSettings, getSyncStatus, getVersion, saveSettings, syncNow, type RiderForm } from "@/lib/settings"
 import { getIcuConnection, getLimits, type Limits } from "@/lib/setup"
 import { Panel, Row, useLoad } from "@/screens/panel"
@@ -37,10 +40,10 @@ function RiderForm_({ s, limits, saved }: { s: SettingsRead; limits: Limits; sav
     }
   }
   const field = (k: "weight" | "ftp" | "lthr" | "maxHr", label: string) => (
-    <label className="flex flex-col gap-1">
+    <Label className="flex-col items-start gap-1">
       {label}
-      <input type="number" className="w-28 rounded-md border px-2 py-1" value={f[k]} onChange={(e) => set(k, e.target.value)} />
-    </label>
+      <Input type="number" className="w-28" value={f[k]} onChange={(e) => set(k, e.target.value)} />
+    </Label>
   )
   return (
     <div className="space-y-3 text-sm">
@@ -49,13 +52,13 @@ function RiderForm_({ s, limits, saved }: { s: SettingsRead; limits: Limits; sav
         {field("ftp", "FTP (W)")}
         {field("lthr", "LTHR (bpm)")}
         {field("maxHr", "Max HR (bpm)")}
-        <label className="flex flex-col gap-1">
+        <Label className="flex-col items-start gap-1">
           Targets
-          <select className="rounded-md border px-2 py-1" value={f.targetMode} onChange={(e) => set("targetMode", e.target.value)}>
+          <NativeSelect  value={f.targetMode} onChange={(e) => set("targetMode", e.target.value)}>
             <option value="power">Power</option>
             <option value="hr">Heart rate</option>
-          </select>
-        </label>
+          </NativeSelect>
+        </Label>
       </div>
       <p className="text-muted-foreground">
         {s.w_per_kg ? `${s.w_per_kg} W/kg. ` : ""}
