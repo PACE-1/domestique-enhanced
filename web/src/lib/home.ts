@@ -1,4 +1,4 @@
-import type { PlanJson, PlanRead, PlanRegenerated, PlanSession, PlanWeek, ProgrammeSummary, RiderStats, SessionDismissed, SessionMoved, SessionSwapped, UnavailableMarked } from "@/api/types"
+import type { AutoAdjustResult, AvailabilitySaved, CapReverted, DailyLogRead, DailyLogSaved, DeloadReverted, FtpTestTypeSet, RaceAdded, Readiness, RedrawAccepted, RedrawCandidate, RematchResult, TierDownApplied, TodayPersisted, TodaySession, PlanJson, PlanRead, PlanRegenerated, PlanSession, PlanWeek, ProgrammeSummary, RiderStats, SessionDismissed, SessionMoved, SessionSwapped, UnavailableMarked } from "@/api/types"
 import { api } from "@/lib/api"
 
 export const getPlan = () => api<PlanRead>("/api/plan")
@@ -81,3 +81,82 @@ export const reading = (r: unknown): number | null => {
   const v = (r as { value?: unknown } | null | undefined)?.value
   return typeof v === "number" ? v : null
 }
+
+// ── Plan tools ───────────────────────────────────────────────────────────
+
+export interface DayAvailability {
+  hours: number
+  type: string
+}
+export type Availability = Record<string, DayAvailability>
+
+/** The server REPLACES the stored availability with what it receives, so always send the full map. */
+export const saveAvailability = (availability: Availability) =>
+  api<AvailabilitySaved>("/api/plan/save-availability", { method: "POST", json: { availability } })
+
+export interface RaceRequest {
+  date: string
+  name: string
+  priority: "B" | "C"
+  km?: number
+  type?: string
+}
+
+/** Add a B/C race; the server re-periodizes the plan around it. */
+export const addRace = (req: RaceRequest) => api<RaceAdded>("/api/plan/add-race", { method: "POST", json: req })
+
+export const FTP_TEST_TYPES = [
+  ["ramp", "Ramp test"],
+  ["coggan_20min", "20-minute test"],
+  ["sixty_min", "60-minute test"],
+  ["cp_test", "CP test"],
+] as const
+
+export const setFtpTestType = (date: string, testType: string) =>
+  api<FtpTestTypeSet>("/api/plan/ftp-test-type", { method: "POST", json: { date, test_type: testType } })
+
+/** Compare this week's sessions with the rides done. `apply` false only previews. */
+export const rematchWeek = (apply: boolean) => api<RematchResult>(`/api/plan/rematch?apply=${apply ? 1 : 0}`, { method: "POST" })
+
+/** Offer another workout for the day. Pass names already seen to get a different one. */
+export const previewRedraw = (date: string, seen: string[]) =>
+  api<RedrawCandidate>("/api/plan/preview-redraw", { method: "POST", json: { date, exclude_extra: seen } })
+
+export const acceptRedraw = (c: RedrawCandidate) =>
+  api<RedrawAccepted>("/api/plan/accept-redraw", {
+    method: "POST",
+    json: { date: c.day, zwo_file: c.zwo_file, zwo_name: c.zwo_name, variation: c.variation, tss_estimate: c.tss_estimate, duration_min: c.duration_min },
+  })
+
+export const revertDeload = () => api<DeloadReverted>("/api/plan/continuous/deload-revert", { method: "POST", json: {} })
+
+// ── Today ────────────────────────────────────────────────────────────────
+
+export const getReadiness = () => api<Readiness>("/api/readiness")
+export const getTodaySession = () => api<TodaySession>("/api/today-session")
+
+/** Keep today's adjusted session in the plan (the replacement the readiness check suggested). */
+export const acceptAdjusted = (adjusted: { session_type: string; duration_min?: number; tss_estimate?: number; description?: string }, reason: string) =>
+  api<TodayPersisted>("/api/today-session/persist", { method: "POST", json: { ...adjusted, reason } })
+
+/** Ride the original session today: switches the readiness caps off until midnight and restores a stored adaptation. */
+export const rideOriginal = () => api<CapReverted>("/api/readiness/revert-cap", { method: "POST", json: {} })
+
+export const easeToday = () => api<TierDownApplied>("/api/readiness/apply-tier-down", { method: "POST", json: {} })
+
+export type AdjustScope = "today" | "week" | "day"
+/** `dryRun` previews without saving. */
+export const autoAdjust = (scope: AdjustScope, dryRun: boolean, severity?: string) =>
+  api<AutoAdjustResult>("/api/plan/auto-adjust", { method: "POST", json: { scope, dry_run: dryRun, ...(severity ? { severity } : {}) } })
+
+export const getDailyLog = () => api<DailyLogRead>("/api/daily-log")
+
+export interface DailyLogInput {
+  sleep_quality: number
+  fatigue: number
+  stress: number
+  soreness: number
+  mood: number
+  notes?: string
+}
+export const saveDailyLog = (entry: DailyLogInput) => api<DailyLogSaved>("/api/daily-log", { method: "POST", json: entry })

@@ -144,3 +144,73 @@ test("time off can be recorded and the plan rebuilt around it", async ({ page, r
   const plan = await (await request.get("http://127.0.0.1:" + (process.env.E2E_PORT ?? 22488) + "/api/plan")).json()
   expect(plan.plan_json.unavailable_periods.at(-1)).toMatchObject({ start: day(3), end: day(5), type: "illness" })
 })
+
+const BASE = "http://127.0.0.1:" + (process.env.E2E_PORT ?? 22488)
+const dayOffset = (n: number) => { const d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10) }
+
+test("Home shows readiness and a daily check-in can be saved", async ({ page, request }) => {
+  await page.goto("#/home")
+  await expect(page.getByRole("heading", { name: "Readiness" })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Daily check-in" })).toBeVisible()
+  await page.getByLabel("Fatigue").selectOption("6")
+  await page.getByRole("button", { name: "Save check-in" }).click()
+  await expect(page.getByText(/Hooper index/)).toBeVisible()
+  const log = await (await request.get(BASE + "/api/daily-log")).json()
+  expect(log.today.fatigue).toBe(6)
+})
+
+test("a race can be added to the Plan", async ({ page, request }) => {
+  await page.goto("#/plan")
+  await page.getByRole("button", { name: "Add a race…" }).click()
+  await page.getByLabel("Race date").fill(dayOffset(35))
+  await page.getByLabel("Name").fill("Club crit")
+  await page.getByRole("button", { name: "Add race and reshape plan" }).click()
+  await expect(page.getByRole("button", { name: "Add a race…" })).toBeVisible()
+  await expect(page.getByRole("alert")).toHaveCount(0)
+  const plan = await (await request.get(BASE + "/api/plan")).json()
+  expect(plan.plan_json.goal.events.some((e: { name: string }) => e.name === "Club crit")).toBe(true)
+})
+
+test("availability for the week can be saved", async ({ page, request }) => {
+  await page.goto("#/plan")
+  await page.getByRole("button", { name: "Availability…" }).click()
+  await page.getByRole("spinbutton").first().fill("1.5")
+  await page.getByRole("button", { name: "Save availability" }).click()
+  await expect(page.getByRole("button", { name: "Availability…" })).toBeVisible()
+  await expect(page.getByRole("alert")).toHaveCount(0)
+  const plan = await (await request.get(BASE + "/api/plan")).json()
+  expect(Object.values(plan.plan_json.availability as Record<string, { hours: number }>).some((a) => a.hours === 1.5)).toBe(true)
+})
+
+test("rides can be matched against the week", async ({ page }) => {
+  await page.goto("#/plan")
+  await page.getByRole("button", { name: "Match rides…" }).click()
+  await page.getByRole("button", { name: "Check this week against my rides" }).click()
+  await expect(page.getByRole("button", { name: "Save these matches" })).toBeVisible()
+  await page.getByRole("button", { name: "Save these matches" }).click()
+  await expect(page.getByRole("button", { name: "Match rides…" })).toBeVisible()
+  await expect(page.getByRole("alert")).toHaveCount(0)
+})
+
+test("another workout can be picked for a day", async ({ page }) => {
+  await page.goto("#/plan")
+  await page.getByRole("button", { name: /^Other workout / }).first().click()
+  await page.getByRole("button", { name: "Find another workout" }).click()
+  await page.getByRole("button", { name: "Use this" }).click()
+  await expect(page.getByRole("button", { name: "Use this" })).toHaveCount(0)
+  await expect(page.getByRole("alert")).toHaveCount(0)
+})
+
+test("an FTP-test session gets a test type", async ({ page, request }) => {
+  await page.goto("#/plan")
+  await page.getByRole("button", { name: /^Change type / }).first().click()
+  await page.getByLabel("New type").selectOption("ftp_test")
+  await page.getByLabel("Minutes").fill("60")
+  await page.getByRole("button", { name: "Apply" }).click()
+  await expect(page.getByLabel("New type")).toHaveCount(0)
+  await page.getByLabel(/^Test type /).first().selectOption("ramp")
+  await expect(page.getByRole("alert")).toHaveCount(0)
+  const plan = await (await request.get(BASE + "/api/plan")).json()
+  const types = plan.plan_json.weeks.flatMap((w: { sessions: { ftp_test_type?: string }[] }) => w.sessions.map((s) => s.ftp_test_type))
+  expect(types).toContain("ramp")
+})

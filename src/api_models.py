@@ -311,3 +311,154 @@ class PlanRegenerated(_Model):
     ok: bool = True
     plan_json: Optional[PlanJson] = None
     regen_info: Optional[dict] = None
+
+
+# ── Plan tools: availability, races, FTP-test type, rematch, redraw, deload ──
+
+class AvailabilitySaved(_Model):
+    ok: bool = True
+    sessions_modified: int = 0
+
+
+class RaceAdded(_Model):
+    ok: bool = True
+    plan_json: Optional[PlanJson] = None
+    regen_info: Optional[dict] = None
+    added: Optional[dict] = None
+
+
+class FtpTestTypeSet(_Model):
+    ok: bool = True
+    test_type: str
+    zwo_file: str = ""
+    zwo_name: str = ""
+    duration_min: Optional[int] = None
+    tss_estimate: Optional[float] = None
+    display_name: Optional[str] = None
+
+
+class RematchResult(_Model):
+    """Preview (apply=0) or result (apply=1). `action` is set when there is no current week."""
+    ok: Optional[bool] = None
+    apply: Optional[bool] = None
+    action: Optional[str] = None
+    changed: Optional[int] = None
+
+
+class RedrawCandidate(_Model):
+    ok: bool = True
+    action: Optional[str] = None       # "no_candidate" / "invalid" when ok is false
+    day: str = ""
+    reason: Optional[str] = None
+    session_type: Optional[str] = None
+    zwo_file: Optional[str] = None
+    zwo_name: Optional[str] = None
+    variation: Optional[int] = None
+    duration_min: Optional[int] = None
+    tss_estimate: Optional[float] = None
+    exhausted: Optional[bool] = None
+
+
+class RedrawAccepted(_Model):
+    ok: bool = True
+    day: str = ""
+    sessions_modified: int = 0
+
+
+class DeloadReverted(_Model):
+    reverted: bool
+    reason: Optional[str] = None
+    week_num: Optional[int] = None
+
+
+# ── Today: readiness, adapted session, daily log ────────────────────────────
+
+class ReadinessAdvice(_Model):
+    advice: str = ""
+
+
+class Readiness(_Model):
+    score_0_100: Optional[float] = None
+    severity: str = "normal"           # normal | tier_down | rest
+    source: Optional[str] = None
+    severity_reasons: list[str] = []
+    readiness: Optional[ReadinessAdvice] = None
+    dfa_cap_applied: Optional[bool] = None
+    decoupling_advisory: Optional[bool] = None
+
+
+class TodaySessionPlan(_Model):
+    session_type: str
+    duration_min: int = 0
+    tss_estimate: float = 0
+    description: str = ""
+    zwo_name: Optional[str] = None
+
+
+class TodaySession(_Model):
+    planned: Optional[TodaySessionPlan] = None
+    adjusted: Optional[TodaySessionPlan] = None
+    reason: str = ""
+    adjustment_reason: Optional[str] = None
+    was_modified: bool = False
+    has_plan: Optional[bool] = None
+    is_race: bool = False
+
+
+class TodayPersisted(_Model):
+    ok: bool = True
+    day: str
+    adapted_reason: str = ""
+    session_type: str
+
+
+class CapReverted(_Model):
+    ok: bool = True
+    reverted: bool = True
+    restored: Optional[dict] = None
+
+
+class TierDownApplied(_Model):
+    ok: bool = True
+    action: Optional[str] = None       # why nothing changed, when ok is false
+    day: str = ""
+    old_type: Optional[str] = None
+    new_type: Optional[str] = None
+    old_tss: Optional[float] = None
+    new_tss: Optional[float] = None
+    duration_min: Optional[int] = None
+    zwo_name: Optional[str] = None
+
+
+class AutoAdjustResult(_Model):
+    ok: bool = True
+    severity: str = "normal"
+    scope: str = "today"
+    dry_run: bool = False
+    actions: list[dict] = []
+    applied: Optional[bool] = None
+    sessions_modified: int = 0
+    note: str = ""
+
+
+class DailyLogEntry(_Model):
+    date: str
+    sleep_quality: Optional[int] = None
+    fatigue: Optional[int] = None
+    soreness: Optional[int] = None
+    stress: Optional[int] = None
+    mood: Optional[int] = None
+    notes: Optional[str] = None
+    hooper_index: Optional[int] = None
+    readiness_to_train: Optional[int] = None
+
+
+class DailyLogRead(_Model):
+    today: Optional[DailyLogEntry] = None
+    history: list[DailyLogEntry] = []
+
+
+class DailyLogSaved(_Model):
+    ok: bool = True
+    entry: DailyLogEntry
+

@@ -1,6 +1,80 @@
 {
   "components": {
     "schemas": {
+      "AutoAdjustResult": {
+        "additionalProperties": true,
+        "properties": {
+          "actions": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Actions",
+            "type": "array"
+          },
+          "applied": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Applied"
+          },
+          "dry_run": {
+            "default": false,
+            "title": "Dry Run",
+            "type": "boolean"
+          },
+          "note": {
+            "default": "",
+            "title": "Note",
+            "type": "string"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "scope": {
+            "default": "today",
+            "title": "Scope",
+            "type": "string"
+          },
+          "sessions_modified": {
+            "default": 0,
+            "title": "Sessions Modified",
+            "type": "integer"
+          },
+          "severity": {
+            "default": "normal",
+            "title": "Severity",
+            "type": "string"
+          }
+        },
+        "title": "AutoAdjustResult",
+        "type": "object"
+      },
+      "AvailabilitySaved": {
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "sessions_modified": {
+            "default": 0,
+            "title": "Sessions Modified",
+            "type": "integer"
+          }
+        },
+        "title": "AvailabilitySaved",
+        "type": "object"
+      },
       "BackfillStarted": {
         "additionalProperties": true,
         "properties": {
@@ -130,6 +204,216 @@
           }
         },
         "title": "BackfillStatus",
+        "type": "object"
+      },
+      "CapReverted": {
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "restored": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Restored"
+          },
+          "reverted": {
+            "default": true,
+            "title": "Reverted",
+            "type": "boolean"
+          }
+        },
+        "title": "CapReverted",
+        "type": "object"
+      },
+      "DailyLogEntry": {
+        "additionalProperties": true,
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "fatigue": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fatigue"
+          },
+          "hooper_index": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hooper Index"
+          },
+          "mood": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mood"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "readiness_to_train": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Readiness To Train"
+          },
+          "sleep_quality": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sleep Quality"
+          },
+          "soreness": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Soreness"
+          },
+          "stress": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stress"
+          }
+        },
+        "required": [
+          "date"
+        ],
+        "title": "DailyLogEntry",
+        "type": "object"
+      },
+      "DailyLogRead": {
+        "additionalProperties": true,
+        "properties": {
+          "history": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/DailyLogEntry"
+            },
+            "title": "History",
+            "type": "array"
+          },
+          "today": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DailyLogEntry"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "DailyLogRead",
+        "type": "object"
+      },
+      "DailyLogSaved": {
+        "additionalProperties": true,
+        "properties": {
+          "entry": {
+            "$ref": "#/components/schemas/DailyLogEntry"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "entry"
+        ],
+        "title": "DailyLogSaved",
+        "type": "object"
+      },
+      "DeloadReverted": {
+        "additionalProperties": true,
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "reverted": {
+            "title": "Reverted",
+            "type": "boolean"
+          },
+          "week_num": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Week Num"
+          }
+        },
+        "required": [
+          "reverted"
+        ],
+        "title": "DeloadReverted",
         "type": "object"
       },
       "DfaAggregate": {
@@ -539,6 +823,68 @@
           "id"
         ],
         "title": "EnsureProfile",
+        "type": "object"
+      },
+      "FtpTestTypeSet": {
+        "additionalProperties": true,
+        "properties": {
+          "display_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "duration_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Min"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "test_type": {
+            "title": "Test Type",
+            "type": "string"
+          },
+          "tss_estimate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tss Estimate"
+          },
+          "zwo_file": {
+            "default": "",
+            "title": "Zwo File",
+            "type": "string"
+          },
+          "zwo_name": {
+            "default": "",
+            "title": "Zwo Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "test_type"
+        ],
+        "title": "FtpTestTypeSet",
         "type": "object"
       },
       "IcuConnection": {
@@ -1419,6 +1765,328 @@
         "title": "ProgrammeSummary",
         "type": "object"
       },
+      "RaceAdded": {
+        "additionalProperties": true,
+        "properties": {
+          "added": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Added"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "plan_json": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlanJson"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "regen_info": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Regen Info"
+          }
+        },
+        "title": "RaceAdded",
+        "type": "object"
+      },
+      "Readiness": {
+        "additionalProperties": true,
+        "properties": {
+          "decoupling_advisory": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decoupling Advisory"
+          },
+          "dfa_cap_applied": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dfa Cap Applied"
+          },
+          "readiness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReadinessAdvice"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "score_0_100": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score 0 100"
+          },
+          "severity": {
+            "default": "normal",
+            "title": "Severity",
+            "type": "string"
+          },
+          "severity_reasons": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Severity Reasons",
+            "type": "array"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          }
+        },
+        "title": "Readiness",
+        "type": "object"
+      },
+      "ReadinessAdvice": {
+        "additionalProperties": true,
+        "properties": {
+          "advice": {
+            "default": "",
+            "title": "Advice",
+            "type": "string"
+          }
+        },
+        "title": "ReadinessAdvice",
+        "type": "object"
+      },
+      "RedrawAccepted": {
+        "additionalProperties": true,
+        "properties": {
+          "day": {
+            "default": "",
+            "title": "Day",
+            "type": "string"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "sessions_modified": {
+            "default": 0,
+            "title": "Sessions Modified",
+            "type": "integer"
+          }
+        },
+        "title": "RedrawAccepted",
+        "type": "object"
+      },
+      "RedrawCandidate": {
+        "additionalProperties": true,
+        "properties": {
+          "action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action"
+          },
+          "day": {
+            "default": "",
+            "title": "Day",
+            "type": "string"
+          },
+          "duration_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Min"
+          },
+          "exhausted": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exhausted"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "session_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Type"
+          },
+          "tss_estimate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tss Estimate"
+          },
+          "variation": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variation"
+          },
+          "zwo_file": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zwo File"
+          },
+          "zwo_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zwo Name"
+          }
+        },
+        "title": "RedrawCandidate",
+        "type": "object"
+      },
+      "RematchResult": {
+        "additionalProperties": true,
+        "description": "Preview (apply=0) or result (apply=1). `action` is set when there is no current week.",
+        "properties": {
+          "action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action"
+          },
+          "apply": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Apply"
+          },
+          "changed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Changed"
+          },
+          "ok": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ok"
+          }
+        },
+        "title": "RematchResult",
+        "type": "object"
+      },
       "RiderStats": {
         "additionalProperties": true,
         "properties": {
@@ -1774,6 +2442,233 @@
         "title": "SyncProgress",
         "type": "object"
       },
+      "TierDownApplied": {
+        "additionalProperties": true,
+        "properties": {
+          "action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action"
+          },
+          "day": {
+            "default": "",
+            "title": "Day",
+            "type": "string"
+          },
+          "duration_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Min"
+          },
+          "new_tss": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "New Tss"
+          },
+          "new_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "New Type"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "old_tss": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Old Tss"
+          },
+          "old_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Old Type"
+          },
+          "zwo_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zwo Name"
+          }
+        },
+        "title": "TierDownApplied",
+        "type": "object"
+      },
+      "TodayPersisted": {
+        "additionalProperties": true,
+        "properties": {
+          "adapted_reason": {
+            "default": "",
+            "title": "Adapted Reason",
+            "type": "string"
+          },
+          "day": {
+            "title": "Day",
+            "type": "string"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "session_type": {
+            "title": "Session Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "day",
+          "session_type"
+        ],
+        "title": "TodayPersisted",
+        "type": "object"
+      },
+      "TodaySession": {
+        "additionalProperties": true,
+        "properties": {
+          "adjusted": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TodaySessionPlan"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "adjustment_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Adjustment Reason"
+          },
+          "has_plan": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Has Plan"
+          },
+          "is_race": {
+            "default": false,
+            "title": "Is Race",
+            "type": "boolean"
+          },
+          "planned": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TodaySessionPlan"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reason": {
+            "default": "",
+            "title": "Reason",
+            "type": "string"
+          },
+          "was_modified": {
+            "default": false,
+            "title": "Was Modified",
+            "type": "boolean"
+          }
+        },
+        "title": "TodaySession",
+        "type": "object"
+      },
+      "TodaySessionPlan": {
+        "additionalProperties": true,
+        "properties": {
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "duration_min": {
+            "default": 0,
+            "title": "Duration Min",
+            "type": "integer"
+          },
+          "session_type": {
+            "title": "Session Type",
+            "type": "string"
+          },
+          "tss_estimate": {
+            "default": 0,
+            "title": "Tss Estimate",
+            "type": "number"
+          },
+          "zwo_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zwo Name"
+          }
+        },
+        "required": [
+          "session_type"
+        ],
+        "title": "TodaySessionPlan",
+        "type": "object"
+      },
       "UnavailableMarked": {
         "additionalProperties": true,
         "properties": {
@@ -1844,6 +2739,38 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/daily-log": {
+      "get": {
+        "operationId": "api_daily_log_api_daily_log_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DailyLogRead"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "operationId": "api_daily_log_post_api_daily_log_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DailyLogSaved"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/icu/connection": {
       "get": {
         "operationId": "api_icu_connection_api_icu_connection_get",
@@ -1878,6 +2805,74 @@
         }
       }
     },
+    "/api/plan/accept-redraw": {
+      "post": {
+        "operationId": "api_plan_accept_redraw_api_plan_accept_redraw_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedrawAccepted"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/plan/add-race": {
+      "post": {
+        "operationId": "api_plan_add_race_api_plan_add_race_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RaceAdded"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/plan/auto-adjust": {
+      "post": {
+        "operationId": "api_plan_auto_adjust_api_plan_auto_adjust_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutoAdjustResult"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/plan/continuous/deload-revert": {
+      "post": {
+        "operationId": "api_continuous_deload_revert_api_plan_continuous_deload_revert_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeloadReverted"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/plan/dismiss-session": {
       "post": {
         "operationId": "api_plan_dismiss_session_api_plan_dismiss_session_post",
@@ -1887,6 +2882,23 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SessionDismissed"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/plan/ftp-test-type": {
+      "post": {
+        "operationId": "api_plan_ftp_test_type_api_plan_ftp_test_type_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FtpTestTypeSet"
                 }
               }
             },
@@ -1946,6 +2958,23 @@
         }
       }
     },
+    "/api/plan/preview-redraw": {
+      "post": {
+        "operationId": "api_plan_preview_redraw_api_plan_preview_redraw_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedrawCandidate"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/plan/regenerate": {
       "post": {
         "operationId": "api_plan_regenerate_dynamic_api_plan_regenerate_post",
@@ -1955,6 +2984,40 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PlanRegenerated"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/plan/rematch": {
+      "post": {
+        "operationId": "api_plan_rematch_api_plan_rematch_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RematchResult"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/plan/save-availability": {
+      "post": {
+        "operationId": "api_save_availability_api_plan_save_availability_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AvailabilitySaved"
                 }
               }
             },
@@ -2131,6 +3194,57 @@
         }
       }
     },
+    "/api/readiness": {
+      "get": {
+        "operationId": "api_readiness_api_readiness_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Readiness"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/readiness/apply-tier-down": {
+      "post": {
+        "operationId": "api_readiness_apply_tier_down_api_readiness_apply_tier_down_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TierDownApplied"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/readiness/revert-cap": {
+      "post": {
+        "operationId": "api_readiness_revert_cap_api_readiness_revert_cap_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CapReverted"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/rider-stats": {
       "get": {
         "operationId": "api_rider_stats_api_rider_stats_get",
@@ -2191,6 +3305,40 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SyncProgress"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/today-session": {
+      "get": {
+        "operationId": "api_today_session_api_today_session_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TodaySession"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/today-session/persist": {
+      "post": {
+        "operationId": "api_today_session_persist_api_today_session_persist_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TodayPersisted"
                 }
               }
             },
