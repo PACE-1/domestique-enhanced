@@ -9630,7 +9630,7 @@ def _classify_exposure_with_signal(activity: dict, lthr: float) -> tuple[str, st
     return ("low_aerobic", "inferred")
 
 
-@app.get("/api/week-summary")
+@app.get("/api/week-summary", responses={200: {"model": api_models.WeekSummary}})
 def api_week_summary(week_offset: int = Query(0)):
     """ISO week (Mon→Sun) training summary for the dashboard week tile.
 

@@ -18,6 +18,7 @@ import { Hrv } from "@/screens/Hrv"
 import { Panel, Row, useLoad } from "@/screens/panel"
 import { Readiness } from "@/screens/Readiness"
 import { Records } from "@/screens/Records"
+import { LastWeek, ThisWeek } from "@/screens/WeekSummary"
 
 export function Home() {
   const [plan, retryPlan] = useLoad<PlanRead>(getPlan)
@@ -49,6 +50,10 @@ export function Home() {
           )
         }}
       </Panel>
+
+      <ThisWeek />
+
+      <LastWeek />
 
       <Records />
 

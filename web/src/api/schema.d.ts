@@ -1268,6 +1268,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/week-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_week_summary_api_week_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/wellness": {
         parameters: {
             query?: never;
@@ -4210,6 +4226,90 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** WeekSummary */
+        WeekSummary: {
+            /**
+             * Duration Min Done
+             * @default 0
+             */
+            duration_min_done: number;
+            /**
+             * Duration Min Planned
+             * @default 0
+             */
+            duration_min_planned: number;
+            /**
+             * Exposure Minutes
+             * @default {}
+             */
+            exposure_minutes: {
+                [key: string]: unknown;
+            };
+            /**
+             * Exposure Minutes Planned
+             * @default {}
+             */
+            exposure_minutes_planned: {
+                [key: string]: unknown;
+            };
+            /**
+             * Missed Sessions
+             * @default []
+             */
+            missed_sessions: {
+                [key: string]: unknown;
+            }[];
+            /**
+             * Overreach
+             * @default false
+             */
+            overreach: boolean;
+            /**
+             * Overreach Reasons
+             * @default []
+             */
+            overreach_reasons: string[];
+            /** Planned Days Done */
+            planned_days_done?: number | null;
+            /** Planned Days Missed */
+            planned_days_missed?: number | null;
+            /** Planned Days Total */
+            planned_days_total?: number | null;
+            /**
+             * Sports
+             * @default {}
+             */
+            sports: {
+                [key: string]: unknown;
+            };
+            /** Today */
+            today?: string | null;
+            /** Tss Adherence Pct */
+            tss_adherence_pct?: number | null;
+            /**
+             * Tss Done
+             * @default 0
+             */
+            tss_done: number;
+            /** Tss Target */
+            tss_target?: number | null;
+            /**
+             * Unclassified Minutes
+             * @default 0
+             */
+            unclassified_minutes: number;
+            /** Week End */
+            week_end: string;
+            /**
+             * Week Offset
+             * @default 0
+             */
+            week_offset: number;
+            /** Week Start */
+            week_start: string;
+        } & {
+            [key: string]: unknown;
+        };
         /** WellnessDay */
         WellnessDay: {
             /** Atl */
@@ -6088,6 +6188,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["VersionInfo"];
+                };
+            };
+        };
+    };
+    api_week_summary_api_week_summary_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeekSummary"];
                 };
             };
         };

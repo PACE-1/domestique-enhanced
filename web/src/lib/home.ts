@@ -1,4 +1,4 @@
-import type { AutoAdjustResult, AvailabilitySaved, CapReverted, DailyLogRead, DailyLogSaved, DeloadReverted, FtpTestTypeSet, RaceAdded, Readiness, RedrawAccepted, RedrawCandidate, RematchResult, TierDownApplied, TodayPersisted, TodaySession, PlanJson, PlanRead, PlanRegenerated, PlanSession, PlanWeek, ProgrammeSummary, RiderStats, SessionDismissed, SessionMoved, SessionSwapped, UnavailableMarked } from "@/api/types"
+import type { AutoAdjustResult, AvailabilitySaved, CapReverted, DailyLogRead, DailyLogSaved, DeloadReverted, FtpTestTypeSet, RaceAdded, Readiness, RedrawAccepted, RedrawCandidate, RematchResult, TierDownApplied, TodayPersisted, TodaySession, PlanJson, PlanRead, PlanRegenerated, PlanSession, PlanWeek, ProgrammeSummary, RiderStats, SessionDismissed, SessionMoved, SessionSwapped, UnavailableMarked, WeekSummary } from "@/api/types"
 import { api } from "@/lib/api"
 
 export const getPlan = () => api<PlanRead>("/api/plan")
@@ -187,3 +187,6 @@ export interface DailyLogInput {
   notes?: string
 }
 export const saveDailyLog = (entry: DailyLogInput) => api<DailyLogSaved>("/api/daily-log", { method: "POST", json: entry })
+
+/** 0 is this ISO week, -1 the one before. */
+export const getWeekSummary = (offset: number) => api<WeekSummary>(`/api/week-summary?week_offset=${offset}`)

@@ -6254,6 +6254,156 @@
         "title": "VersionInfo",
         "type": "object"
       },
+      "WeekSummary": {
+        "additionalProperties": true,
+        "properties": {
+          "duration_min_done": {
+            "default": 0,
+            "title": "Duration Min Done",
+            "type": "integer"
+          },
+          "duration_min_planned": {
+            "default": 0,
+            "title": "Duration Min Planned",
+            "type": "integer"
+          },
+          "exposure_minutes": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Exposure Minutes",
+            "type": "object"
+          },
+          "exposure_minutes_planned": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Exposure Minutes Planned",
+            "type": "object"
+          },
+          "missed_sessions": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Missed Sessions",
+            "type": "array"
+          },
+          "overreach": {
+            "default": false,
+            "title": "Overreach",
+            "type": "boolean"
+          },
+          "overreach_reasons": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Overreach Reasons",
+            "type": "array"
+          },
+          "planned_days_done": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned Days Done"
+          },
+          "planned_days_missed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned Days Missed"
+          },
+          "planned_days_total": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned Days Total"
+          },
+          "sports": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Sports",
+            "type": "object"
+          },
+          "today": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Today"
+          },
+          "tss_adherence_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tss Adherence Pct"
+          },
+          "tss_done": {
+            "default": 0,
+            "title": "Tss Done",
+            "type": "number"
+          },
+          "tss_target": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tss Target"
+          },
+          "unclassified_minutes": {
+            "default": 0,
+            "title": "Unclassified Minutes",
+            "type": "integer"
+          },
+          "week_end": {
+            "title": "Week End",
+            "type": "string"
+          },
+          "week_offset": {
+            "default": 0,
+            "title": "Week Offset",
+            "type": "integer"
+          },
+          "week_start": {
+            "title": "Week Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "week_start",
+          "week_end"
+        ],
+        "title": "WeekSummary",
+        "type": "object"
+      },
       "WellnessDay": {
         "additionalProperties": true,
         "properties": {
@@ -8150,6 +8300,23 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/VersionInfo"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/week-summary": {
+      "get": {
+        "operationId": "api_week_summary_api_week_summary_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeekSummary"
                 }
               }
             },

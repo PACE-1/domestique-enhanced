@@ -39,6 +39,7 @@ function mockApi(over: Record<string, () => Response> = {}) {
     if (url.startsWith("/api/metrics/history")) return json([])
     if (url === "/api/wellness/hrv-recording-status") return json({ should_show_prompt: false })
     if (url === "/api/daily-log") return json({ today: null, history: [] })
+    if (url.startsWith("/api/week-summary")) return json({ week_start: "2026-10-12", week_end: "2026-10-18", tss_target: null, tss_done: 0, sports: {} })
     return json({}, 404)
   }))
   return calls

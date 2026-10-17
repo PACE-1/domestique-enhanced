@@ -1104,3 +1104,25 @@ class RouteSuggestions(_Model):
     filters_applied: dict = {}
     results: list[RouteSuggestion] = []
     empty_hint: Optional[dict] = None   # {filter, filter_label, would_match}: the one filter to drop for the most routes
+
+
+class WeekSummary(_Model):
+    week_start: str
+    week_end: str
+    today: Optional[str] = None
+    tss_target: Optional[float] = None       # None: no plan on record for that week
+    tss_done: float = 0
+    tss_adherence_pct: Optional[float] = None
+    duration_min_done: int = 0
+    duration_min_planned: int = 0
+    exposure_minutes: dict = {}              # low_aerobic, mid_aerobic, high_aerobic, anaerobic
+    exposure_minutes_planned: dict = {}
+    unclassified_minutes: int = 0
+    sports: dict = {}                        # sport -> count of activities
+    missed_sessions: list[dict] = []
+    planned_days_total: Optional[int] = None
+    planned_days_done: Optional[int] = None
+    planned_days_missed: Optional[int] = None
+    overreach: bool = False
+    overreach_reasons: list[str] = []
+    week_offset: int = 0
