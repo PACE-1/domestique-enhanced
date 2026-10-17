@@ -233,6 +233,31 @@ describe("Plan toolbar", () => {
     expect(calls.some((c) => c.url === "/api/plan/update" && c.method === "POST")).toBe(true)
   })
 
+  it("refreshes an old plan when the page opens, and offers a re-plan when fitness has drifted", async () => {
+    const drifted = { plan_json: { ...PLAN.plan_json, ctl_drift: { exceeded: true, snapshot_ctl: 50, live_ctl: 62.4 } } }
+    let plan: unknown = drifted
+    mock({
+      "/api/plan": () => json(plan),
+      "/api/plan/daily-adapt": () => json({ projected_adaptations: [] }),
+      "/api/plan/auto-recalc": () => { plan = PLAN; return json({ action: "recalculated", weeks_regenerated: 3, plan_json: PLAN.plan_json }) },
+    })
+    render(<Plan />)
+    expect((await screen.findByText("Plan refreshed (3 weeks updated).")).textContent).toBeTruthy()
+    await waitFor(() => expect(screen.queryByText(/The plan assumes fitness 50/)).toBeNull())
+  })
+
+  it("shows the drift note and opens the generator from it", async () => {
+    mock({
+      "/api/plan": () => json({ plan_json: { ...PLAN.plan_json, ctl_drift: { exceeded: true, snapshot_ctl: 50, live_ctl: 62.4 } } }),
+      "/api/plan/daily-adapt": () => json({ projected_adaptations: [] }),
+      "/api/plan/auto-recalc": () => json({ action: "fresh" }),
+    })
+    render(<Plan />)
+    expect(await screen.findByText(/The plan assumes fitness 50; you are at 62\./)).toBeTruthy()
+    await userEvent.click(screen.getByRole("button", { name: "Re-plan" }))
+    expect(await screen.findByRole("heading", { name: "Replace the plan" })).toBeTruthy()
+  })
+
   it("switches to the calendar and shows each session's export links", async () => {
     mock({ "/api/plan": () => json(PLAN), "/api/plan/daily-adapt": () => json({ projected_adaptations: [] }), "/api/calendar": () => json(CAL([day(1)])) })
     render(<Plan />)

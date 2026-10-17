@@ -233,6 +233,7 @@ class PlanJson(_Model):
     weeks: list[PlanWeek] = []
     generated: Optional[str] = None
     ctl_snapshot: Optional[dict] = None
+    ctl_drift: Optional[dict] = None     # {exceeded, snapshot_ctl, live_ctl, generated_on}: the plan assumes a different fitness than you have
     availability: Optional[dict] = None
 
 
@@ -1126,3 +1127,10 @@ class WeekSummary(_Model):
     overreach: bool = False
     overreach_reasons: list[str] = []
     week_offset: int = 0
+
+
+class PlanAutoRecalc(_Model):
+    action: str                          # fresh | recalculated | no_change | no_plan
+    days_since_recalc: Optional[int] = None
+    weeks_regenerated: Optional[int] = None
+    plan_json: Optional[PlanJson] = None

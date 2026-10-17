@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { NativeSelect } from "@/components/ui/native-select"
 import { Input } from "@/components/ui/input"
 import { PlanGenerate } from "@/screens/PlanGenerate"
-import { getDailyAdapt, summaryImageUrl, updatePlan } from "@/lib/plan"
+import { autoRecalc, getDailyAdapt, summaryImageUrl, updatePlan } from "@/lib/plan"
 import { GoalEvent } from "@/screens/GoalEvent"
 import { PlanAvailability } from "@/screens/PlanAvailability"
 import { PlanCalendar } from "@/screens/PlanCalendar"
@@ -75,6 +75,17 @@ export function Plan() {
       () => {},
     )
   }, [])
+  // A plan older than a week rebuilds itself when the page opens. A failure here is not worth a message.
+  useEffect(() => {
+    autoRecalc().then(
+      (r) => {
+        if (r.action !== "recalculated") return
+        setUpdateMsg(`Plan refreshed (${r.weeks_regenerated ?? 0} weeks updated).`)
+        reread()
+      },
+      () => {},
+    )
+  }, [reread])
   const updateNow = async () => {
     setUpdating(true)
     setUpdateError("")
@@ -145,6 +156,7 @@ export function Plan() {
     if (k >= 0) setIndex(k)
     setView("weeks")
   }
+  const drift = plan.ctl_drift as { exceeded?: boolean; snapshot_ctl: number; live_ctl: number } | null | undefined
   const deload = (plan as { deload_advance?: { reverted?: boolean; week_num?: number } }).deload_advance
   const canUndoDeload = !!deload && !deload.reverted
   const undoDeload = async () => {
@@ -195,6 +207,15 @@ export function Plan() {
           Summary image
         </a>
       </div>
+      {drift?.exceeded && (
+        <p role="note" className="text-sm">
+          The plan assumes fitness {Math.round(drift.snapshot_ctl)}; you are at {Math.round(drift.live_ctl)}.{" "}
+          <button type="button" className="underline underline-offset-2" onClick={() => setTool("replace")}>
+            Re-plan
+          </button>
+          ?
+        </p>
+      )}
       {updateMsg && <p role="status" className="text-sm">{updateMsg}</p>}
       {updateError && <p role="alert" className="text-sm">Couldn’t update the plan: {updateError}</p>}
       {adapt && <p role="note" className="text-sm text-muted-foreground">{adapt}</p>}

@@ -292,6 +292,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/plan/auto-recalc": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_plan_auto_recalc_api_plan_auto_recalc_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/plan/continuous/deload-revert": {
         parameters: {
             query?: never;
@@ -2626,6 +2642,18 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** PlanAutoRecalc */
+        PlanAutoRecalc: {
+            /** Action */
+            action: string;
+            /** Days Since Recalc */
+            days_since_recalc?: number | null;
+            plan_json?: components["schemas"]["PlanJson"] | null;
+            /** Weeks Regenerated */
+            weeks_regenerated?: number | null;
+        } & {
+            [key: string]: unknown;
+        };
         /** PlanGoal */
         PlanGoal: {
             /** Entry Mode */
@@ -2660,6 +2688,10 @@ export interface components {
         PlanJson: {
             /** Availability */
             availability?: {
+                [key: string]: unknown;
+            } | null;
+            /** Ctl Drift */
+            ctl_drift?: {
                 [key: string]: unknown;
             } | null;
             /** Ctl Snapshot */
@@ -4908,6 +4940,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AutoAdjustResult"];
+                };
+            };
+        };
+    };
+    api_plan_auto_recalc_api_plan_auto_recalc_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanAutoRecalc"];
                 };
             };
         };

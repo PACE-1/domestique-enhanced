@@ -1,8 +1,10 @@
-import type { CalendarRead, DailyAdapt, EntryScan, IcuRaces, PlanPreview, PlanReforecasted, PlanUpdated, WorkoutPushed } from "@/api/types"
+import type { PlanAutoRecalc, CalendarRead, DailyAdapt, EntryScan, IcuRaces, PlanPreview, PlanReforecasted, PlanUpdated, WorkoutPushed } from "@/api/types"
 import { api } from "@/lib/api"
 import type { GenerateRequest } from "@/lib/home"
 
 export const getCalendar = () => api<CalendarRead>("/api/calendar")
+/** The plan rebuilds itself when it is over a week old; this is asked when the plan page opens. */
+export const autoRecalc = () => api<PlanAutoRecalc>("/api/plan/auto-recalc", { method: "POST" })
 export const getDailyAdapt = () => api<DailyAdapt>("/api/plan/daily-adapt")
 
 /** The plan-shaping parts of the form, as the preview and ride scan read them. */

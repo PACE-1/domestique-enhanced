@@ -2627,6 +2627,52 @@
         "title": "PickerResult",
         "type": "object"
       },
+      "PlanAutoRecalc": {
+        "additionalProperties": true,
+        "properties": {
+          "action": {
+            "title": "Action",
+            "type": "string"
+          },
+          "days_since_recalc": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days Since Recalc"
+          },
+          "plan_json": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlanJson"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "weeks_regenerated": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weeks Regenerated"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "title": "PlanAutoRecalc",
+        "type": "object"
+      },
       "PlanGoal": {
         "additionalProperties": true,
         "properties": {
@@ -2718,6 +2764,18 @@
               }
             ],
             "title": "Availability"
+          },
+          "ctl_drift": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ctl Drift"
           },
           "ctl_snapshot": {
             "anyOf": [
@@ -7214,6 +7272,23 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AutoAdjustResult"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/plan/auto-recalc": {
+      "post": {
+        "operationId": "api_plan_auto_recalc_api_plan_auto_recalc_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanAutoRecalc"
                 }
               }
             },

@@ -17194,7 +17194,7 @@ async def api_plan_dismiss_session(request: Request):
         return JSONResponse({"detail": "Dismiss failed"}, 500)
 
 
-@app.post("/api/plan/auto-recalc")
+@app.post("/api/plan/auto-recalc", responses={200: {"model": api_models.PlanAutoRecalc}})
 def api_plan_auto_recalc():
     """Auto-recalculate plan if >7 days since last recalc. Called on tab load.
 
