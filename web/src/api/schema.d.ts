@@ -1140,6 +1140,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/surface-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_surface_types_api_surface_types_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/sync/progress": {
         parameters: {
             query?: never;
@@ -1372,6 +1388,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["api_workouts_api_workouts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/workouts/tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_workouts_tags_api_workouts_tags_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3831,6 +3863,25 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** SurfaceTypes */
+        SurfaceTypes: {
+            /**
+             * Gravel Workouts
+             * @default []
+             */
+            gravel_workouts: {
+                [key: string]: unknown;
+            }[];
+            /**
+             * Routes
+             * @default {}
+             */
+            routes: {
+                [key: string]: unknown;
+            };
+        } & {
+            [key: string]: unknown;
+        };
         /** SyncProgress */
         SyncProgress: {
             /** Added */
@@ -4245,6 +4296,16 @@ export interface components {
             start: number;
             /** Type */
             type: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** WorkoutTags */
+        WorkoutTags: {
+            /**
+             * Tags
+             * @default []
+             */
+            tags: string[];
         } & {
             [key: string]: unknown;
         };
@@ -5813,6 +5874,26 @@ export interface operations {
             };
         };
     };
+    api_surface_types_api_surface_types_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SurfaceTypes"];
+                };
+            };
+        };
+    };
     api_sync_progress_api_sync_progress_get: {
         parameters: {
             query?: never;
@@ -6109,6 +6190,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["WorkoutRow"][];
+                };
+            };
+        };
+    };
+    api_workouts_tags_api_workouts_tags_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkoutTags"];
                 };
             };
         };

@@ -1082,3 +1082,12 @@ class FatigueResistance(_Model):
     robustness_score: Optional[float] = None
     by_duration: list[dict] = []
     scatter: list[dict] = []
+
+
+class WorkoutTags(_Model):
+    tags: list[str] = []
+
+
+class SurfaceTypes(_Model):
+    routes: dict = {}                 # route file -> surface
+    gravel_workouts: list[dict] = []  # workouts that pair well with gravel and cobbles

@@ -5727,7 +5727,7 @@ def _get_library_tags_cached() -> list[str]:
         return tags_list
 
 
-@app.get("/api/workouts/tags")
+@app.get("/api/workouts/tags", responses={200: {"model": api_models.WorkoutTags}})
 def api_workouts_tags():
     """Return the sorted distinct list of tags across the library.
 
@@ -6712,7 +6712,7 @@ def api_courses(region: str = Query(None)):
     return courses
 
 
-@app.get("/api/surface-types")
+@app.get("/api/surface-types", responses={200: {"model": api_models.SurfaceTypes}})
 def api_surface_types():
     """Return surface_types.json content for client-side surface filtering."""
     path = Path(__file__).parent / "surface_types.json"

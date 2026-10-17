@@ -2,7 +2,8 @@ import { useState } from "react"
 
 import type { WorkoutDetail, WorkoutRow } from "@/api/types"
 import { buttonVariants } from "@/components/ui/button"
-import { downloadUrl, getWorkout, minutes } from "@/lib/library"
+import { downloadUrl, getWorkout, minutes, type Outdoor } from "@/lib/library"
+import { fitWorkoutUrl } from "@/lib/plan"
 
 /** The workout as bars: width is time, height is % of FTP. */
 export function PowerProfile({ detail }: { detail: WorkoutDetail }) {
@@ -19,7 +20,7 @@ export function PowerProfile({ detail }: { detail: WorkoutDetail }) {
 }
 
 /** A library row. Opens to the description and power profile; the .zwo downloads from here. */
-export function WorkoutCard({ w }: { w: WorkoutRow }) {
+export function WorkoutCard({ w, outdoor }: { w: WorkoutRow; outdoor?: Outdoor }) {
   const [open, setOpen] = useState(false)
   const [detail, setDetail] = useState<WorkoutDetail | null>(null)
   const [error, setError] = useState("")
@@ -55,9 +56,14 @@ export function WorkoutCard({ w }: { w: WorkoutRow }) {
               <p className="text-muted-foreground">{detail.description}</p>
             </>
           )}
-          <a href={downloadUrl(w.File)} download className={buttonVariants({ size: "sm", variant: "outline" })}>
-            Download .zwo
-          </a>
+          <div className="flex flex-wrap gap-2">
+            <a href={downloadUrl(w.File, outdoor)} download className={buttonVariants({ size: "sm", variant: "outline" })}>
+              Download .zwo
+            </a>
+            <a href={fitWorkoutUrl(w.File, w.display_name || w.Name, w.content_class || "endurance", w["Duration(min)"])} download className={buttonVariants({ size: "sm", variant: "outline" })}>
+              Download .fit
+            </a>
+          </div>
         </div>
       )}
     </li>

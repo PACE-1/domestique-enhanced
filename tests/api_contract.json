@@ -5528,6 +5528,28 @@
         "title": "SetupDefaults",
         "type": "object"
       },
+      "SurfaceTypes": {
+        "additionalProperties": true,
+        "properties": {
+          "gravel_workouts": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Gravel Workouts",
+            "type": "array"
+          },
+          "routes": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Routes",
+            "type": "object"
+          }
+        },
+        "title": "SurfaceTypes",
+        "type": "object"
+      },
       "SyncProgress": {
         "additionalProperties": true,
         "properties": {
@@ -6558,6 +6580,21 @@
           "type"
         ],
         "title": "WorkoutSegment",
+        "type": "object"
+      },
+      "WorkoutTags": {
+        "additionalProperties": true,
+        "properties": {
+          "tags": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Tags",
+            "type": "array"
+          }
+        },
+        "title": "WorkoutTags",
         "type": "object"
       },
       "ZoneBand": {
@@ -7924,6 +7961,23 @@
         }
       }
     },
+    "/api/surface-types": {
+      "get": {
+        "operationId": "api_surface_types_api_surface_types_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SurfaceTypes"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/sync/progress": {
       "get": {
         "operationId": "api_sync_progress_api_sync_progress_get",
@@ -8179,6 +8233,23 @@
                   },
                   "title": "Response 200 Api Workouts Api Workouts Get",
                   "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/workouts/tags": {
+      "get": {
+        "operationId": "api_workouts_tags_api_workouts_tags_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutTags"
                 }
               }
             },
