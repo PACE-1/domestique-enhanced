@@ -1,5 +1,38 @@
 # Changelog
 
+## v1.0.0 — A new interface and a safer server (2026-10-16)
+
+This is the first release of the Domestique Enhanced fork. Its version number starts over at 1.0.0, so an install that still reports 3.x is not offered it as an upgrade: download it from the release page. Your data folder (`~/.domestique`) is unchanged.
+
+### A new interface
+
+- **Every section now opens in a new interface.** Home, Workout Shuffle, Workout Library, Routes & Climbs, Training Plan, Analysis, DFA α1 and Settings, plus first-run setup and the rider picker. It is built with TypeScript and React and talks to the same server.
+- **Home** shows today's session, the week, fitness numbers and the programme. The readiness card offers to use the suggested session, ride the original, ease today's session, or adjust the week or apply a rest day (a preview first, nothing is saved until you confirm). The daily check-in is there too.
+- **Training Plan** lets you browse weeks and dismiss, restore, move or change the type of a session, pick another workout for a day, set the type of an FTP test, record time off, add a race, set the hours you can ride each day, match rides to sessions, undo a deload, and create or replace the plan.
+- **Workout Library, Workout Shuffle and Routes & Climbs** have search, filters, a power or elevation chart and a download of the `.zwo` or `.crs` file.
+- **Analysis** has the fitness, fatigue and form chart, the power curve and your recent rides. **Settings** edits weight, FTP, LTHR, max HR and targets, shows your zones, and syncs with intervals.icu.
+- Each card loads on its own and shows a message with a Retry button when it fails, so one failed request no longer blanks the page.
+- **The current dashboard is still included.** It keeps the features the new interface does not have yet: month calendar and drag to move, FIT import and ride detail, HRV upload, connecting intervals.icu, extra workout folders and custom zones. The list is in `docs/code-bloat/ui-feature-map.md`.
+
+### The server does the housekeeping
+
+- **The weekly fitness recalculation now runs on the server**, once a day, instead of when you open the Plan tab. Plan changes after a ride sync already ran there.
+- **Background jobs follow the rider.** A backfill started under one profile stops when you switch to another instead of writing into the wrong one.
+- **Imports are bounded.** A FIT file over 50 MB or an HRV file over 5 MB is refused before it is read, a FIT that takes more than 60 seconds to parse is abandoned, and at most two imports run at once.
+- **Shutdown is orderly.** Running jobs are asked to stop and given up to 8 seconds before the server exits.
+- **Pruned rides are moved, not deleted.** When intervals.icu no longer lists a ride, its local copy moves to `rides/icu/_pruned/`, at most 20 per pass.
+- Server access can sit behind an OIDC proxy such as Pocket ID; see `docs/SERVER.md`.
+
+### Planning
+
+- **A heavy week no longer exceeds its load ceiling when a continuous plan is extended**, and no week can be filled with more than 18 percent of its time at VO2max and above, except where the minimum number of hard sessions for the phase forces it. One 6-hour threshold week still sits at 18.4 percent for that reason.
+- Every plan entry point (generate, regenerate, recalculate, extend, refit) now ends with the same checks.
+
+### Packaging and updates
+
+- Update checks look at this fork's releases, never the original project's. Set `DOMESTIQUE_RELEASE_REPO` to use another channel.
+- Windows packages are no longer built. The Linux AppImage and Docker image are the supported builds.
+
 ## v3.13.1 — Your own workouts, added to the full library (2026-10-14)
 
 This release fixes the Critical Power test for riders who use their own workout folder, and changes what that folder does: from now on it adds workouts to Domestique's library instead of replacing it.
