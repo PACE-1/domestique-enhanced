@@ -6,7 +6,7 @@ export class ApiError extends Error {
   }
 }
 
-type Options = Omit<RequestInit, "body"> & { json?: unknown }
+type Options = Omit<RequestInit, "body"> & { json?: unknown; form?: FormData }
 
 // Thin wrapper over the existing /api routes: JSON in and out, non-2xx throws ApiError.
 export async function api<T>(path: string, options: Options = {}): Promise<T> {
@@ -14,11 +14,11 @@ export async function api<T>(path: string, options: Options = {}): Promise<T> {
 }
 
 /** Same as `api`, but also returns the response headers (some lists report a total there). */
-export async function apiFull<T>(path: string, { json, ...init }: Options = {}): Promise<{ data: T; headers: Headers }> {
+export async function apiFull<T>(path: string, { json, form, ...init }: Options = {}): Promise<{ data: T; headers: Headers }> {
   const res = await fetch(path, {
     ...init,
     headers: json === undefined ? init.headers : { "Content-Type": "application/json", ...init.headers },
-    body: json === undefined ? undefined : JSON.stringify(json),
+    body: form ?? (json === undefined ? undefined : JSON.stringify(json)),
   })
   if (!res.ok) {
     const text = await res.text().catch(() => "")
@@ -31,5 +31,5 @@ export async function apiFull<T>(path: string, { json, ...init }: Options = {}):
     }
     throw new ApiError(res.status, message || `HTTP ${res.status}`)
   }
-  return { data: (await res.json()) as T, headers: res.headers }
+  return { data: (res.status === 204 ? undefined : await res.json()) as T, headers: res.headers }
 }

@@ -1,4 +1,4 @@
-import type { PickerResult, WorkoutDetail, WorkoutRow } from "@/api/types"
+import type { PickerResult, SurfaceTypes, WorkoutTags, WorkoutDetail, WorkoutRow } from "@/api/types"
 import { api, apiFull } from "@/lib/api"
 
 export interface WorkoutQuery {
@@ -6,6 +6,29 @@ export interface WorkoutQuery {
   minDuration: number | null
   maxDuration: number | null
   sort: string
+  contentClass: string
+  tags: string[]
+}
+
+/** The workout types the server can classify a file as, grouped as the library offers them. */
+export const TYPES: [string, [string, string][]][] = [
+  ["Aerobic", [["recovery", "Recovery"], ["endurance", "Endurance"], ["endurance_intervals", "Endurance + strides"]]],
+  ["Tempo and sweet spot", [["tempo", "Tempo"], ["tempo_intervals", "Tempo intervals"], ["tempo_ladder", "Tempo ladder"], ["sweet_spot", "Sweet spot"], ["sweet_spot_ladder", "Sweet spot ladder"]]],
+  ["Threshold", [["threshold", "Threshold"], ["threshold_ladder", "Threshold ladder"], ["over_under", "Over-unders"]]],
+  ["VO2 and anaerobic", [["vo2max", "VO2max"], ["vo2_short", "Short VO2"], ["vo2_ladder", "VO2 ladder"], ["anaerobic", "Anaerobic"], ["neuromuscular", "Sprint"]]],
+  ["Tests", [["ftp_test", "FTP test"]]],
+]
+
+export const getTags = () => api<WorkoutTags>("/api/workouts/tags").then((r) => r.tags ?? [])
+
+/** Workouts that suit gravel and cobbles: steady, sustained, low-cadence work (the server's own list plus protocol and name). */
+export const getSurfaceTypes = () => api<SurfaceTypes>("/api/surface-types")
+const GRAVEL_PROTOCOLS = ["tempo", "sweet spot", "endurance", "threshold"]
+const GRAVEL_NAMES = ["gravel", "cobble", "strade", "roubaix", "big gear", "pave"]
+export function suitsGravel(w: WorkoutRow, listed: SurfaceTypes["gravel_workouts"]) {
+  const proto = (w.Protocol ?? "").toLowerCase()
+  const name = (w.Name ?? "").toLowerCase()
+  return GRAVEL_PROTOCOLS.some((p) => proto.includes(p)) || GRAVEL_NAMES.some((n) => name.includes(n)) || listed.some((g) => (String((g as { name?: string }).name ?? "")).toLowerCase() === name)
 }
 
 export const SORTS = [
@@ -24,6 +47,8 @@ export async function listWorkouts(q: WorkoutQuery): Promise<{ rows: WorkoutRow[
   if (q.search.trim()) p.set("search", q.search.trim())
   if (q.minDuration !== null) p.set("duration_min", String(q.minDuration))
   if (q.maxDuration !== null) p.set("duration_max", String(q.maxDuration))
+  if (q.contentClass) p.set("content_class", q.contentClass)
+  if (q.tags.length) p.set("tags", q.tags.join(","))
   const { data, headers } = await apiFull<WorkoutRow[]>(`/api/workouts?${p}`)
   const total = Number(headers.get("X-Library-Total"))
   return { rows: data, total: Number.isFinite(total) && headers.get("X-Library-Total") !== null ? total : null }
@@ -32,7 +57,17 @@ export async function listWorkouts(q: WorkoutQuery): Promise<{ rows: WorkoutRow[
 export const getWorkout = (category: string, file: string) =>
   api<WorkoutDetail>(`/api/workout/${encodeURIComponent(category)}/${encodeURIComponent(file)}`)
 
-export const downloadUrl = (file: string) => `/api/workout/download/${encodeURIComponent(file)}`
+export interface Outdoor {
+  on: boolean
+  transitMin: number
+  spinMin: number
+}
+
+/** The outdoor variant adds an off-plan ride to the climb and an easy spin home; those minutes are not counted in planned load. */
+export const downloadUrl = (file: string, outdoor?: Outdoor) =>
+  outdoor?.on
+    ? `/api/download/zwo/${encodeURIComponent(file)}?outdoor=1&transit_min=${outdoor.transitMin}&spin_min=${outdoor.spinMin}`
+    : `/api/workout/download/${encodeURIComponent(file)}`
 
 export const getPicker = (feel: number, durationMin: number) =>
   api<PickerResult>(`/api/picker?subjective=${feel}&duration=${durationMin}`)

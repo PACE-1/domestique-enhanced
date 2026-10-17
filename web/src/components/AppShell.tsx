@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 
 import { Button } from "@/components/ui/button"
 import { api } from "@/lib/api"
+import { Notices } from "@/screens/Notices"
 
 export const TABS = [
   { id: "home", label: "Home" },
@@ -55,20 +56,9 @@ export function AppShell({ tab, children }: { tab: TabId; children: ReactNode })
             Switch rider
           </Button>
         </nav>
+        <Notices />
         {children}
       </div>
     </ShellContext.Provider>
-  )
-}
-
-export function NotMigrated({ label }: { label: string }) {
-  return (
-    <div className="rounded-xl border p-6 text-sm">
-      <p className="font-medium">{label} has not moved to the new interface yet.</p>
-      <p className="mt-1 text-muted-foreground">It still works in the current dashboard.</p>
-      <Button className="mt-3" variant="outline" render={<a href="/" />}>
-        Open current dashboard
-      </Button>
-    </div>
   )
 }

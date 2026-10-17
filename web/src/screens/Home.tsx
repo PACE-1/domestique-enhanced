@@ -12,9 +12,14 @@ import {
   sessionsOn,
   weekSessions,
 } from "@/lib/home"
+import { BodyPerf } from "@/screens/BodyPerf"
+import { DfaSnapshotCard } from "@/screens/DfaSnapshot"
 import { DailyCheckIn } from "@/screens/DailyCheckIn"
+import { Hrv } from "@/screens/Hrv"
 import { Panel, Row, useLoad } from "@/screens/panel"
 import { Readiness } from "@/screens/Readiness"
+import { Records } from "@/screens/Records"
+import { LastWeek, ThisWeek } from "@/screens/WeekSummary"
 
 export function Home() {
   const [plan, retryPlan] = useLoad<PlanRead>(getPlan)
@@ -47,9 +52,19 @@ export function Home() {
         }}
       </Panel>
 
+      <ThisWeek />
+
+      <LastWeek />
+
+      <Records />
+
+      <DfaSnapshotCard />
+
       <Readiness />
 
       <DailyCheckIn />
+
+      <Hrv />
 
       <Panel title="This week" load={plan} retry={retryPlan}>
         {(p) => {
@@ -93,6 +108,10 @@ export function Home() {
           )
         }}
       </Panel>
+
+      <div className="md:col-span-2">
+        <BodyPerf />
+      </div>
 
       <Panel title="Programme" load={summary} retry={retrySummary}>
         {(s) => (

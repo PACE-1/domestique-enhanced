@@ -30,6 +30,36 @@ describe("Library", () => {
     expect((screen.getByRole("link", { name: "Download .zwo" }) as HTMLAnchorElement).getAttribute("href")).toBe("/api/workout/download/w1.zwo")
   })
 
+  it("filters by type and tag, narrows to gravel-suitable workouts, and clears", async () => {
+    const urls = mock((u) =>
+      u.startsWith("/api/workouts/tags") ? json({ tags: ["ftp_test", "outdoor"] })
+      : u.startsWith("/api/surface-types") ? json({ routes: {}, gravel_workouts: [{ name: "Gravel grinder" }] })
+      : json([row(1, { Protocol: "VO2max", Name: "Intervals" }), row(2, { Protocol: "Sweet Spot", Name: "Steady" })]))
+    render(<Library />)
+    await screen.findByText("Sweet Spot 1")
+    await userEvent.selectOptions(screen.getByLabelText("Type"), "threshold")
+    await userEvent.click(await screen.findByRole("button", { name: "outdoor" }))
+    await waitFor(() => expect(urls.at(-1)).toContain("content_class=threshold"))
+    expect(urls.at(-1)).toContain("tags=outdoor")
+    await userEvent.click(screen.getByRole("checkbox", { name: "Suits gravel and cobbles" }))
+    await waitFor(() => expect(screen.queryByText("Sweet Spot 1")).toBeNull())
+    expect(screen.getByText("Sweet Spot 2")).toBeTruthy()
+    await userEvent.click(screen.getByRole("button", { name: "Clear filters" }))
+    await waitFor(() => expect(urls.at(-1)).not.toContain("content_class"))
+    expect(await screen.findByText("Sweet Spot 1")).toBeTruthy()
+  })
+
+  it("adds the outdoor variant to the .zwo download and offers a .fit file", async () => {
+    mock((u) => (u.startsWith("/api/workouts?") ? json([row(1)]) : u.startsWith("/api/workout/") ? json(DETAIL) : json({}, 404)))
+    render(<Library />)
+    await userEvent.click(await screen.findByRole("checkbox", { name: "Outdoor variant for downloads" }))
+    await userEvent.clear(screen.getByLabelText("Spin home (min)"))
+    await userEvent.type(screen.getByLabelText("Spin home (min)"), "30")
+    await userEvent.click(screen.getByRole("button", { name: "Sweet Spot 1" }))
+    expect((await screen.findByRole("link", { name: "Download .zwo" })).getAttribute("href")).toBe("/api/download/zwo/w1.zwo?outdoor=1&transit_min=10&spin_min=30")
+    expect(screen.getByRole("link", { name: "Download .fit" }).getAttribute("href")).toContain("/api/export/fit-workout?zwo_file=w1.zwo")
+  })
+
   it("asks the server after a pause in typing, with the filters", async () => {
     const urls = mock(() => json([row(1)]))
     render(<Library />)

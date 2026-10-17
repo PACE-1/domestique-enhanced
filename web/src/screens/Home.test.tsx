@@ -35,7 +35,12 @@ function mockApi(over: Record<string, () => Response> = {}) {
     if (url === "/api/programme/summary") return json(SUMMARY)
     if (url === "/api/readiness") return json({ severity: "normal", score_0_100: 80, severity_reasons: [] })
     if (url === "/api/today-session") return json({ planned: null, adjusted: null, was_modified: false })
+    if (url.startsWith("/api/profile/pr-toast-queue")) return json({ queue: [], count: 0 })
+    if (url.startsWith("/api/metrics/history")) return json([])
+    if (url === "/api/wellness/hrv-recording-status") return json({ should_show_prompt: false })
     if (url === "/api/daily-log") return json({ today: null, history: [] })
+    if (url === "/api/profile/dfa-alpha1") return json({ value: 0.87, n_rides: 3, last_computed_at: "2026-10-12T08:00:00", n_recent_total: 5, n_no_rr_data: 2, n_fetch_failed: 0, message: "" })
+    if (url.startsWith("/api/week-summary")) return json({ week_start: "2026-10-12", week_end: "2026-10-18", tss_target: null, tss_done: 0, sports: {} })
     return json({}, 404)
   }))
   return calls
@@ -44,6 +49,12 @@ function mockApi(over: Record<string, () => Response> = {}) {
 afterEach(() => { cleanup(); vi.unstubAllGlobals() })
 
 describe("Home", () => {
+  it("shows the latest DFA α1", async () => {
+    mockApi()
+    render(<Home />)
+    expect(await screen.findByText(/from 3 recent rides, last computed 2026-10-12/)).toBeTruthy()
+  })
+
   it("shows today's session, the week's planned load, fitness and the programme", async () => {
     mockApi()
     render(<Home />)

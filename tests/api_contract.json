@@ -75,6 +75,122 @@
         "title": "AvailabilitySaved",
         "type": "object"
       },
+      "Backfill3d": {
+        "additionalProperties": true,
+        "properties": {
+          "backfilled": {
+            "default": 0,
+            "title": "Backfilled",
+            "type": "integer"
+          },
+          "failed": {
+            "default": 0,
+            "title": "Failed",
+            "type": "integer"
+          },
+          "results": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Results",
+            "type": "array"
+          },
+          "skipped": {
+            "default": 0,
+            "title": "Skipped",
+            "type": "integer"
+          }
+        },
+        "title": "Backfill3d",
+        "type": "object"
+      },
+      "BackfillHistoryStarted": {
+        "additionalProperties": true,
+        "properties": {
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Id"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "BackfillHistoryStarted",
+        "type": "object"
+      },
+      "BackfillHistoryStatus": {
+        "additionalProperties": true,
+        "properties": {
+          "already_cached": {
+            "default": 0,
+            "title": "Already Cached",
+            "type": "integer"
+          },
+          "backfilled": {
+            "default": 0,
+            "title": "Backfilled",
+            "type": "integer"
+          },
+          "done": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Done"
+          },
+          "failed": {
+            "default": 0,
+            "title": "Failed",
+            "type": "integer"
+          },
+          "state": {
+            "default": "running",
+            "title": "State",
+            "type": "string"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Id"
+          },
+          "total": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total"
+          }
+        },
+        "title": "BackfillHistoryStatus",
+        "type": "object"
+      },
       "BackfillStarted": {
         "additionalProperties": true,
         "properties": {
@@ -206,6 +322,431 @@
         "title": "BackfillStatus",
         "type": "object"
       },
+      "BanisterValidation": {
+        "additionalProperties": true,
+        "properties": {
+          "comparison": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comparison"
+          },
+          "ctl_mae_tss": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ctl Mae Tss"
+          },
+          "ctl_mae_tss_ci_high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ctl Mae Tss Ci High"
+          },
+          "ctl_mae_tss_ci_low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ctl Mae Tss Ci Low"
+          },
+          "fit_status": {
+            "default": "insufficient_data",
+            "title": "Fit Status",
+            "type": "string"
+          },
+          "ftp_mae_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp Mae Pct"
+          },
+          "ftp_mae_pct_ci_high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp Mae Pct Ci High"
+          },
+          "ftp_mae_pct_ci_low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp Mae Pct Ci Low"
+          },
+          "ftp_mae_w": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp Mae W"
+          },
+          "holdout_weeks": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Holdout Weeks"
+          },
+          "horizon_weeks": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Horizon Weeks"
+          },
+          "n_markers_in_holdout": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N Markers In Holdout"
+          },
+          "tau_fits_used": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tau Fits Used"
+          }
+        },
+        "title": "BanisterValidation",
+        "type": "object"
+      },
+      "CalendarDay": {
+        "additionalProperties": true,
+        "properties": {
+          "actual": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual"
+          },
+          "availability_hours": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Availability Hours"
+          },
+          "card_state": {
+            "default": "",
+            "title": "Card State",
+            "type": "string"
+          },
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "dow": {
+            "default": 0,
+            "title": "Dow",
+            "type": "integer"
+          },
+          "is_today": {
+            "default": false,
+            "title": "Is Today",
+            "type": "boolean"
+          },
+          "planned": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CalendarPlanned"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "race": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Race"
+          }
+        },
+        "required": [
+          "date"
+        ],
+        "title": "CalendarDay",
+        "type": "object"
+      },
+      "CalendarPlanned": {
+        "additionalProperties": true,
+        "properties": {
+          "display_name": {
+            "default": "",
+            "title": "Display Name",
+            "type": "string"
+          },
+          "duration_min": {
+            "default": 0,
+            "title": "Duration Min",
+            "type": "number"
+          },
+          "is_race": {
+            "default": false,
+            "title": "Is Race",
+            "type": "boolean"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          },
+          "session_type": {
+            "default": "rest",
+            "title": "Session Type",
+            "type": "string"
+          },
+          "status": {
+            "default": "pending",
+            "title": "Status",
+            "type": "string"
+          },
+          "tss": {
+            "default": 0,
+            "title": "Tss",
+            "type": "number"
+          },
+          "user_moved": {
+            "default": false,
+            "title": "User Moved",
+            "type": "boolean"
+          },
+          "zwo_file": {
+            "default": "",
+            "title": "Zwo File",
+            "type": "string"
+          }
+        },
+        "title": "CalendarPlanned",
+        "type": "object"
+      },
+      "CalendarRead": {
+        "additionalProperties": true,
+        "properties": {
+          "current_iso_week": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Iso Week"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "goal": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Goal"
+          },
+          "summary": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Summary",
+            "type": "object"
+          },
+          "today": {
+            "title": "Today",
+            "type": "string"
+          },
+          "weeks": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/CalendarWeek"
+            },
+            "title": "Weeks",
+            "type": "array"
+          }
+        },
+        "required": [
+          "today"
+        ],
+        "title": "CalendarRead",
+        "type": "object"
+      },
+      "CalendarWeek": {
+        "additionalProperties": true,
+        "properties": {
+          "actual_tss": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual Tss"
+          },
+          "completion_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completion Pct"
+          },
+          "days": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/CalendarDay"
+            },
+            "title": "Days",
+            "type": "array"
+          },
+          "end_date": {
+            "title": "End Date",
+            "type": "string"
+          },
+          "is_current": {
+            "default": false,
+            "title": "Is Current",
+            "type": "boolean"
+          },
+          "is_stepback": {
+            "default": false,
+            "title": "Is Stepback",
+            "type": "boolean"
+          },
+          "iso_week": {
+            "title": "Iso Week",
+            "type": "integer"
+          },
+          "iso_year": {
+            "title": "Iso Year",
+            "type": "integer"
+          },
+          "phase": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phase"
+          },
+          "planned_tss": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned Tss"
+          },
+          "start_date": {
+            "title": "Start Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "iso_year",
+          "iso_week",
+          "start_date",
+          "end_date"
+        ],
+        "title": "CalendarWeek",
+        "type": "object"
+      },
       "CapReverted": {
         "additionalProperties": true,
         "properties": {
@@ -233,6 +774,38 @@
           }
         },
         "title": "CapReverted",
+        "type": "object"
+      },
+      "DailyAdapt": {
+        "additionalProperties": true,
+        "properties": {
+          "action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action"
+          },
+          "projected_adaptations": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Projected Adaptations",
+            "type": "array"
+          },
+          "projection_only": {
+            "default": true,
+            "title": "Projection Only",
+            "type": "boolean"
+          }
+        },
+        "title": "DailyAdapt",
         "type": "object"
       },
       "DailyLogEntry": {
@@ -675,6 +1248,60 @@
         "title": "DfaRides",
         "type": "object"
       },
+      "DfaSnapshot": {
+        "additionalProperties": true,
+        "properties": {
+          "last_computed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Computed At"
+          },
+          "message": {
+            "default": "",
+            "title": "Message",
+            "type": "string"
+          },
+          "n_fetch_failed": {
+            "default": 0,
+            "title": "N Fetch Failed",
+            "type": "integer"
+          },
+          "n_no_rr_data": {
+            "default": 0,
+            "title": "N No Rr Data",
+            "type": "integer"
+          },
+          "n_recent_total": {
+            "default": 0,
+            "title": "N Recent Total",
+            "type": "integer"
+          },
+          "n_rides": {
+            "default": 0,
+            "title": "N Rides",
+            "type": "integer"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "title": "DfaSnapshot",
+        "type": "object"
+      },
       "DfaThreshold": {
         "additionalProperties": true,
         "properties": {
@@ -806,6 +1433,45 @@
         "title": "DfaZoneMinutes",
         "type": "object"
       },
+      "DiagErrors": {
+        "additionalProperties": true,
+        "properties": {
+          "count": {
+            "default": 0,
+            "title": "Count",
+            "type": "integer"
+          },
+          "items": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "title": "DiagErrors",
+        "type": "object"
+      },
+      "DiagHealth": {
+        "additionalProperties": true,
+        "properties": {
+          "checks": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Checks",
+            "type": "object"
+          },
+          "ok": {
+            "default": false,
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "title": "DiagHealth",
+        "type": "object"
+      },
       "EnsureProfile": {
         "additionalProperties": true,
         "properties": {
@@ -823,6 +1489,593 @@
           "id"
         ],
         "title": "EnsureProfile",
+        "type": "object"
+      },
+      "EntryScan": {
+        "additionalProperties": true,
+        "properties": {
+          "capped": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capped"
+          },
+          "entry_week": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entry Week"
+          },
+          "equivalent_start_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Equivalent Start Date"
+          },
+          "plan_end_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan End Date"
+          },
+          "plan_weeks": {
+            "default": 0,
+            "title": "Plan Weeks",
+            "type": "integer"
+          },
+          "proposal_weeks": {
+            "default": 0,
+            "title": "Proposal Weeks",
+            "type": "integer"
+          },
+          "weeks": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Weeks",
+            "type": "array"
+          },
+          "weeks_remaining": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weeks Remaining"
+          }
+        },
+        "title": "EntryScan",
+        "type": "object"
+      },
+      "EventProjection": {
+        "additionalProperties": true,
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "climb_readiness_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Climb Readiness Pct"
+          },
+          "current_ctl": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Ctl"
+          },
+          "event_climb_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Climb M"
+          },
+          "event_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Date"
+          },
+          "event_km": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Km"
+          },
+          "event_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Name"
+          },
+          "ftp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp"
+          },
+          "gap_endurance_h": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gap Endurance H"
+          },
+          "gap_power_w_per_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gap Power W Per Kg"
+          },
+          "longest_completed_ride_h": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longest Completed Ride H"
+          },
+          "longest_required_h": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longest Required H"
+          },
+          "predicted_finish_h": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Predicted Finish H"
+          },
+          "predicted_np": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Predicted Np"
+          },
+          "predicted_tss": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Predicted Tss"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "weight_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight Kg"
+          }
+        },
+        "required": [
+          "available"
+        ],
+        "title": "EventProjection",
+        "type": "object"
+      },
+      "ExtraFolder": {
+        "additionalProperties": true,
+        "properties": {
+          "added": {
+            "default": 0,
+            "title": "Added",
+            "type": "integer"
+          },
+          "files": {
+            "default": 0,
+            "title": "Files",
+            "type": "integer"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "title": "ExtraFolder",
+        "type": "object"
+      },
+      "FatigueResistance": {
+        "additionalProperties": true,
+        "properties": {
+          "by_duration": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "By Duration",
+            "type": "array"
+          },
+          "fit_status": {
+            "default": "insufficient_data",
+            "title": "Fit Status",
+            "type": "string"
+          },
+          "kj_threshold": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kj Threshold"
+          },
+          "n_long_rides": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N Long Rides"
+          },
+          "n_long_rides_with_streams": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N Long Rides With Streams"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "robustness_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Robustness Score"
+          },
+          "scatter": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Scatter",
+            "type": "array"
+          }
+        },
+        "title": "FatigueResistance",
+        "type": "object"
+      },
+      "Fitness3dStatus": {
+        "additionalProperties": true,
+        "properties": {
+          "rides_total_post_v106": {
+            "default": 0,
+            "title": "Rides Total Post V106",
+            "type": "integer"
+          },
+          "rides_with_ss": {
+            "default": 0,
+            "title": "Rides With Ss",
+            "type": "integer"
+          }
+        },
+        "title": "Fitness3dStatus",
+        "type": "object"
+      },
+      "FolderCount": {
+        "additionalProperties": true,
+        "properties": {
+          "count": {
+            "default": 0,
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "title": "FolderCount",
+        "type": "object"
+      },
+      "FtpHistory": {
+        "additionalProperties": true,
+        "properties": {
+          "ftp_current": {
+            "title": "Ftp Current",
+            "type": "number"
+          },
+          "ftp_source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp Source"
+          },
+          "history": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/FtpHistoryEntry"
+            },
+            "title": "History",
+            "type": "array"
+          }
+        },
+        "required": [
+          "ftp_current"
+        ],
+        "title": "FtpHistory",
+        "type": "object"
+      },
+      "FtpHistoryEntry": {
+        "additionalProperties": true,
+        "properties": {
+          "applied": {
+            "default": false,
+            "title": "Applied",
+            "type": "boolean"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date"
+          },
+          "ftp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp"
+          },
+          "method": {
+            "default": "manual",
+            "title": "Method",
+            "type": "string"
+          },
+          "source": {
+            "default": "",
+            "title": "Source",
+            "type": "string"
+          },
+          "type": {
+            "default": "manual",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "title": "FtpHistoryEntry",
+        "type": "object"
+      },
+      "FtpReviewSaved": {
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "persisted": {
+            "default": false,
+            "title": "Persisted",
+            "type": "boolean"
+          }
+        },
+        "title": "FtpReviewSaved",
+        "type": "object"
+      },
+      "FtpTestAnalysis": {
+        "additionalProperties": true,
+        "properties": {
+          "halted": {
+            "default": false,
+            "title": "Halted",
+            "type": "boolean"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "prior_ftp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prior Ftp"
+          },
+          "ride_id": {
+            "title": "Ride Id",
+            "type": "string"
+          },
+          "series": {
+            "default": [],
+            "items": {
+              "type": "integer"
+            },
+            "title": "Series",
+            "type": "array"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "step_s": {
+            "default": 1,
+            "title": "Step S",
+            "type": "integer"
+          },
+          "suggestion": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Suggestion",
+            "type": "object"
+          },
+          "total_s": {
+            "default": 0,
+            "title": "Total S",
+            "type": "integer"
+          },
+          "windows": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Windows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "ride_id"
+        ],
+        "title": "FtpTestAnalysis",
         "type": "object"
       },
       "FtpTestTypeSet": {
@@ -887,6 +2140,154 @@
         "title": "FtpTestTypeSet",
         "type": "object"
       },
+      "FtpUpdated": {
+        "additionalProperties": true,
+        "properties": {
+          "ftp": {
+            "title": "Ftp",
+            "type": "number"
+          },
+          "ftp_source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp Source"
+          },
+          "ftp_test_history": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Ftp Test History",
+            "type": "array"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ftp"
+        ],
+        "title": "FtpUpdated",
+        "type": "object"
+      },
+      "HrvImported": {
+        "additionalProperties": true,
+        "properties": {
+          "imported": {
+            "default": 0,
+            "title": "Imported",
+            "type": "integer"
+          },
+          "skipped": {
+            "default": 0,
+            "title": "Skipped",
+            "type": "integer"
+          }
+        },
+        "title": "HrvImported",
+        "type": "object"
+      },
+      "HrvPromptDismissed": {
+        "additionalProperties": true,
+        "properties": {
+          "level": {
+            "title": "Level",
+            "type": "string"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "version": {
+            "default": "",
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "level"
+        ],
+        "title": "HrvPromptDismissed",
+        "type": "object"
+      },
+      "HrvPromptStatus": {
+        "additionalProperties": true,
+        "properties": {
+          "device_product_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device Product Name"
+          },
+          "dismissal_state": {
+            "default": "none",
+            "title": "Dismissal State",
+            "type": "string"
+          },
+          "last_ride_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Ride Id"
+          },
+          "should_show_prompt": {
+            "default": false,
+            "title": "Should Show Prompt",
+            "type": "boolean"
+          },
+          "version": {
+            "default": "",
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "title": "HrvPromptStatus",
+        "type": "object"
+      },
+      "HrvSaved": {
+        "additionalProperties": true,
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "hrv_manual_rmssd": {
+            "title": "Hrv Manual Rmssd",
+            "type": "number"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "date",
+          "hrv_manual_rmssd"
+        ],
+        "title": "HrvSaved",
+        "type": "object"
+      },
       "IcuConnection": {
         "additionalProperties": true,
         "properties": {
@@ -927,6 +2328,293 @@
           }
         },
         "title": "IcuConnection",
+        "type": "object"
+      },
+      "IcuPushResult": {
+        "additionalProperties": true,
+        "properties": {
+          "deleted": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deleted"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "needs_reconnect": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Needs Reconnect"
+          },
+          "ok": {
+            "default": false,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "pushed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pushed"
+          },
+          "sync_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sync Enabled"
+          },
+          "updated": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated"
+          }
+        },
+        "title": "IcuPushResult",
+        "type": "object"
+      },
+      "IcuPushStatus": {
+        "additionalProperties": true,
+        "properties": {
+          "connected": {
+            "default": false,
+            "title": "Connected",
+            "type": "boolean"
+          },
+          "horizon_days": {
+            "default": 14,
+            "title": "Horizon Days",
+            "type": "integer"
+          },
+          "last_result": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Result"
+          },
+          "method": {
+            "default": "none",
+            "title": "Method",
+            "type": "string"
+          },
+          "sync_enabled": {
+            "default": false,
+            "title": "Sync Enabled",
+            "type": "boolean"
+          },
+          "write_ok": {
+            "default": false,
+            "title": "Write Ok",
+            "type": "boolean"
+          }
+        },
+        "title": "IcuPushStatus",
+        "type": "object"
+      },
+      "IcuRaces": {
+        "additionalProperties": true,
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "needs_reconnect": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Needs Reconnect"
+          },
+          "races": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Races",
+            "type": "array"
+          }
+        },
+        "title": "IcuRaces",
+        "type": "object"
+      },
+      "LogTail": {
+        "additionalProperties": true,
+        "properties": {
+          "exists": {
+            "default": false,
+            "title": "Exists",
+            "type": "boolean"
+          },
+          "lines": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "path": {
+            "default": "",
+            "title": "Path",
+            "type": "string"
+          },
+          "size_kb": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Kb"
+          },
+          "total": {
+            "default": 0,
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "title": "LogTail",
+        "type": "object"
+      },
+      "MetricPoint": {
+        "additionalProperties": true,
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "value": {
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "date",
+          "value"
+        ],
+        "title": "MetricPoint",
+        "type": "object"
+      },
+      "MigrationResult": {
+        "additionalProperties": true,
+        "properties": {
+          "from_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Version"
+          },
+          "rider_data_preserved": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rider Data Preserved"
+          },
+          "show_toast": {
+            "default": false,
+            "title": "Show Toast",
+            "type": "boolean"
+          },
+          "to_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Version"
+          }
+        },
+        "title": "MigrationResult",
         "type": "object"
       },
       "Ok": {
@@ -991,6 +2679,52 @@
           }
         },
         "title": "PickerResult",
+        "type": "object"
+      },
+      "PlanAutoRecalc": {
+        "additionalProperties": true,
+        "properties": {
+          "action": {
+            "title": "Action",
+            "type": "string"
+          },
+          "days_since_recalc": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days Since Recalc"
+          },
+          "plan_json": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlanJson"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "weeks_regenerated": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weeks Regenerated"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "title": "PlanAutoRecalc",
         "type": "object"
       },
       "PlanGoal": {
@@ -1084,6 +2818,18 @@
               }
             ],
             "title": "Availability"
+          },
+          "ctl_drift": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ctl Drift"
           },
           "ctl_snapshot": {
             "anyOf": [
@@ -1181,6 +2927,92 @@
         "title": "PlanPhase",
         "type": "object"
       },
+      "PlanPreview": {
+        "additionalProperties": true,
+        "properties": {
+          "event_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Date"
+          },
+          "goal": {
+            "default": "",
+            "title": "Goal",
+            "type": "string"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "phase_weeks_disabled_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phase Weeks Disabled Reason"
+          },
+          "phase_weeks_rec": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phase Weeks Rec"
+          },
+          "phase_weeks_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phase Weeks Status"
+          },
+          "phases": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PreviewPhase"
+            },
+            "title": "Phases",
+            "type": "array"
+          },
+          "plan_weeks": {
+            "default": 0,
+            "title": "Plan Weeks",
+            "type": "integer"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          }
+        },
+        "title": "PlanPreview",
+        "type": "object"
+      },
       "PlanRead": {
         "additionalProperties": true,
         "properties": {
@@ -1202,6 +3034,63 @@
           "plan_json"
         ],
         "title": "PlanRead",
+        "type": "object"
+      },
+      "PlanReforecasted": {
+        "additionalProperties": true,
+        "properties": {
+          "gaps": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gaps"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "plan_json": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlanJson"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reforecast": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reforecast"
+          },
+          "sessions_changed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sessions Changed"
+          }
+        },
+        "title": "PlanReforecasted",
         "type": "object"
       },
       "PlanRegenerated": {
@@ -1431,6 +3320,44 @@
           "session_type"
         ],
         "title": "PlanSession",
+        "type": "object"
+      },
+      "PlanUpdated": {
+        "additionalProperties": true,
+        "properties": {
+          "action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "plan_json": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlanJson"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status_message": {
+            "default": "",
+            "title": "Status Message",
+            "type": "string"
+          }
+        },
+        "title": "PlanUpdated",
         "type": "object"
       },
       "PlanWeek": {
@@ -1666,6 +3593,72 @@
           "watts"
         ],
         "title": "PowerCurvePoint",
+        "type": "object"
+      },
+      "PrToastQueue": {
+        "additionalProperties": true,
+        "properties": {
+          "count": {
+            "default": 0,
+            "title": "Count",
+            "type": "integer"
+          },
+          "queue": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Queue",
+            "type": "array"
+          }
+        },
+        "title": "PrToastQueue",
+        "type": "object"
+      },
+      "PreviewPhase": {
+        "additionalProperties": true,
+        "properties": {
+          "end": {
+            "default": "",
+            "title": "End",
+            "type": "string"
+          },
+          "focus": {
+            "default": "",
+            "title": "Focus",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "start": {
+            "default": "",
+            "title": "Start",
+            "type": "string"
+          },
+          "weekly_tss": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekly Tss"
+          },
+          "weeks": {
+            "title": "Weeks",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "weeks"
+        ],
+        "title": "PreviewPhase",
         "type": "object"
       },
       "ProfileCreated": {
@@ -2440,6 +4433,430 @@
         "title": "RematchResult",
         "type": "object"
       },
+      "RetestSnoozed": {
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "until": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Until"
+          }
+        },
+        "title": "RetestSnoozed",
+        "type": "object"
+      },
+      "RideDetail": {
+        "additionalProperties": true,
+        "properties": {
+          "activity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Activity Id"
+          },
+          "avg_cadence": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Cadence"
+          },
+          "avg_hr": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Hr"
+          },
+          "avg_power_w": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Power W"
+          },
+          "decoupling_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decoupling Pct"
+          },
+          "dfa_alpha1": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dfa Alpha1"
+          },
+          "distance_km": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance Km"
+          },
+          "duration_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration S"
+          },
+          "efforts": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Efforts",
+            "type": "array"
+          },
+          "elevation_m": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Elevation M"
+          },
+          "ftp_at_ride": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp At Ride"
+          },
+          "hr_max": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hr Max"
+          },
+          "if_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "If Pct"
+          },
+          "intervals": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Intervals",
+            "type": "array"
+          },
+          "is_race": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Race"
+          },
+          "kcal": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kcal"
+          },
+          "kj": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kj"
+          },
+          "moving_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Moving S"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          },
+          "np_w": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Np W"
+          },
+          "prs": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Prs",
+            "type": "array"
+          },
+          "ride_id": {
+            "title": "Ride Id",
+            "type": "string"
+          },
+          "rpe": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rpe"
+          },
+          "samples": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Samples"
+          },
+          "source": {
+            "default": "",
+            "title": "Source",
+            "type": "string"
+          },
+          "sport": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sport"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "time_in_zone": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time In Zone"
+          },
+          "tss": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tss"
+          }
+        },
+        "required": [
+          "ride_id"
+        ],
+        "title": "RideDetail",
+        "type": "object"
+      },
+      "RideImported": {
+        "additionalProperties": true,
+        "properties": {
+          "bytes": {
+            "default": 0,
+            "title": "Bytes",
+            "type": "integer"
+          },
+          "icu_upload": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Icu Upload",
+            "type": "object"
+          },
+          "parsed_stats": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Parsed Stats",
+            "type": "object"
+          },
+          "ride_id": {
+            "title": "Ride Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ride_id"
+        ],
+        "title": "RideImported",
+        "type": "object"
+      },
+      "RidePrs": {
+        "additionalProperties": true,
+        "properties": {
+          "prs": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Prs",
+            "type": "array"
+          },
+          "ride_id": {
+            "title": "Ride Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ride_id"
+        ],
+        "title": "RidePrs",
+        "type": "object"
+      },
+      "RideRpeSaved": {
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "ride_id": {
+            "title": "Ride Id",
+            "type": "string"
+          },
+          "rpe": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rpe"
+          },
+          "scale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scale"
+          }
+        },
+        "required": [
+          "ride_id"
+        ],
+        "title": "RideRpeSaved",
+        "type": "object"
+      },
       "RideSummary": {
         "additionalProperties": true,
         "properties": {
@@ -2649,6 +5066,117 @@
           }
         },
         "title": "RiderStats",
+        "type": "object"
+      },
+      "RidesSynced": {
+        "additionalProperties": true,
+        "properties": {
+          "added": {
+            "default": 0,
+            "title": "Added",
+            "type": "integer"
+          },
+          "plan_adapted": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan Adapted"
+          },
+          "plan_load_alert": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan Load Alert"
+          },
+          "skipped": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skipped"
+          },
+          "total": {
+            "default": 0,
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "title": "RidesSynced",
+        "type": "object"
+      },
+      "RouteSuggestion": {
+        "additionalProperties": true,
+        "properties": {
+          "match_score": {
+            "default": 0,
+            "title": "Match Score",
+            "type": "number"
+          },
+          "rationale": {
+            "default": "",
+            "title": "Rationale",
+            "type": "string"
+          },
+          "route": {
+            "$ref": "#/components/schemas/RouteSummary"
+          }
+        },
+        "required": [
+          "route"
+        ],
+        "title": "RouteSuggestion",
+        "type": "object"
+      },
+      "RouteSuggestions": {
+        "additionalProperties": true,
+        "properties": {
+          "count": {
+            "default": 0,
+            "title": "Count",
+            "type": "integer"
+          },
+          "empty_hint": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Empty Hint"
+          },
+          "filters_applied": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Filters Applied",
+            "type": "object"
+          },
+          "results": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/RouteSuggestion"
+            },
+            "title": "Results",
+            "type": "array"
+          }
+        },
+        "title": "RouteSuggestions",
         "type": "object"
       },
       "RouteSummary": {
@@ -3173,6 +5701,28 @@
         "title": "SetupDefaults",
         "type": "object"
       },
+      "SurfaceTypes": {
+        "additionalProperties": true,
+        "properties": {
+          "gravel_workouts": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Gravel Workouts",
+            "type": "array"
+          },
+          "routes": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Routes",
+            "type": "object"
+          }
+        },
+        "title": "SurfaceTypes",
+        "type": "object"
+      },
       "SyncProgress": {
         "additionalProperties": true,
         "properties": {
@@ -3294,6 +5844,117 @@
           }
         },
         "title": "SyncStatus",
+        "type": "object"
+      },
+      "TauFits": {
+        "additionalProperties": true,
+        "properties": {
+          "atl_tau_ci_high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Atl Tau Ci High"
+          },
+          "atl_tau_ci_low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Atl Tau Ci Low"
+          },
+          "atl_tau_fit": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Atl Tau Fit"
+          },
+          "conventional": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conventional"
+          },
+          "ctl_tau_ci_high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ctl Tau Ci High"
+          },
+          "ctl_tau_ci_low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ctl Tau Ci Low"
+          },
+          "ctl_tau_fit": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ctl Tau Fit"
+          },
+          "fit_residual_r2": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fit Residual R2"
+          },
+          "fit_status": {
+            "default": "insufficient_data",
+            "title": "Fit Status",
+            "type": "string"
+          },
+          "n_markers": {
+            "default": 0,
+            "title": "N Markers",
+            "type": "integer"
+          },
+          "weighted_n": {
+            "default": 0,
+            "title": "Weighted N",
+            "type": "number"
+          }
+        },
+        "title": "TauFits",
         "type": "object"
       },
       "TierDownApplied": {
@@ -3473,6 +6134,18 @@
             "default": "",
             "title": "Reason",
             "type": "string"
+          },
+          "retest_nudge": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retest Nudge"
           },
           "was_modified": {
             "default": false,
@@ -3693,6 +6366,156 @@
         "title": "VersionInfo",
         "type": "object"
       },
+      "WeekSummary": {
+        "additionalProperties": true,
+        "properties": {
+          "duration_min_done": {
+            "default": 0,
+            "title": "Duration Min Done",
+            "type": "integer"
+          },
+          "duration_min_planned": {
+            "default": 0,
+            "title": "Duration Min Planned",
+            "type": "integer"
+          },
+          "exposure_minutes": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Exposure Minutes",
+            "type": "object"
+          },
+          "exposure_minutes_planned": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Exposure Minutes Planned",
+            "type": "object"
+          },
+          "missed_sessions": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Missed Sessions",
+            "type": "array"
+          },
+          "overreach": {
+            "default": false,
+            "title": "Overreach",
+            "type": "boolean"
+          },
+          "overreach_reasons": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Overreach Reasons",
+            "type": "array"
+          },
+          "planned_days_done": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned Days Done"
+          },
+          "planned_days_missed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned Days Missed"
+          },
+          "planned_days_total": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned Days Total"
+          },
+          "sports": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Sports",
+            "type": "object"
+          },
+          "today": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Today"
+          },
+          "tss_adherence_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tss Adherence Pct"
+          },
+          "tss_done": {
+            "default": 0,
+            "title": "Tss Done",
+            "type": "number"
+          },
+          "tss_target": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tss Target"
+          },
+          "unclassified_minutes": {
+            "default": 0,
+            "title": "Unclassified Minutes",
+            "type": "integer"
+          },
+          "week_end": {
+            "title": "Week End",
+            "type": "string"
+          },
+          "week_offset": {
+            "default": 0,
+            "title": "Week Offset",
+            "type": "integer"
+          },
+          "week_start": {
+            "title": "Week Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "week_start",
+          "week_end"
+        ],
+        "title": "WeekSummary",
+        "type": "object"
+      },
       "WellnessDay": {
         "additionalProperties": true,
         "properties": {
@@ -3706,6 +6529,17 @@
               }
             ],
             "title": "Atl"
+          },
+          "cp_fitness": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cp Fitness"
           },
           "ctl": {
             "anyOf": [
@@ -3744,6 +6578,17 @@
             ],
             "title": "Hrv"
           },
+          "pmax_fitness": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pmax Fitness"
+          },
           "rhr": {
             "anyOf": [
               {
@@ -3776,6 +6621,17 @@
               }
             ],
             "title": "Tsb"
+          },
+          "w_prime_fitness": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "W Prime Fitness"
           }
         },
         "required": [
@@ -3839,6 +6695,80 @@
           }
         },
         "title": "WorkoutDetail",
+        "type": "object"
+      },
+      "WorkoutFolders": {
+        "additionalProperties": true,
+        "properties": {
+          "builtin": {
+            "$ref": "#/components/schemas/FolderCount"
+          },
+          "extra": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExtraFolder"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "builtin"
+        ],
+        "title": "WorkoutFolders",
+        "type": "object"
+      },
+      "WorkoutPushed": {
+        "additionalProperties": true,
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "needs_lthr": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Needs Lthr"
+          },
+          "needs_reconnect": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Needs Reconnect"
+          },
+          "ok": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ok"
+          }
+        },
+        "title": "WorkoutPushed",
         "type": "object"
       },
       "WorkoutRow": {
@@ -3975,6 +6905,21 @@
         "title": "WorkoutSegment",
         "type": "object"
       },
+      "WorkoutTags": {
+        "additionalProperties": true,
+        "properties": {
+          "tags": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Tags",
+            "type": "array"
+          }
+        },
+        "title": "WorkoutTags",
+        "type": "object"
+      },
       "ZoneBand": {
         "additionalProperties": true,
         "properties": {
@@ -4003,6 +6948,43 @@
         ],
         "title": "ZoneBand",
         "type": "object"
+      },
+      "ZonesSaved": {
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "reset": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reset"
+          },
+          "zones": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ZoneBand"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zones"
+          }
+        },
+        "title": "ZonesSaved",
+        "type": "object"
       }
     }
   },
@@ -4012,6 +6994,40 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/calendar": {
+      "get": {
+        "operationId": "api_calendar_api_calendar_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarRead"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/calendar/push-workout": {
+      "post": {
+        "operationId": "api_calendar_push_workout_api_calendar_push_workout_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutPushed"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/daily-log": {
       "get": {
         "operationId": "api_daily_log_api_daily_log_get",
@@ -4044,6 +7060,57 @@
         }
       }
     },
+    "/api/diag/health": {
+      "get": {
+        "operationId": "api_diag_health_api_diag_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiagHealth"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/diag/recent-errors": {
+      "get": {
+        "operationId": "api_diag_recent_errors_api_diag_recent_errors_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiagErrors"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/event/projection": {
+      "get": {
+        "operationId": "api_event_projection_api_event_projection_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventProjection"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/icu/connection": {
       "get": {
         "operationId": "api_icu_connection_api_icu_connection_get",
@@ -4053,6 +7120,127 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/IcuConnection"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/icu/disconnect": {
+      "post": {
+        "operationId": "api_icu_disconnect_api_icu_disconnect_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ok"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/icu/push": {
+      "get": {
+        "operationId": "api_icu_push_status_api_icu_push_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IcuPushStatus"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "operationId": "api_icu_push_api_icu_push_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IcuPushResult"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/icu/races": {
+      "get": {
+        "operationId": "api_icu_races_api_icu_races_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IcuRaces"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/logs": {
+      "get": {
+        "operationId": "api_logs_api_logs_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogTail"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/metrics/history": {
+      "get": {
+        "operationId": "api_metrics_history_api_metrics_history_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MetricPoint"
+                  },
+                  "title": "Response 200 Api Metrics History Api Metrics History Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/migrations/last-run-result": {
+      "get": {
+        "operationId": "api_migrations_last_run_result_api_migrations_last_run_result_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MigrationResult"
                 }
               }
             },
@@ -4146,6 +7334,23 @@
         }
       }
     },
+    "/api/plan/auto-recalc": {
+      "post": {
+        "operationId": "api_plan_auto_recalc_api_plan_auto_recalc_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanAutoRecalc"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/plan/continuous/deload-revert": {
       "post": {
         "operationId": "api_continuous_deload_revert_api_plan_continuous_deload_revert_post",
@@ -4163,6 +7368,23 @@
         }
       }
     },
+    "/api/plan/daily-adapt": {
+      "get": {
+        "operationId": "api_plan_daily_adapt_api_plan_daily_adapt_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DailyAdapt"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/plan/dismiss-session": {
       "post": {
         "operationId": "api_plan_dismiss_session_api_plan_dismiss_session_post",
@@ -4172,6 +7394,23 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SessionDismissed"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/plan/entry-scan": {
+      "get": {
+        "operationId": "api_plan_entry_scan_api_plan_entry_scan_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntryScan"
                 }
               }
             },
@@ -4248,6 +7487,23 @@
         }
       }
     },
+    "/api/plan/preview": {
+      "get": {
+        "operationId": "api_plan_preview_api_plan_preview_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanPreview"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/plan/preview-redraw": {
       "post": {
         "operationId": "api_plan_preview_redraw_api_plan_preview_redraw_post",
@@ -4257,6 +7513,23 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/RedrawCandidate"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/plan/reforecast": {
+      "post": {
+        "operationId": "api_plan_reforecast_api_plan_reforecast_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanReforecasted"
                 }
               }
             },
@@ -4333,6 +7606,91 @@
         }
       }
     },
+    "/api/plan/update": {
+      "post": {
+        "operationId": "api_plan_update_api_plan_update_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanUpdated"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/profile/backfill-history": {
+      "post": {
+        "operationId": "api_profile_backfill_history_api_profile_backfill_history_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackfillHistoryStarted"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/profile/backfill-history/status": {
+      "get": {
+        "operationId": "api_profile_backfill_history_status_api_profile_backfill_history_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackfillHistoryStatus"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/profile/banister-validation": {
+      "get": {
+        "operationId": "api_profile_banister_validation_api_profile_banister_validation_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BanisterValidation"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/profile/dfa-alpha1": {
+      "get": {
+        "operationId": "api_profile_dfa_alpha1_api_profile_dfa_alpha1_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DfaSnapshot"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/profile/dfa-backfill": {
       "post": {
         "operationId": "api_profile_dfa_backfill_api_profile_dfa_backfill_post",
@@ -4384,6 +7742,40 @@
         }
       }
     },
+    "/api/profile/fatigue-resistance": {
+      "get": {
+        "operationId": "api_profile_fatigue_resistance_api_profile_fatigue_resistance_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FatigueResistance"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/profile/ftp-history": {
+      "get": {
+        "operationId": "api_profile_ftp_history_api_profile_ftp_history_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FtpHistory"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/profile/power-curve": {
       "get": {
         "operationId": "api_profile_power_curve_api_profile_power_curve_get",
@@ -4393,6 +7785,57 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PowerCurve"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/profile/pr-toast-queue": {
+      "get": {
+        "operationId": "api_profile_pr_toast_queue_api_profile_pr_toast_queue_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrToastQueue"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/profile/tau-fits": {
+      "get": {
+        "operationId": "api_profile_tau_fits_api_profile_tau_fits_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TauFits"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/profile/update-ftp": {
+      "post": {
+        "operationId": "api_profile_update_ftp_api_profile_update_ftp_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FtpUpdated"
                 }
               }
             },
@@ -4552,6 +7995,125 @@
         }
       }
     },
+    "/api/retest-nudge/snooze": {
+      "post": {
+        "operationId": "api_retest_nudge_snooze_api_retest_nudge_snooze_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetestSnoozed"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/ride/import": {
+      "post": {
+        "operationId": "api_ride_import_api_ride_import_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RideImported"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/ride/{ride_id}/detail": {
+      "get": {
+        "operationId": "api_ride_full_detail_api_ride__ride_id__detail_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RideDetail"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/ride/{ride_id}/ftp-test-analysis": {
+      "get": {
+        "operationId": "api_ride_ftp_test_analysis_api_ride__ride_id__ftp_test_analysis_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FtpTestAnalysis"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/ride/{ride_id}/ftp-test-review": {
+      "post": {
+        "operationId": "api_ride_ftp_test_review_api_ride__ride_id__ftp_test_review_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FtpReviewSaved"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/ride/{ride_id}/prs": {
+      "get": {
+        "operationId": "api_ride_prs_api_ride__ride_id__prs_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RidePrs"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/ride/{ride_id}/rpe": {
+      "post": {
+        "operationId": "api_ride_rpe_api_ride__ride_id__rpe_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RideRpeSaved"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/rider-stats": {
       "get": {
         "operationId": "api_rider_stats_api_rider_stats_get",
@@ -4582,6 +8144,23 @@
                   },
                   "title": "Response 200 Api Rides Api Rides Get",
                   "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/rides/sync": {
+      "post": {
+        "operationId": "api_rides_sync_api_rides_sync_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RidesSynced"
                 }
               }
             },
@@ -4624,6 +8203,23 @@
         }
       }
     },
+    "/api/routes/suggest": {
+      "post": {
+        "operationId": "api_routes_suggest_api_routes_suggest_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouteSuggestions"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/settings": {
       "get": {
         "operationId": "api_settings_api_settings_get",
@@ -4648,6 +8244,55 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SettingsSaved"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/settings/workout-folders": {
+      "get": {
+        "operationId": "api_workout_folders_api_settings_workout_folders_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutFolders"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "operationId": "api_set_extra_workout_folder_api_settings_workout_folders_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutFolders"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/settings/zones": {
+      "post": {
+        "operationId": "update_custom_zones_api_settings_zones_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZonesSaved"
                 }
               }
             },
@@ -4682,6 +8327,23 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/EnsureProfile"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/surface-types": {
+      "get": {
+        "operationId": "api_surface_types_api_surface_types_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SurfaceTypes"
                 }
               }
             },
@@ -4792,6 +8454,23 @@
         }
       }
     },
+    "/api/week-summary": {
+      "get": {
+        "operationId": "api_week_summary_api_week_summary_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeekSummary"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/wellness": {
       "get": {
         "operationId": "api_wellness_api_wellness_get",
@@ -4805,6 +8484,108 @@
                   },
                   "title": "Response 200 Api Wellness Api Wellness Get",
                   "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/wellness/3d-fitness-status": {
+      "get": {
+        "operationId": "api_3d_fitness_status_api_wellness_3d_fitness_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fitness3dStatus"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/wellness/backfill-3d-fitness": {
+      "post": {
+        "operationId": "api_backfill_3d_fitness_api_wellness_backfill_3d_fitness_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Backfill3d"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/wellness/hrv-recording-dismiss": {
+      "post": {
+        "operationId": "api_hrv_recording_dismiss_api_wellness_hrv_recording_dismiss_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrvPromptDismissed"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/wellness/hrv-recording-status": {
+      "get": {
+        "operationId": "api_hrv_recording_status_api_wellness_hrv_recording_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrvPromptStatus"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/wellness/import-hrv4training": {
+      "post": {
+        "operationId": "api_wellness_import_hrv4training_api_wellness_import_hrv4training_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrvImported"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/wellness/manual-hrv": {
+      "post": {
+        "operationId": "api_wellness_manual_hrv_api_wellness_manual_hrv_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrvSaved"
                 }
               }
             },
@@ -4843,6 +8624,23 @@
                   },
                   "title": "Response 200 Api Workouts Api Workouts Get",
                   "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/workouts/tags": {
+      "get": {
+        "operationId": "api_workouts_tags_api_workouts_tags_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutTags"
                 }
               }
             },

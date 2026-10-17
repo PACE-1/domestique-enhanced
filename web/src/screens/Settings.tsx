@@ -1,13 +1,18 @@
 import { useCallback, useEffect, useState } from "react"
 
 import type { IcuConnection, SettingsRead, SyncStatus, UpdateCheck, VersionInfo, ZoneBand } from "@/api/types"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { NativeSelect } from "@/components/ui/native-select"
 import { Input } from "@/components/ui/input"
-import { checkUpdate, diff, formFrom, getSettings, getSyncStatus, getVersion, saveSettings, syncNow, type RiderForm } from "@/lib/settings"
+import { checkUpdate, connectUrl, diff, disconnectIcu, formFrom, getSettings, getSyncStatus, getVersion, saveSettings, syncNow, type RiderForm } from "@/lib/settings"
 import { getIcuConnection, getLimits, type Limits } from "@/lib/setup"
+import { CalendarPush } from "@/screens/CalendarPush"
+import { Diagnostics } from "@/screens/Diagnostics"
+import { Folders } from "@/screens/Folders"
+import { FtpHistory } from "@/screens/FtpHistory"
 import { Panel, Row, useLoad } from "@/screens/panel"
+import { ZonesEditor } from "@/screens/ZonesEditor"
 
 const Zones = ({ title, zones, unit }: { title: string; zones: ZoneBand[]; unit: string }) => (
   <div>
@@ -78,11 +83,13 @@ function RiderForm_({ s, limits, saved }: { s: SettingsRead; limits: Limits; sav
 }
 
 function Rider() {
-  const [load, retry] = useLoad<SettingsRead>(getSettings)
+  const [load, retry, refresh] = useLoad<SettingsRead>(getSettings)
   const [limits, setLimits] = useState<Limits>({})
   // After a save the server's answer replaces the loaded value in place, so the card never flashes back to "Loading…".
   const [now, setNow] = useState<{ s: SettingsRead; n: number } | null>(null)
+  const [editing, setEditing] = useState<"power" | "hr" | null>(null)
   useEffect(() => { getLimits().then(setLimits, () => {}) }, [])
+  const zonesSaved = () => { setEditing(null); setNow(null); refresh() }
   return (
     <Panel title="Rider" load={load} retry={retry}>
       {(loaded) => {
@@ -92,8 +99,26 @@ function Rider() {
             <RiderForm_ key={now?.n ?? 0} s={s} limits={limits} saved={(fresh) => setNow({ s: fresh, n: (now?.n ?? 0) + 1 })} />
             {now && <p role="status">Saved.</p>}
             <div className="grid gap-4 sm:grid-cols-2">
-              <Zones title="Power zones" zones={s.power_zones} unit="W" />
-              <Zones title="Heart-rate zones" zones={s.hr_zones} unit="bpm" />
+              {editing === "power" ? (
+                <ZonesEditor kind="power" zones={s.power_zones} unit="W" onSaved={zonesSaved} onCancel={() => setEditing(null)} />
+              ) : (
+                <div className="space-y-2">
+                  <Zones title="Power zones" zones={s.power_zones} unit="W" />
+                  <Button size="sm" variant="outline" disabled={editing !== null} onClick={() => setEditing("power")}>
+                    Edit power zones
+                  </Button>
+                </div>
+              )}
+              {editing === "hr" ? (
+                <ZonesEditor kind="hr" zones={s.hr_zones} unit="bpm" onSaved={zonesSaved} onCancel={() => setEditing(null)} />
+              ) : (
+                <div className="space-y-2">
+                  <Zones title="Heart-rate zones" zones={s.hr_zones} unit="bpm" />
+                  <Button size="sm" variant="outline" disabled={editing !== null} onClick={() => setEditing("hr")}>
+                    Edit heart-rate zones
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         )
@@ -107,6 +132,20 @@ function Sync() {
   const [status, retryStatus] = useLoad<SyncStatus>(getSyncStatus)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState("")
+  const [confirming, setConfirming] = useState(false)
+  const disconnect = async () => {
+    setBusy(true)
+    setError("")
+    try {
+      await disconnectIcu()
+      setConfirming(false)
+      retryConn()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e))
+    } finally {
+      setBusy(false)
+    }
+  }
   const go = useCallback(async () => {
     setBusy(true)
     setError("")
@@ -124,7 +163,7 @@ function Sync() {
       {(c) => (
         <div className="space-y-3 text-sm">
           <p>
-            {c.connected ? `Connected${c.name ? ` as ${c.name}` : ""}${c.write_ok ? "" : ", read only"}.` : "Not connected. Connect it in the current dashboard's Settings."}
+            {c.connected ? `Connected${c.name ? ` as ${c.name}` : ""}${c.write_ok ? "" : ", read only"}.` : "Not connected."}
           </p>
           {c.needs_oauth_migration && <p>This connection uses an old API key. Reconnect to switch to sign-in.</p>}
           {status.state === "ok" && (
@@ -135,10 +174,30 @@ function Sync() {
             </p>
           )}
           {status.state === "error" && <p role="alert">Couldn’t read the sync state: {status.message}</p>}
-          <Button size="sm" disabled={busy || !c.connected} onClick={go}>
-            {busy ? "Syncing…" : "Sync now"}
-          </Button>
-          {error && <p role="alert">Sync failed: {error}</p>}
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" disabled={busy || !c.connected} onClick={go}>
+              {busy ? "Working…" : "Sync now"}
+            </Button>
+            <a href={connectUrl} className={buttonVariants({ size: "sm", variant: "outline" })}>
+              {c.connected ? "Reconnect" : "Connect intervals.icu"}
+            </a>
+            {c.connected &&
+              (confirming ? (
+                <>
+                  <Button size="sm" variant="destructive" disabled={busy} onClick={disconnect}>
+                    Yes, disconnect
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setConfirming(false)}>
+                    Stay connected
+                  </Button>
+                </>
+              ) : (
+                <Button size="sm" variant="ghost" onClick={() => setConfirming(true)}>
+                  Disconnect…
+                </Button>
+              ))}
+          </div>
+          {error && <p role="alert">Couldn’t do that: {error}</p>}
         </div>
       )}
     </Panel>
@@ -195,7 +254,15 @@ export function Settings() {
         <Rider />
       </div>
       <Sync />
+      <CalendarPush />
+      <Folders />
       <About />
+      <div className="lg:col-span-2">
+        <FtpHistory />
+      </div>
+      <div className="lg:col-span-2">
+        <Diagnostics />
+      </div>
     </div>
   )
 }

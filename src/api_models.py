@@ -233,6 +233,7 @@ class PlanJson(_Model):
     weeks: list[PlanWeek] = []
     generated: Optional[str] = None
     ctl_snapshot: Optional[dict] = None
+    ctl_drift: Optional[dict] = None     # {exceeded, snapshot_ctl, live_ctl, generated_on}: the plan assumes a different fitness than you have
     availability: Optional[dict] = None
 
 
@@ -403,6 +404,7 @@ class TodaySession(_Model):
     was_modified: bool = False
     has_plan: Optional[bool] = None
     is_race: bool = False
+    retest_nudge: Optional[dict] = None   # {metric, reason, days_since, action, suggested_date, snooze_days}
 
 
 class TodayPersisted(_Model):
@@ -574,6 +576,9 @@ class WellnessDay(_Model):
     rhr: Optional[float] = None
     sleep_h: Optional[float] = None
     eftp: Optional[float] = None
+    cp_fitness: Optional[float] = None
+    w_prime_fitness: Optional[float] = None
+    pmax_fitness: Optional[float] = None
 
 
 class PowerCurvePoint(_Model):
@@ -675,3 +680,467 @@ class UpdateCheck(_Model):
     checked_at: Optional[str] = None
     error: Optional[str] = None
 
+
+# ── Rides: import, detail, rpe, ftp test ────────────────────────────────────
+
+class RideImported(_Model):
+    ride_id: str
+    bytes: int = 0
+    parsed_stats: dict = {}
+    icu_upload: dict = {}              # {ok, skipped, needs_reconnect, detail}
+
+
+class RideDetail(RideSummary):
+    moving_s: Optional[int] = None
+    if_pct: Optional[float] = None
+    kj: Optional[float] = None
+    kcal: Optional[int] = None
+    avg_hr: Optional[int] = None
+    hr_max: Optional[int] = None
+    avg_cadence: Optional[int] = None
+    ftp_at_ride: Optional[float] = None
+    decoupling_pct: Optional[float] = None
+    dfa_alpha1: Optional[float] = None
+    rpe: Optional[int] = None
+    is_race: Optional[bool] = None
+    activity_id: Optional[str] = None     # key of the race flag; None when the ride has no activity row
+    time_in_zone: Optional[dict] = None   # {"z1": seconds, … "z7"}
+    intervals: list[dict] = []
+    efforts: list[dict] = []
+    prs: list[dict] = []
+    samples: Optional[dict] = None     # with ?include=samples: {t_s, power_w, hr_bpm, cadence_rpm, elevation_m}
+
+
+class RideRpeSaved(_Model):
+    ok: bool = True
+    ride_id: str
+    rpe: Optional[int] = None
+    scale: Optional[str] = None
+
+
+class RidePrs(_Model):
+    ride_id: str
+    prs: list[dict] = []
+
+
+class FtpTestAnalysis(_Model):
+    ok: bool = True
+    ride_id: str
+    source: Optional[str] = None
+    suggestion: dict = {}              # {ftp, method, window_start_s, window_end_s, ...}
+    halted: bool = False
+    total_s: int = 0
+    step_s: int = 1
+    series: list[int] = []
+    windows: list[dict] = []
+    prior_ftp: Optional[float] = None
+
+
+class FtpReviewSaved(_Model):
+    ok: bool = True
+    persisted: bool = False
+
+
+class FtpUpdated(_Model):
+    ok: bool = True
+    ftp: float
+    ftp_source: Optional[str] = None
+    ftp_test_history: list[dict] = []
+
+
+class RidesSynced(_Model):
+    added: int = 0
+    total: int = 0
+    skipped: Optional[str] = None
+    plan_load_alert: Optional[bool] = None
+    plan_adapted: Optional[str] = None
+
+
+class PrToastQueue(_Model):
+    queue: list[dict] = []
+    count: int = 0
+
+
+# ── Wellness, notices, history ──────────────────────────────────────────────
+
+class HrvSaved(_Model):
+    ok: bool = True
+    date: str
+    hrv_manual_rmssd: float
+
+
+class HrvImported(_Model):
+    imported: int = 0
+    skipped: int = 0
+
+
+class HrvPromptStatus(_Model):
+    should_show_prompt: bool = False
+    device_product_name: Optional[str] = None
+    last_ride_id: Optional[str] = None
+    dismissal_state: str = "none"       # none | version | permanent
+    version: str = ""
+
+
+class HrvPromptDismissed(_Model):
+    ok: bool = True
+    level: str
+    version: str = ""
+
+
+class RetestSnoozed(_Model):
+    ok: bool = True
+    until: Optional[str] = None
+
+
+class MetricPoint(_Model):
+    date: str
+    value: float
+    source: Optional[str] = None
+    notes: Optional[str] = None
+
+
+class FtpHistoryEntry(_Model):
+    date: Optional[str] = None
+    ftp: Optional[float] = None
+    type: str = "manual"
+    source: str = ""
+    applied: bool = False
+    method: str = "manual"
+
+
+class FtpHistory(_Model):
+    ftp_current: float
+    ftp_source: Optional[str] = None
+    history: list[FtpHistoryEntry] = []
+
+
+class EventProjection(_Model):
+    available: bool
+    reason: Optional[str] = None        # why not available
+    event_name: Optional[str] = None
+    event_date: Optional[str] = None
+    event_km: Optional[float] = None
+    event_climb_m: Optional[float] = None
+    predicted_finish_h: Optional[float] = None
+    predicted_np: Optional[float] = None
+    predicted_tss: Optional[float] = None
+    ftp: Optional[float] = None
+    weight_kg: Optional[float] = None
+    current_ctl: Optional[float] = None
+    gap_endurance_h: Optional[float] = None
+    longest_required_h: Optional[float] = None
+    longest_completed_ride_h: Optional[float] = None
+    gap_power_w_per_kg: Optional[float] = None
+    climb_readiness_pct: Optional[float] = None
+
+
+class Fitness3dStatus(_Model):
+    rides_with_ss: int = 0
+    rides_total_post_v106: int = 0
+
+
+class Backfill3d(_Model):
+    backfilled: int = 0
+    skipped: int = 0
+    failed: int = 0
+    results: list[dict] = []
+
+
+class MigrationResult(_Model):
+    show_toast: bool = False
+    from_version: Optional[str] = None
+    to_version: Optional[str] = None
+    rider_data_preserved: Optional[bool] = None
+
+
+# ── Settings: intervals.icu push, folders, zones, logs, diagnostics, history backfill ──
+
+class IcuPushStatus(_Model):
+    connected: bool = False
+    method: str = "none"
+    write_ok: bool = False
+    sync_enabled: bool = False
+    horizon_days: int = 14
+    last_result: Optional[dict] = None
+
+
+class IcuPushResult(_Model):
+    ok: bool = False
+    error: Optional[str] = None
+    needs_reconnect: Optional[bool] = None
+    sync_enabled: Optional[bool] = None
+    pushed: Optional[int] = None
+    updated: Optional[int] = None
+    deleted: Optional[int] = None
+
+
+class FolderCount(_Model):
+    count: int = 0
+
+
+class ExtraFolder(_Model):
+    path: str
+    files: int = 0
+    added: int = 0
+
+
+class WorkoutFolders(_Model):
+    builtin: FolderCount
+    extra: Optional[ExtraFolder] = None
+
+
+class ZonesSaved(_Model):
+    ok: bool = True
+    reset: Optional[bool] = None
+    zones: Optional[list[ZoneBand]] = None
+
+
+class LogTail(_Model):
+    lines: list[str] = []
+    total: int = 0
+    path: str = ""
+    size_kb: Optional[float] = None
+    exists: bool = False
+
+
+class DiagErrors(_Model):
+    count: int = 0
+    items: list[dict] = []
+
+
+class DiagHealth(_Model):
+    ok: bool = False
+    checks: dict = {}
+
+
+class BackfillHistoryStarted(_Model):
+    status: str                         # started | already_running
+    task_id: Optional[str] = None
+
+
+class BackfillHistoryStatus(_Model):
+    task_id: Optional[str] = None
+    state: str = "running"             # running | done | error
+    backfilled: int = 0
+    already_cached: int = 0
+    failed: int = 0
+    done: Optional[int] = None
+    total: Optional[int] = None
+
+
+# ── Plan: calendar, preview, ride scan, update, races, workout push ─────────
+
+class CalendarPlanned(_Model):
+    session_type: str = "rest"
+    name: str = ""
+    display_name: str = ""
+    duration_min: float = 0
+    tss: float = 0
+    zwo_file: str = ""
+    status: str = "pending"
+    user_moved: bool = False
+    is_race: bool = False
+
+
+class CalendarDay(_Model):
+    date: str
+    dow: int = 0
+    is_today: bool = False
+    planned: Optional[CalendarPlanned] = None
+    actual: Optional[dict] = None
+    card_state: str = ""
+    race: Optional[dict] = None
+    availability_hours: Optional[float] = None
+
+
+class CalendarWeek(_Model):
+    iso_year: int
+    iso_week: int
+    start_date: str
+    end_date: str
+    phase: Optional[str] = None
+    is_stepback: bool = False
+    is_current: bool = False
+    planned_tss: Optional[float] = None
+    actual_tss: Optional[float] = None
+    completion_pct: Optional[float] = None
+    days: list[CalendarDay] = []
+
+
+class CalendarRead(_Model):
+    today: str
+    current_iso_week: Optional[dict] = None
+    weeks: list[CalendarWeek] = []
+    summary: dict = {}
+    goal: Optional[dict] = None
+    error: Optional[str] = None
+
+
+class PreviewPhase(_Model):
+    name: str
+    weeks: int
+    start: str = ""
+    end: str = ""
+    weekly_tss: Optional[float] = None
+    focus: str = ""
+
+
+class PlanPreview(_Model):
+    ok: bool = True
+    plan_weeks: int = 0
+    goal: str = ""
+    event_date: Optional[str] = None
+    start_date: Optional[str] = None
+    phase_weeks_status: Optional[str] = None
+    phase_weeks_rec: Optional[dict] = None
+    phase_weeks_disabled_reason: Optional[str] = None
+    phases: list[PreviewPhase] = []
+
+
+class EntryScan(_Model):
+    proposal_weeks: int = 0
+    equivalent_start_date: Optional[str] = None
+    entry_week: Optional[int] = None
+    weeks_remaining: Optional[int] = None
+    plan_weeks: int = 0
+    plan_end_date: Optional[str] = None
+    capped: Optional[bool] = None
+    weeks: list[dict] = []
+
+
+class IcuRaces(_Model):
+    races: list[dict] = []
+    error: Optional[str] = None
+    needs_reconnect: Optional[bool] = None
+
+
+class WorkoutPushed(_Model):
+    ok: Optional[bool] = None
+    error: Optional[str] = None
+    needs_reconnect: Optional[bool] = None
+    needs_lthr: Optional[bool] = None
+
+
+class PlanUpdated(_Model):
+    ok: bool = True
+    action: Optional[str] = None
+    status_message: str = ""
+    plan_json: Optional[PlanJson] = None
+
+
+class PlanReforecasted(_Model):
+    ok: bool = True
+    plan_json: Optional[PlanJson] = None
+    gaps: Optional[dict] = None
+    sessions_changed: Optional[int] = None
+    reforecast: Optional[dict] = None
+
+
+class DailyAdapt(_Model):
+    action: Optional[str] = None
+    projection_only: bool = True
+    projected_adaptations: list[dict] = []
+
+
+
+class TauFits(_Model):
+    fit_status: str = "insufficient_data"   # success | low_confidence | insufficient_data
+    n_markers: int = 0
+    weighted_n: float = 0
+    ctl_tau_fit: Optional[float] = None
+    atl_tau_fit: Optional[float] = None
+    ctl_tau_ci_low: Optional[float] = None
+    ctl_tau_ci_high: Optional[float] = None
+    atl_tau_ci_low: Optional[float] = None
+    atl_tau_ci_high: Optional[float] = None
+    fit_residual_r2: Optional[float] = None
+    conventional: Optional[dict] = None
+
+
+class BanisterValidation(_Model):
+    fit_status: str = "insufficient_data"
+    comparison: Optional[str] = None        # better_than_literature | in_line | worse_than_literature
+    tau_fits_used: Optional[dict] = None
+    n_markers_in_holdout: Optional[int] = None
+    holdout_weeks: Optional[int] = None
+    horizon_weeks: Optional[int] = None
+    ftp_mae_w: Optional[float] = None
+    ftp_mae_pct: Optional[float] = None
+    ftp_mae_pct_ci_low: Optional[float] = None
+    ftp_mae_pct_ci_high: Optional[float] = None
+    ctl_mae_tss: Optional[float] = None
+    ctl_mae_tss_ci_low: Optional[float] = None
+    ctl_mae_tss_ci_high: Optional[float] = None
+
+
+class FatigueResistance(_Model):
+    fit_status: str = "insufficient_data"
+    reason: Optional[str] = None
+    kj_threshold: Optional[int] = None
+    n_long_rides: Optional[int] = None
+    n_long_rides_with_streams: Optional[int] = None
+    robustness_score: Optional[float] = None
+    by_duration: list[dict] = []
+    scatter: list[dict] = []
+
+
+class WorkoutTags(_Model):
+    tags: list[str] = []
+
+
+class SurfaceTypes(_Model):
+    routes: dict = {}                 # route file -> surface
+    gravel_workouts: list[dict] = []  # workouts that pair well with gravel and cobbles
+
+
+class RouteSuggestion(_Model):
+    route: RouteSummary
+    match_score: float = 0
+    rationale: str = ""
+
+
+class RouteSuggestions(_Model):
+    count: int = 0
+    filters_applied: dict = {}
+    results: list[RouteSuggestion] = []
+    empty_hint: Optional[dict] = None   # {filter, filter_label, would_match}: the one filter to drop for the most routes
+
+
+class WeekSummary(_Model):
+    week_start: str
+    week_end: str
+    today: Optional[str] = None
+    tss_target: Optional[float] = None       # None: no plan on record for that week
+    tss_done: float = 0
+    tss_adherence_pct: Optional[float] = None
+    duration_min_done: int = 0
+    duration_min_planned: int = 0
+    exposure_minutes: dict = {}              # low_aerobic, mid_aerobic, high_aerobic, anaerobic
+    exposure_minutes_planned: dict = {}
+    unclassified_minutes: int = 0
+    sports: dict = {}                        # sport -> count of activities
+    missed_sessions: list[dict] = []
+    planned_days_total: Optional[int] = None
+    planned_days_done: Optional[int] = None
+    planned_days_missed: Optional[int] = None
+    overreach: bool = False
+    overreach_reasons: list[str] = []
+    week_offset: int = 0
+
+
+class PlanAutoRecalc(_Model):
+    action: str                          # fresh | recalculated | no_change | no_plan
+    days_since_recalc: Optional[int] = None
+    weeks_regenerated: Optional[int] = None
+    plan_json: Optional[PlanJson] = None
+
+
+class DfaSnapshot(_Model):
+    value: Optional[float] = None            # None when no ride has a computed value yet
+    n_rides: int = 0
+    last_computed_at: Optional[str] = None
+    n_recent_total: int = 0
+    n_no_rr_data: int = 0
+    n_fetch_failed: int = 0
+    message: str = ""

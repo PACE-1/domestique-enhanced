@@ -7,13 +7,10 @@ import { NativeSelect } from "@/components/ui/native-select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { generatePlan, isoDay, type GenerateRequest } from "@/lib/home"
+import { advancedProblem, applyAdvanced, GOALS, NO_ADVANCED, type Advanced } from "@/lib/planForm"
+import { PlanAdvanced } from "@/screens/PlanAdvanced"
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-const GOALS: [GenerateRequest["goal"], string][] = [
-  ["general", "General fitness"],
-  ["ftp", "Raise FTP"],
-  ["event", "Prepare for an event"],
-]
 
 /** Why the form can't be submitted, or "" when it can. */
 export function problem(f: { hours: number; weeks: number; goal: string; eventDate: string }, today: string): string {
@@ -32,21 +29,25 @@ export function PlanGenerate({ hasPlan, onDone }: { hasPlan: boolean; onDone: ()
   const [rest, setRest] = useState<number[]>([0])
   const [eventName, setEventName] = useState("")
   const [eventDate, setEventDate] = useState("")
+  const [adv, setAdv] = useState<Advanced>(NO_ADVANCED)
+  const [advOpen, setAdvOpen] = useState(false)
+  const [recommended, setRecommended] = useState<Record<string, number> | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState("")
 
-  const why = problem({ hours, weeks, goal, eventDate }, today)
+  const why = problem({ hours, weeks, goal, eventDate }, today) || advancedProblem(adv, goal, today)
   const submit = async () => {
     setBusy(true)
     setError("")
     try {
-      await generatePlan({
+      const base: GenerateRequest = {
         goal,
         hours_per_week: hours,
         plan_weeks: weeks,
         rest_days: rest,
         ...(goal === "event" ? { event_name: eventName, event_date: eventDate } : {}),
-      })
+      }
+      await generatePlan(applyAdvanced(base, adv, recommended))
       onDone()
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
@@ -106,6 +107,10 @@ export function PlanGenerate({ hasPlan, onDone }: { hasPlan: boolean; onDone: ()
             ))}
           </div>
         </fieldset>
+        <Button size="sm" variant="ghost" aria-expanded={advOpen} onClick={() => setAdvOpen(!advOpen)}>
+          {advOpen ? "Hide more options" : "More options…"}
+        </Button>
+        {advOpen && <PlanAdvanced a={adv} set={setAdv} goal={goal} base={{ plan_weeks: weeks, hours_per_week: hours, event_date: eventDate }} today={today} onRecommended={setRecommended} />}
         {why && <p className="text-sm text-muted-foreground">{why}</p>}
         {error && (
           <p role="alert" className="text-sm">

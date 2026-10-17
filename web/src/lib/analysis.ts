@@ -1,4 +1,4 @@
-import type { PowerCurve, RideSummary, WellnessDay } from "@/api/types"
+import type { BanisterValidation, FatigueResistance, PowerCurve, RideSummary, TauFits, WellnessDay } from "@/api/types"
 import { api } from "@/lib/api"
 
 export const RANGES = [
@@ -38,3 +38,9 @@ export function plot(series: Series[], w: number, h: number, pad = 4) {
 }
 
 export const fmtDuration = (s: number) => (s < 60 ? `${s} s` : s < 3600 ? `${Math.round(s / 60)} min` : `${(s / 3600).toFixed(1)} h`)
+
+export const getTauFits = () => api<TauFits>("/api/profile/tau-fits")
+export const getBanister = (refresh: boolean) => api<BanisterValidation>(`/api/profile/banister-validation${refresh ? "?refresh=1" : ""}`)
+/** Only 1500 and 2000 kJ are valid thresholds; the server answers 422 for anything else. */
+export const getFatigue = (kj: 1500 | 2000, refresh: boolean) =>
+  api<FatigueResistance>(`/api/profile/fatigue-resistance?kj_threshold=${kj}${refresh ? "&refresh=1" : ""}`)

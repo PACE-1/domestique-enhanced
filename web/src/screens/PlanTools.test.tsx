@@ -16,6 +16,7 @@ function mock(routes: Record<string, Handler>) {
   vi.stubGlobal("fetch", vi.fn(async (url: string, init?: RequestInit) => {
     const body = init?.body ? JSON.parse(init.body as string) : undefined
     calls.push({ url, body })
+    if (url === "/api/event/projection" && !routes[url]) return json({ available: false })
     return (routes[url] ?? (() => json({}, 404)))(body)
   }))
   return calls
@@ -160,5 +161,32 @@ describe("Plan tools in the screen", () => {
     await userEvent.click(screen.getByRole("button", { name: "Cancel" }))
     await userEvent.click(screen.getByRole("button", { name: "Match rides…" }))
     expect(screen.getByRole("button", { name: "Check this week against my rides" })).toBeTruthy()
+  })
+})
+
+
+describe("PlanRace import from intervals.icu", () => {
+  it("lists upcoming races and adds the one chosen", async () => {
+    const calls = mock({
+      "/api/icu/races": () => json({ races: [{ date: addDays(30), name: "Club crit", priority: "C" }] }),
+      "/api/plan/add-race": () => json({ ok: true }),
+    })
+    const onDone = vi.fn()
+    render(<PlanRace onDone={onDone} onCancel={() => {}} />)
+    await userEvent.click(screen.getByRole("button", { name: "Import from intervals.icu" }))
+    await userEvent.click(await screen.findByRole("button", { name: `Add Club crit on ${addDays(30)}` }))
+    await waitFor(() => expect(onDone).toHaveBeenCalled())
+    expect(calls.find((c) => c.url === "/api/plan/add-race")!.body).toEqual({ date: addDays(30), name: "Club crit", priority: "C" })
+  })
+
+  it("says to reconnect, or that there are none", async () => {
+    let reply: unknown = { needs_reconnect: true }
+    mock({ "/api/icu/races": () => json(reply) })
+    render(<PlanRace onDone={() => {}} onCancel={() => {}} />)
+    await userEvent.click(screen.getByRole("button", { name: "Import from intervals.icu" }))
+    expect((await screen.findByRole("status")).textContent).toContain("Reconnect intervals.icu")
+    reply = { races: [] }
+    await userEvent.click(screen.getByRole("button", { name: "Import from intervals.icu" }))
+    await waitFor(() => expect(screen.getByRole("status").textContent).toContain("No upcoming races"))
   })
 })

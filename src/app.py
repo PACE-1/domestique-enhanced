@@ -1331,12 +1331,12 @@ def _workout_folders_state() -> dict:
     return out
 
 
-@app.get("/api/settings/workout-folders")
+@app.get("/api/settings/workout-folders", responses={200: {"model": api_models.WorkoutFolders}})
 def api_workout_folders():
     return _workout_folders_state()
 
 
-@app.post("/api/settings/workout-folders")
+@app.post("/api/settings/workout-folders", responses={200: {"model": api_models.WorkoutFolders}})
 def api_set_extra_workout_folder(body: dict):
     """Set or clear (extra_dir "") the active profile's extra workouts folder.
     Its .zwo files join the built-in library; the built-in one is always on."""
@@ -1983,7 +1983,7 @@ def api_profiles_delete(profile_id: str):
 # v3.6.0-fix35e: post-FTP-test FTP adoption endpoint.
 # Body: {"ftp": int, "method": str, "source": str, "applied": bool}.
 # Always appends a history entry; only mutates `ftp` when applied=True.
-@app.get("/api/profile/ftp-history")
+@app.get("/api/profile/ftp-history", responses={200: {"model": api_models.FtpHistory}})
 def api_profile_ftp_history():
     """T4 (v4.1.0) — expose the ftp_test_history ledger for the UI.
 
@@ -2040,7 +2040,7 @@ def api_profile_ftp_history():
     }
 
 
-@app.post("/api/profile/update-ftp")
+@app.post("/api/profile/update-ftp", responses={200: {"model": api_models.FtpUpdated}})
 def api_profile_update_ftp(body: dict):
     from profile_manager import ProfileManager
     try:
@@ -2086,7 +2086,7 @@ def api_profile_update_ftp(body: dict):
             "ftp_test_history": pm.ftp_test_history}
 
 
-@app.get("/api/profile/tau-fits")
+@app.get("/api/profile/tau-fits", responses={200: {"model": api_models.TauFits}})
 def api_profile_tau_fits(refresh: int = Query(0)):
     """v1.0.7 IMPL-TAU-FIT-WIRING — return current per-athlete τ fit + CIs.
 
@@ -2127,7 +2127,7 @@ def api_profile_tau_fits(refresh: int = Query(0)):
     return result
 
 
-@app.get("/api/profile/banister-validation")
+@app.get("/api/profile/banister-validation", responses={200: {"model": api_models.BanisterValidation}})
 def api_profile_banister_validation(refresh: int = Query(0)):
     """v1.2.0 IMPL-OOS-VALIDATION — out-of-sample Banister model accuracy.
 
@@ -2394,7 +2394,7 @@ def _run_backfill_job(task_id: str) -> None:
             pass
 
 
-@app.post("/api/profile/backfill-history")
+@app.post("/api/profile/backfill-history", responses={200: {"model": api_models.BackfillHistoryStarted}})
 def api_profile_backfill_history():
     """v1.3.0 — kicks off a one-shot ICU history backfill job.
 
@@ -2431,7 +2431,7 @@ def api_profile_backfill_history():
     return {"status": "started", "task_id": task_id}
 
 
-@app.get("/api/profile/backfill-history/status")
+@app.get("/api/profile/backfill-history/status", responses={200: {"model": api_models.BackfillHistoryStatus}})
 def api_profile_backfill_history_status(task_id: str = Query(...)):
     """v1.3.0 — poll the in-memory state of a backfill job.
 
@@ -2720,7 +2720,7 @@ def api_profile_dfa_backfill_cancel(task_id: str = Query(...)):
     return {"status": "cancel_requested", "task_id": task_id}
 
 
-@app.get("/api/profile/fatigue-resistance")
+@app.get("/api/profile/fatigue-resistance", responses={200: {"model": api_models.FatigueResistance}})
 def api_profile_fatigue_resistance(window_days: int = Query(365, ge=1, le=3650),
                                      kj_threshold: int = Query(1500),
                                      refresh: int = Query(0)):
@@ -2888,7 +2888,7 @@ def api_profile_fatigue_resistance(window_days: int = Query(365, ge=1, le=3650),
         return result
 
 
-@app.get("/api/profile/dfa-alpha1")
+@app.get("/api/profile/dfa-alpha1", responses={200: {"model": api_models.DfaSnapshot}})
 def api_profile_dfa_alpha1():
     """v1.8.9 Bug 7 (master §7) — DFA α1 snapshot for the homepage.
 
@@ -4689,7 +4689,7 @@ async def _upload_size_guard(request, call_next):
     return await call_next(request)
 
 
-@app.post("/api/wellness/import-hrv4training")
+@app.post("/api/wellness/import-hrv4training", responses={200: {"model": api_models.HrvImported}})
 async def api_wellness_import_hrv4training(file: UploadFile = File(...)):
     """v1.1.0 IMPL-HRV-RECOVERY — HRV4Training CSV import (PATCH G16).
 
@@ -4739,7 +4739,7 @@ async def api_wellness_import_hrv4training(file: UploadFile = File(...)):
     return {"imported": imported, "skipped": skipped}
 
 
-@app.post("/api/wellness/manual-hrv")
+@app.post("/api/wellness/manual-hrv", responses={200: {"model": api_models.HrvSaved}})
 async def api_wellness_manual_hrv(request: Request):
     """v1.1.0 IMPL-HRV-RECOVERY — manual HRV entry (rMSSD ms).
 
@@ -5135,7 +5135,7 @@ def _v136_status_counts() -> dict:
     return {"rides_with_ss": K, "rides_total_post_v106": M}
 
 
-@app.get("/api/wellness/3d-fitness-status")
+@app.get("/api/wellness/3d-fitness-status", responses={200: {"model": api_models.Fitness3dStatus}})
 def api_3d_fitness_status():
     """v1.3.6 — count K of M rides that have SS data."""
     return _v136_status_counts()
@@ -5172,7 +5172,7 @@ def _v136_extract_fit_power_series(fit_path: Path) -> list:
     return out
 
 
-@app.post("/api/wellness/backfill-3d-fitness")
+@app.post("/api/wellness/backfill-3d-fitness", responses={200: {"model": api_models.Backfill3d}})
 def api_backfill_3d_fitness(auto: int = Query(0)):
     """v1.3.6 — one-shot SS backfill for post-v1.0.6 rides.
 
@@ -5466,7 +5466,7 @@ def _recent_rides_have_dfa_computed(n: int = 3) -> bool:
     return False
 
 
-@app.get("/api/wellness/hrv-recording-status")
+@app.get("/api/wellness/hrv-recording-status", responses={200: {"model": api_models.HrvPromptStatus}})
 def api_hrv_recording_status():
     """v1.0.7 IMPL-HRV-PROMPT — does the home-page toast fire?
 
@@ -5526,7 +5526,7 @@ def api_hrv_recording_status():
     }
 
 
-@app.post("/api/wellness/hrv-recording-dismiss")
+@app.post("/api/wellness/hrv-recording-dismiss", responses={200: {"model": api_models.HrvPromptDismissed}})
 def api_hrv_recording_dismiss(payload: dict = Body(...)):
     """v1.0.7 IMPL-HRV-PROMPT — record toast dismissal.
 
@@ -5727,7 +5727,7 @@ def _get_library_tags_cached() -> list[str]:
         return tags_list
 
 
-@app.get("/api/workouts/tags")
+@app.get("/api/workouts/tags", responses={200: {"model": api_models.WorkoutTags}})
 def api_workouts_tags():
     """Return the sorted distinct list of tags across the library.
 
@@ -6712,7 +6712,7 @@ def api_courses(region: str = Query(None)):
     return courses
 
 
-@app.get("/api/surface-types")
+@app.get("/api/surface-types", responses={200: {"model": api_models.SurfaceTypes}})
 def api_surface_types():
     """Return surface_types.json content for client-side surface filtering."""
     path = Path(__file__).parent / "surface_types.json"
@@ -6956,7 +6956,7 @@ def api_routes(
 
 
 
-@app.post("/api/routes/suggest")
+@app.post("/api/routes/suggest", responses={200: {"model": api_models.RouteSuggestions}})
 async def api_routes_suggest(request: Request):
     """Rank + return top N routes matching user picker input."""
     body = await _get_json_body(request)
@@ -7485,7 +7485,7 @@ def _tail_lines(p: Path, n: int = 2000) -> list[str]:
         return data.decode("utf-8", "replace").splitlines()[-n:]
 
 
-@app.get("/api/logs")
+@app.get("/api/logs", responses={200: {"model": api_models.LogTail}})
 def api_logs(lines: int = Query(100)):
     """Return last N lines of the log file for debugging.
 
@@ -7530,7 +7530,7 @@ def api_version():
     }
 
 
-@app.get("/api/migrations/last-run-result")
+@app.get("/api/migrations/last-run-result", responses={200: {"model": api_models.MigrationResult}})
 def api_migrations_last_run_result():
     """Return the v1.0.2 startup migration-check result.
 
@@ -7976,7 +7976,7 @@ def api_oauth_icu_callback(code: str = Query(""), state: str = Query(""),
         return _back("icu=error&reason=exchange")
 
 
-@app.post("/api/icu/disconnect")
+@app.post("/api/icu/disconnect", responses={200: {"model": api_models.Ok}})
 def api_icu_disconnect():
     """AC3b: disconnect = clear the token AND purge the profile's synced data
     (activities/wellness/sync_log rows + icu-sourced athlete mirrors). The next
@@ -8276,7 +8276,7 @@ def _icu_push_daily_from_sync() -> None:
         _log.warning("daily ICU calendar push failed", exc_info=True)
 
 
-@app.get("/api/icu/push")
+@app.get("/api/icu/push", responses={200: {"model": api_models.IcuPushStatus}})
 def api_icu_push_status():
     """Push-button + sync-toggle state for the UI. Never raises."""
     import icu_calendar_push as _icp
@@ -8306,7 +8306,7 @@ def api_icu_push_status():
     }
 
 
-@app.post("/api/icu/push")
+@app.post("/api/icu/push", responses={200: {"model": api_models.IcuPushResult}})
 def api_icu_push(body: "dict | None" = None):
     """No body / {} → run the reconcile NOW (the plan-tab button).
     {"sync": true|false} → flip the keep-in-sync toggle; OFF runs the final
@@ -8342,7 +8342,7 @@ def api_icu_push(body: "dict | None" = None):
         return {"ok": False, "error": f"internal:{type(e).__name__}"}
 
 
-@app.post("/api/calendar/push-workout")
+@app.post("/api/calendar/push-workout", responses={200: {"model": api_models.WorkoutPushed}})
 def api_calendar_push_workout(body: "dict | None" = None):
     """calendar-push (2026-07-07): push ONE workout to the athlete's ICU calendar
     from a workout-detail modal — the "Send to intervals.icu calendar" button.
@@ -8521,7 +8521,7 @@ def api_calendar_push_workout(body: "dict | None" = None):
 _ICU_RACE_PRIORITY = {"RACE_A": "A", "RACE_B": "B", "RACE_C": "C"}
 
 
-@app.get("/api/icu/races")
+@app.get("/api/icu/races", responses={200: {"model": api_models.IcuRaces}})
 def api_icu_races():
     """Race import (3.13.0): the rider's races planned in intervals.icu
     (RACE_A / RACE_B / RACE_C events, today .. +365 days) for the plan builder
@@ -9155,7 +9155,7 @@ def _hr_zones(lthr, max_hr, pm=None):
     ]
 
 
-@app.post("/api/settings/zones")
+@app.post("/api/settings/zones", responses={200: {"model": api_models.ZonesSaved}})
 def update_custom_zones(body: dict):
     """Save or reset CUSTOM power/HR zones for the active profile.
 
@@ -9217,7 +9217,7 @@ def api_sync_status():
 # ATHLETE METRICS APIs
 # ═══════════════════════════════════════════════════════════════════════════════
 
-@app.get("/api/metrics/history")
+@app.get("/api/metrics/history", responses={200: {"model": list[api_models.MetricPoint]}})
 def api_metrics_history(metric: str = Query(...), days: int = Query(365)):
     """Return historical values for a metric (weight, ftp, lbm, vo2max, body_fat, etc.)."""
     if metric == "w_per_kg":
@@ -9630,7 +9630,7 @@ def _classify_exposure_with_signal(activity: dict, lthr: float) -> tuple[str, st
     return ("low_aerobic", "inferred")
 
 
-@app.get("/api/week-summary")
+@app.get("/api/week-summary", responses={200: {"model": api_models.WeekSummary}})
 def api_week_summary(week_offset: int = Query(0)):
     """ISO week (Mon→Sun) training summary for the dashboard week tile.
 
@@ -10156,7 +10156,7 @@ def _retest_nudge_payload(pm=None, today: "date | None" = None) -> "dict | None"
         return None
 
 
-@app.post("/api/retest-nudge/snooze")
+@app.post("/api/retest-nudge/snooze", responses={200: {"model": api_models.RetestSnoozed}})
 def api_retest_nudge_snooze():
     """Snooze the retest banner for 14 days (persisted in athlete.json via
     the sanctioned save_athlete path, so it survives webview storage
@@ -11266,7 +11266,7 @@ def api_plan():
         return {"plan": f.read(), "plan_json": None, "file": str(plans[0])}
 
 
-@app.get("/api/plan/preview")
+@app.get("/api/plan/preview", responses={200: {"model": api_models.PlanPreview}})
 def api_plan_preview(
     goal: str = Query("general"),
     plan_weeks: int = Query(0),
@@ -11367,7 +11367,7 @@ def api_plan_preview(
     }
 
 
-@app.get("/api/plan/entry-scan")
+@app.get("/api/plan/entry-scan", responses={200: {"model": api_models.EntryScan}})
 def api_plan_entry_scan(
     goal: str | None = Query(None),
     plan_weeks: int = Query(0),
@@ -11462,7 +11462,7 @@ def api_plan_entry_scan(
     return result
 
 
-@app.get("/api/event/projection")
+@app.get("/api/event/projection", responses={200: {"model": api_models.EventProjection}})
 def api_event_projection():
     """v4.6.7 IMPL-CAP: capability projection for the active event-prep plan.
 
@@ -12067,7 +12067,7 @@ def _maybe_auto_reforecast(profile_id: str, new_rides: int) -> "str | None":
     return written
 
 
-@app.post("/api/plan/reforecast")
+@app.post("/api/plan/reforecast", responses={200: {"model": api_models.PlanReforecasted}})
 async def api_plan_reforecast():
     """Reforecast the plan based on actual training data."""
     json_path = _plan_dir() / "current_plan.json"
@@ -13071,7 +13071,7 @@ async def api_plan_add_race(request: Request):
         return JSONResponse({"error": str(e)}, status_code=500)
 
 
-@app.post("/api/plan/update")
+@app.post("/api/plan/update", responses={200: {"model": api_models.PlanUpdated}})
 async def api_plan_update(debounce: int = Query(0)):
     """v1.8.24 — the ONE primary "Update plan" action.
 
@@ -13755,7 +13755,7 @@ def _collect_week_activities(current_week, today: date, include_today: bool = Fa
     return actual
 
 
-@app.get("/api/plan/daily-adapt")
+@app.get("/api/plan/daily-adapt", responses={200: {"model": api_models.DailyAdapt}})
 def api_plan_daily_adapt():
     """Daily-adapt PROJECTION (fix26 §6.1) — read-only preview.
 
@@ -16053,7 +16053,7 @@ def merge_plan_with_rides(plan: dict, rides: list[dict]) -> dict:
     }
 
 
-@app.get("/api/calendar")
+@app.get("/api/calendar", responses={200: {"model": api_models.CalendarRead}})
 def api_calendar():
     """v4.3.0 B4+B5+B6 + v4.4.0 — unified calendar overlay (intervals.icu-style).
 
@@ -17194,7 +17194,7 @@ async def api_plan_dismiss_session(request: Request):
         return JSONResponse({"detail": "Dismiss failed"}, 500)
 
 
-@app.post("/api/plan/auto-recalc")
+@app.post("/api/plan/auto-recalc", responses={200: {"model": api_models.PlanAutoRecalc}})
 def api_plan_auto_recalc():
     """Auto-recalculate plan if >7 days since last recalc. Called on tab load.
 
@@ -17728,7 +17728,7 @@ def _parse_fit_stats(fit_path: Path) -> dict:
     return out
 
 
-@app.post("/api/ride/import")
+@app.post("/api/ride/import", responses={200: {"model": api_models.RideImported}})
 async def api_ride_import(
     fit_file: UploadFile = File(...),
 ):
@@ -18811,7 +18811,7 @@ def _maybe_queue_pr_toasts(added_paths: list[Path]) -> None:
     _write_pr_toast_queue(queue)
 
 
-@app.post("/api/ride/{ride_id}/rpe")
+@app.post("/api/ride/{ride_id}/rpe", responses={200: {"model": api_models.RideRpeSaved}})
 async def api_ride_rpe(ride_id: str, request: Request):
     """v3.5.6 — store the rider's session RPE for a ride.
 
@@ -18882,7 +18882,7 @@ async def api_ride_rpe(ride_id: str, request: Request):
             "scale": "foster_cr10" if rpe is not None else None}
 
 
-@app.get("/api/ride/{ride_id}/prs")
+@app.get("/api/ride/{ride_id}/prs", responses={200: {"model": api_models.RidePrs}})
 def api_ride_prs(ride_id: str):
     """v1.3.0 — return the cached PR list for a ride.
 
@@ -18920,7 +18920,7 @@ def api_ride_prs(ride_id: str):
     return {"ride_id": ride_id, "prs": prs}
 
 
-@app.get("/api/profile/pr-toast-queue")
+@app.get("/api/profile/pr-toast-queue", responses={200: {"model": api_models.PrToastQueue}})
 def api_profile_pr_toast_queue(drain: int = Query(0)):
     """v1.3.0 IMPL-PR-DETECTION (W2B-G4 fix) — read pending PR toasts.
 
@@ -19102,7 +19102,7 @@ def _detect_plan_load_alert() -> bool:
         return False
 
 
-@app.post("/api/rides/sync")
+@app.post("/api/rides/sync", responses={200: {"model": api_models.RidesSynced}})
 def api_rides_sync(force: int = Query(0)):
     """v4.4.0 — pull last 90 days of ICU activities into the local rides
     store and return counts.
@@ -19264,7 +19264,7 @@ def _project_intervals_for_display(rec: dict) -> dict:
     return rec
 
 
-@app.get("/api/ride/{ride_id}/detail")
+@app.get("/api/ride/{ride_id}/detail", responses={200: {"model": api_models.RideDetail}})
 def api_ride_full_detail(ride_id: str, include: str = Query("")):
     """v4.4.0 — return the full normalized ride record (MASTER §3 schema).
 
@@ -19937,7 +19937,7 @@ def _fit_power_series_1hz(fit_path: Path) -> list[int]:
     return _resample_series_1hz(ts, pw)
 
 
-@app.get("/api/ride/{ride_id}/ftp-test-analysis")
+@app.get("/api/ride/{ride_id}/ftp-test-analysis", responses={200: {"model": api_models.FtpTestAnalysis}})
 def api_ride_ftp_test_analysis(ride_id: str):
     """v3.11.3 — the FTP-test analysis view: the recognised protocol, the
     1 Hz power trace, and WHERE the number came from (scored window, the
@@ -20007,7 +20007,7 @@ def api_ride_ftp_test_analysis(ride_id: str):
     }
 
 
-@app.post("/api/ride/{ride_id}/ftp-test-review")
+@app.post("/api/ride/{ride_id}/ftp-test-review", responses={200: {"model": api_models.FtpReviewSaved}})
 async def api_ride_ftp_test_review(ride_id: str, request: Request):
     """FTP-tests IP W2c — persist the rider's verdict on a test suggestion
     (accepted / declined / edited) onto the ICU ride envelope, so the post-
@@ -20222,7 +20222,7 @@ _DIAG_HEALTH_CACHE: dict = {"ts": 0.0, "result": None}
 _DIAG_HEALTH_CACHE_TTL = 60.0
 
 
-@app.get("/api/diag/recent-errors")
+@app.get("/api/diag/recent-errors", responses={200: {"model": api_models.DiagErrors}})
 def api_diag_recent_errors(
     request: Request,
     since: str | None = Query(None),
@@ -20291,7 +20291,7 @@ async def api_diag_frontend_error(request: Request):
     return {"ok": True, "code": code}
 
 
-@app.get("/api/diag/health")
+@app.get("/api/diag/health", responses={200: {"model": api_models.DiagHealth}})
 def api_diag_health(request: Request):
     """v1.6.0 — system-state self-check.
 

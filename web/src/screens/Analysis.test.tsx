@@ -25,6 +25,7 @@ function mock(over: Record<string, () => Response> = {}) {
     if (key) return over[key]()
     if (url.startsWith("/api/wellness")) return json(wellness)
     if (url.startsWith("/api/profile/power-curve")) return json(CURVE)
+    if (url.startsWith("/api/profile/tau-fits") || url.startsWith("/api/profile/fatigue-resistance")) return json({ fit_status: "insufficient_data" })
     if (url.startsWith("/api/rides")) return json(RIDES)
     return json({}, 404)
   }))
@@ -68,6 +69,6 @@ describe("Analysis", () => {
   it("points to the backfill when rides exist but no curve is built", async () => {
     mock({ "/api/profile/power-curve": () => json({ ...CURVE, rider_curve: [], needs_backfill: true }) })
     render(<Analysis />)
-    expect(await screen.findByText(/run the history backfill/)).toBeTruthy()
+    expect(await screen.findByText(/have not been read for power yet/)).toBeTruthy()
   })
 })

@@ -90,7 +90,7 @@ test("Home shows the plan, this week and fitness from the typed reads", async ({
   await page.goto("#/home")
   await expect(page.getByRole("heading", { name: "Today" })).toBeVisible()
   await expect(page.getByText(/TSS planned/)).toBeVisible()
-  await expect(page.getByText("FTP", { exact: true })).toBeVisible()
+  await expect(page.getByText("FTP", { exact: true }).first()).toBeVisible()
   await expect(page.getByText(/Loading…/)).toHaveCount(0)
 })
 
@@ -258,7 +258,7 @@ test("Analysis shows its cards with empty states and no errors", async ({ page }
 test("Settings saves a changed value and shows the zones", async ({ page, request }) => {
   await page.goto("#/settings")
   await expect(page.getByRole("heading", { name: "Rider" })).toBeVisible()
-  await expect(page.getByText("Power zones")).toBeVisible()
+  await expect(page.getByText("Power zones", { exact: true })).toBeVisible()
   const weight = page.getByLabel("Weight (kg)")
   await weight.fill("72.5")
   await page.getByRole("button", { name: "Save changes" }).click()
@@ -276,4 +276,157 @@ test("Settings shows the version and says intervals.icu is not connected", async
   await expect(page.getByText("Data folder")).toBeVisible()
   await expect(page.getByText(/Not connected/)).toBeVisible()
   await expect(page.getByRole("button", { name: "Sync now" })).toBeDisabled()
+})
+
+test("a FIT ride can be imported, rated, downloaded and deleted", async ({ page }) => {
+  await page.goto("#/analysis")
+  await page.locator('input[type="file"]').setInputFiles("e2e/fixtures/ride.fit")
+  await page.getByRole("button", { name: "Import ride" }).click()
+  await expect(page.getByRole("status").filter({ hasText: "Ride imported." })).toBeVisible()
+  await page.getByRole("link", { name: "Open it" }).click()
+  await expect(page.getByRole("link", { name: "Download .fit" })).toBeVisible()
+  await page.getByLabel(/How hard was it/).fill("7")
+  await page.getByRole("button", { name: "Save rating" }).click()
+  await expect(page.getByText("Rating saved.")).toBeVisible()
+  await page.getByRole("button", { name: "Delete ride…" }).click()
+  await page.getByRole("button", { name: "Yes, delete this ride" }).click()
+  await expect(page.getByText("Ride deleted.")).toBeVisible()
+})
+
+test("syncing rides without intervals.icu says it is not connected", async ({ page }) => {
+  await page.goto("#/analysis")
+  await page.getByRole("button", { name: "Sync from intervals.icu" }).click()
+  await expect(page.getByRole("status").filter({ hasText: /not connected/ })).toBeVisible()
+})
+
+test("Home takes a manual HRV reading and shows body and performance", async ({ page, request }) => {
+  await page.goto("#/home")
+  await expect(page.getByRole("heading", { name: "Heart-rate variability" })).toBeVisible()
+  await page.getByLabel(/Today’s rMSSD/).fill("64")
+  await page.getByRole("button", { name: "Save", exact: true }).click()
+  await expect(page.getByRole("status").filter({ hasText: "Saved 64 ms" })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Body and performance" })).toBeVisible()
+  await expect(page.getByText(/Loading…/)).toHaveCount(0)
+})
+
+test("Settings sets FTP and records it in the history", async ({ page, request }) => {
+  await page.goto("#/settings")
+  await expect(page.getByRole("heading", { name: "FTP history" })).toBeVisible()
+  await page.getByLabel("Set FTP (W)").fill("241")
+  await page.getByRole("button", { name: "Set FTP", exact: true }).click()
+  await expect(page.getByText("FTP is now 241 W.")).toBeVisible()
+  const h = await (await request.get(BASE + "/api/profile/ftp-history")).json()
+  expect(h.ftp_current).toBe(241)
+})
+
+test("Analysis shows the energy-system card", async ({ page }) => {
+  await page.goto("#/analysis")
+  await expect(page.getByRole("heading", { name: "Energy systems" })).toBeVisible()
+  await expect(page.getByText(/rides have energy-system data|No energy-system data yet/).first()).toBeVisible()
+  await expect(page.getByRole("alert")).toHaveCount(0)
+})
+
+test("Settings edits and resets custom power zones", async ({ page, request }) => {
+  await page.goto("#/settings")
+  await page.getByRole("button", { name: "Edit power zones" }).click()
+  await page.getByLabel("Power Z1 high").fill("100")
+  await page.getByRole("button", { name: "Save zones" }).click()
+  await expect(page.getByRole("button", { name: "Edit power zones" })).toBeVisible()
+  const custom = await (await request.get(BASE + "/api/settings")).json()
+  expect(custom.power_zones[0].high).toBe(100)
+  await page.getByRole("button", { name: "Edit power zones" }).click()
+  await page.getByRole("button", { name: "Use automatic zones" }).click()
+  await expect(page.getByRole("button", { name: "Edit power zones" })).toBeVisible()
+  const auto = await (await request.get(BASE + "/api/settings")).json()
+  expect(auto.power_zones[0].high).not.toBe(100)
+})
+
+test("Settings refuses a folder outside the home folder and offers to connect intervals.icu", async ({ page }) => {
+  await page.goto("#/settings")
+  await expect(page.getByText(/always included/)).toBeVisible()
+  await page.getByLabel(/Folder with your own/).fill("/definitely/outside/home")
+  await page.getByRole("button", { name: "Add folder" }).click()
+  await expect(page.getByRole("alert").filter({ hasText: /inside your home folder/ })).toBeVisible()
+  await expect(page.getByRole("link", { name: "Connect intervals.icu" })).toHaveAttribute("href", /\/oauth\/icu\/start\?return_to=/)
+  await expect(page.getByText("Connect intervals.icu first.")).toBeVisible()
+})
+
+test("Settings diagnostics runs a health check", async ({ page }) => {
+  await page.goto("#/settings")
+  await page.getByRole("button", { name: "Check health" }).click()
+  await expect(page.getByRole("status").filter({ hasText: /Every check passed|need attention/ })).toBeVisible()
+})
+
+test("Plan shows a calendar, and a session can be dragged to another day of its week", async ({ page, request }) => {
+  await request.post(BASE + "/api/plan/generate", { data: { goal: "ftp", hours_per_week: 8, plan_weeks: 8, rest_days: [] } })
+  await page.goto("#/plan")
+  await page.getByRole("button", { name: "Calendar" }).click()
+  await expect(page.getByRole("heading", { name: "Calendar" })).toBeVisible()
+  const cells = page.getByRole("group")
+  await expect(cells.first()).toBeVisible()
+  expect(await cells.count()).toBeGreaterThanOrEqual(7)
+  // A future week has all seven days ahead of today, so two draggable days are always there.
+  const week = page.locator("section[aria-label^='Week of']").nth(-2)
+  const drag = week.locator('[draggable="true"]')
+  expect(await drag.count()).toBeGreaterThanOrEqual(2)
+  await drag.nth(0).dragTo(drag.nth(1))
+  await expect(page.getByRole("status").filter({ hasText: /Moved|Swapped/ })).toBeVisible()
+  await expect(page.getByRole("alert")).toHaveCount(0)
+  await page.getByRole("button", { name: "Weeks", exact: true }).click()
+  await expect(page.getByRole("heading", { name: /^Week \d+/ })).toBeVisible()
+})
+
+test("Plan can be updated and its summary image and exports are linked", async ({ page }) => {
+  await page.goto("#/plan")
+  await page.getByRole("button", { name: "Update plan" }).click()
+  await expect(page.getByRole("button", { name: "Update plan" })).toBeEnabled()
+  await expect(page.getByRole("alert")).toHaveCount(0)
+  await expect(page.getByRole("link", { name: "Summary image" })).toHaveAttribute("href", "/api/programme/summary/png")
+  await expect(page.getByRole("link", { name: /Download .zwo/ }).first()).toBeVisible()
+  const link = await page.getByRole("link", { name: /Download .zwo/ }).first().getAttribute("href")
+  const res = await page.request.get(link!)
+  expect(res.ok()).toBeTruthy()
+})
+
+test("the plan form takes advanced options and previews the phases", async ({ page }) => {
+  await page.goto("#/plan")
+  await page.getByRole("button", { name: "Replace the plan…" }).click()
+  await page.getByRole("button", { name: "More options…" }).click()
+  await page.getByLabel("Intensity mix").selectOption("pyramidal")
+  await page.getByRole("button", { name: "Preview the phases" }).click()
+  await expect(page.getByLabel(/^base weeks$/)).toBeVisible()
+  await page.getByRole("button", { name: "Replace plan" }).click()
+  await expect(page.getByText(/\d+ weeks/).first()).toBeVisible()
+  await expect(page.getByRole("alert")).toHaveCount(0)
+})
+
+test("Analysis shows the training-model cards and the model check runs on request", async ({ page }) => {
+  await page.goto("#/analysis")
+  await expect(page.getByRole("heading", { name: "Fatigue resistance" })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Your training-load time constants" })).toBeVisible()
+  await page.getByRole("button", { name: "Check the model" }).click()
+  await expect(page.getByRole("button", { name: "Recompute" })).toBeVisible({ timeout: 60000 })
+  await expect(page.getByRole("alert")).toHaveCount(0)
+})
+
+test("Library filters by type and downloads the outdoor variant", async ({ page }) => {
+  await page.goto("#/library")
+  await page.getByLabel(/^Type/).selectOption("threshold")
+  await page.getByRole("checkbox", { name: "Outdoor variant for downloads" }).click()
+  await expect(page.getByRole("alert")).toHaveCount(0)
+  await expect(page.getByRole("button", { name: "Clear filters" })).toBeVisible()
+})
+
+test("Routes suggests routes for a ride length", async ({ page }) => {
+  await page.goto("#/courses")
+  await page.getByRole("button", { name: "Suggest routes" }).click()
+  await expect(page.getByRole("button", { name: "Show others" })).toBeVisible()
+  await expect(page.getByRole("alert")).toHaveCount(0)
+})
+
+test("Home shows this week and last week", async ({ page }) => {
+  await page.goto("#/home")
+  await expect(page.getByRole("heading", { name: "This week so far" })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Last week" })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "DFA α1" })).toBeVisible()
 })
