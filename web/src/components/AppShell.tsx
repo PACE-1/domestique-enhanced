@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react"
 
 import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/ThemeToggle"
 import { api } from "@/lib/api"
 import { Notices } from "@/screens/Notices"
 
@@ -38,7 +39,10 @@ export function AppShell({ tab, children }: { tab: TabId; children: ReactNode })
   return (
     <ShellContext.Provider value={value}>
       <div className="mx-auto max-w-7xl px-4 py-4">
-        <nav className="mb-4 flex flex-wrap items-center gap-1" aria-label="Sections">
+        <nav className="mb-6 flex flex-wrap items-center gap-1 border-b pb-3" aria-label="Sections">
+          <a href="#/home" className="mr-3 text-base font-semibold tracking-tight">
+            Shepherd
+          </a>
           {TABS.map((t) => (
             <Button
               key={t.id}
@@ -54,6 +58,7 @@ export function AppShell({ tab, children }: { tab: TabId; children: ReactNode })
           <Button size="sm" variant="ghost" render={<a href="#/profile-picker" />}>
             Switch rider
           </Button>
+          <ThemeToggle />
         </nav>
         <Notices />
         {children}

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- **New look.** A clean black-and-white style with light and dark themes, tighter corners, bordered inputs, and a header with the Shepherd name. A button at the top right cycles System, Light and Dark (the d key still flips light and dark).
 - **The app is now called Shepherd** (it was Domestique). The data folder moves from `~/.domestique` to `~/.shepherd` the first time the new version starts, and a link is left at the old name. The environment settings are renamed from `DOMESTIQUE_*` to `SHEPHERD_*`; the old names still work. The workout library files, the log file, the AppImage name and the window title carry the new name. Your intervals.icu calendar events keep their old internal IDs so existing events are still recognised.
 - **AI coach.** Connect a model in Settings → AI coach: Anthropic, OpenAI, OpenRouter, or a local Ollama or LM Studio. Then ask questions about your training on Home, get a review of your week, or open a ride and choose Review this ride. Only a short summary of your fitness, week and recent rides is sent, never ride files or your intervals.icu key. The connection is stored in your profile folder, readable only by you.
 - **Dropdown lists are readable in the dark theme.** They were white with white text.
