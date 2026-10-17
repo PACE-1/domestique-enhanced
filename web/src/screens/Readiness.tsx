@@ -4,6 +4,7 @@ import type { AutoAdjustResult, Readiness as ReadinessRead, TodaySession } from 
 import { Button } from "@/components/ui/button"
 import { acceptAdjusted, autoAdjust, easeToday, fmtMinutes, getReadiness, getTodaySession, rideOriginal } from "@/lib/home"
 import { Panel, useLoad } from "@/screens/panel"
+import { RetestNudge, type Nudge } from "@/screens/RetestNudge"
 
 const WORD: Record<string, string> = { normal: "Ready to train", tier_down: "Ease off today", rest: "Rest advised" }
 
@@ -144,6 +145,7 @@ export function Readiness() {
             </p>
             {reason && <p className="text-sm text-muted-foreground">{reason}</p>}
             <Actions r={r} t={today.state === "ok" ? today.data : null} reload={reload} />
+            {today.state === "ok" && today.data.retest_nudge && <RetestNudge n={today.data.retest_nudge as Nudge} />}
           </div>
         )
       }}

@@ -5,6 +5,7 @@ import { fmtDuration, getFitness, getPowerCurve, getRides, RANGES, type Series }
 import { fmtMinutes } from "@/lib/home"
 import { rideRoute } from "@/lib/rides"
 import { LineChart } from "@/screens/Chart"
+import { EnergySystems } from "@/screens/EnergySystems"
 import { Panel, useLoad } from "@/screens/panel"
 import { Label } from "@/components/ui/label"
 import { NativeSelect } from "@/components/ui/native-select"
@@ -149,6 +150,7 @@ export function Analysis() {
     <div className="grid gap-4 lg:grid-cols-2" aria-label="Analysis">
       <Fitness />
       <Power />
+      <EnergySystems />
       <div className="lg:col-span-2">
         <Rides />
       </div>

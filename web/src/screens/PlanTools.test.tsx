@@ -16,6 +16,7 @@ function mock(routes: Record<string, Handler>) {
   vi.stubGlobal("fetch", vi.fn(async (url: string, init?: RequestInit) => {
     const body = init?.body ? JSON.parse(init.body as string) : undefined
     calls.push({ url, body })
+    if (url === "/api/event/projection" && !routes[url]) return json({ available: false })
     return (routes[url] ?? (() => json({}, 404)))(body)
   }))
   return calls

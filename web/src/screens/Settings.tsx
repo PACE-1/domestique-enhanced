@@ -7,6 +7,7 @@ import { NativeSelect } from "@/components/ui/native-select"
 import { Input } from "@/components/ui/input"
 import { checkUpdate, diff, formFrom, getSettings, getSyncStatus, getVersion, saveSettings, syncNow, type RiderForm } from "@/lib/settings"
 import { getIcuConnection, getLimits, type Limits } from "@/lib/setup"
+import { FtpHistory } from "@/screens/FtpHistory"
 import { Panel, Row, useLoad } from "@/screens/panel"
 
 const Zones = ({ title, zones, unit }: { title: string; zones: ZoneBand[]; unit: string }) => (
@@ -196,6 +197,9 @@ export function Settings() {
       </div>
       <Sync />
       <About />
+      <div className="lg:col-span-2">
+        <FtpHistory />
+      </div>
     </div>
   )
 }

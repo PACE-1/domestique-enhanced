@@ -20,6 +20,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/event/projection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_event_projection_api_event_projection_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/icu/connection": {
         parameters: {
             query?: never;
@@ -28,6 +44,38 @@ export interface paths {
             cookie?: never;
         };
         get: operations["api_icu_connection_api_icu_connection_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/metrics/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_metrics_history_api_metrics_history_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/migrations/last-run-result": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_migrations_last_run_result_api_migrations_last_run_result_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -340,6 +388,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/profile/ftp-history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_profile_ftp_history_api_profile_ftp_history_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/profile/power-curve": {
         parameters: {
             query?: never;
@@ -510,6 +574,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["api_readiness_revert_cap_api_readiness_revert_cap_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/retest-nudge/snooze": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_retest_nudge_snooze_api_retest_nudge_snooze_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -852,6 +932,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/wellness/3d-fitness-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_3d_fitness_status_api_wellness_3d_fitness_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/wellness/backfill-3d-fitness": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_backfill_3d_fitness_api_wellness_backfill_3d_fitness_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/wellness/hrv-recording-dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_hrv_recording_dismiss_api_wellness_hrv_recording_dismiss_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/wellness/hrv-recording-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_hrv_recording_status_api_wellness_hrv_recording_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/wellness/import-hrv4training": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_wellness_import_hrv4training_api_wellness_import_hrv4training_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/wellness/manual-hrv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_wellness_manual_hrv_api_wellness_manual_hrv_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/workout/{category}/{filename}": {
         parameters: {
             query?: never;
@@ -944,6 +1120,33 @@ export interface components {
              * @default 0
              */
             sessions_modified: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** Backfill3d */
+        Backfill3d: {
+            /**
+             * Backfilled
+             * @default 0
+             */
+            backfilled: number;
+            /**
+             * Failed
+             * @default 0
+             */
+            failed: number;
+            /**
+             * Results
+             * @default []
+             */
+            results: {
+                [key: string]: unknown;
+            }[];
+            /**
+             * Skipped
+             * @default 0
+             */
+            skipped: number;
         } & {
             [key: string]: unknown;
         };
@@ -1181,6 +1384,103 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** EventProjection */
+        EventProjection: {
+            /** Available */
+            available: boolean;
+            /** Climb Readiness Pct */
+            climb_readiness_pct?: number | null;
+            /** Current Ctl */
+            current_ctl?: number | null;
+            /** Event Climb M */
+            event_climb_m?: number | null;
+            /** Event Date */
+            event_date?: string | null;
+            /** Event Km */
+            event_km?: number | null;
+            /** Event Name */
+            event_name?: string | null;
+            /** Ftp */
+            ftp?: number | null;
+            /** Gap Endurance H */
+            gap_endurance_h?: number | null;
+            /** Gap Power W Per Kg */
+            gap_power_w_per_kg?: number | null;
+            /** Longest Completed Ride H */
+            longest_completed_ride_h?: number | null;
+            /** Longest Required H */
+            longest_required_h?: number | null;
+            /** Predicted Finish H */
+            predicted_finish_h?: number | null;
+            /** Predicted Np */
+            predicted_np?: number | null;
+            /** Predicted Tss */
+            predicted_tss?: number | null;
+            /** Reason */
+            reason?: string | null;
+            /** Weight Kg */
+            weight_kg?: number | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** Fitness3dStatus */
+        Fitness3dStatus: {
+            /**
+             * Rides Total Post V106
+             * @default 0
+             */
+            rides_total_post_v106: number;
+            /**
+             * Rides With Ss
+             * @default 0
+             */
+            rides_with_ss: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** FtpHistory */
+        FtpHistory: {
+            /** Ftp Current */
+            ftp_current: number;
+            /** Ftp Source */
+            ftp_source?: string | null;
+            /**
+             * History
+             * @default []
+             */
+            history: components["schemas"]["FtpHistoryEntry"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** FtpHistoryEntry */
+        FtpHistoryEntry: {
+            /**
+             * Applied
+             * @default false
+             */
+            applied: boolean;
+            /** Date */
+            date?: string | null;
+            /** Ftp */
+            ftp?: number | null;
+            /**
+             * Method
+             * @default manual
+             */
+            method: string;
+            /**
+             * Source
+             * @default
+             */
+            source: string;
+            /**
+             * Type
+             * @default manual
+             */
+            type: string;
+        } & {
+            [key: string]: unknown;
+        };
         /** FtpReviewSaved */
         FtpReviewSaved: {
             /**
@@ -1295,6 +1595,76 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** HrvImported */
+        HrvImported: {
+            /**
+             * Imported
+             * @default 0
+             */
+            imported: number;
+            /**
+             * Skipped
+             * @default 0
+             */
+            skipped: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** HrvPromptDismissed */
+        HrvPromptDismissed: {
+            /** Level */
+            level: string;
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
+            /**
+             * Version
+             * @default
+             */
+            version: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** HrvPromptStatus */
+        HrvPromptStatus: {
+            /** Device Product Name */
+            device_product_name?: string | null;
+            /**
+             * Dismissal State
+             * @default none
+             */
+            dismissal_state: string;
+            /** Last Ride Id */
+            last_ride_id?: string | null;
+            /**
+             * Should Show Prompt
+             * @default false
+             */
+            should_show_prompt: boolean;
+            /**
+             * Version
+             * @default
+             */
+            version: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** HrvSaved */
+        HrvSaved: {
+            /** Date */
+            date: string;
+            /** Hrv Manual Rmssd */
+            hrv_manual_rmssd: number;
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
+        } & {
+            [key: string]: unknown;
+        };
         /** IcuConnection */
         IcuConnection: {
             /**
@@ -1332,6 +1702,35 @@ export interface components {
              * @default false
              */
             write_ok: boolean;
+        } & {
+            [key: string]: unknown;
+        };
+        /** MetricPoint */
+        MetricPoint: {
+            /** Date */
+            date: string;
+            /** Notes */
+            notes?: string | null;
+            /** Source */
+            source?: string | null;
+            /** Value */
+            value: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** MigrationResult */
+        MigrationResult: {
+            /** From Version */
+            from_version?: string | null;
+            /** Rider Data Preserved */
+            rider_data_preserved?: boolean | null;
+            /**
+             * Show Toast
+             * @default false
+             */
+            show_toast: boolean;
+            /** To Version */
+            to_version?: string | null;
         } & {
             [key: string]: unknown;
         };
@@ -2056,6 +2455,18 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** RetestSnoozed */
+        RetestSnoozed: {
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
+            /** Until */
+            until?: string | null;
+        } & {
+            [key: string]: unknown;
+        };
         /** RideDetail */
         RideDetail: {
             /** Avg Cadence */
@@ -2639,6 +3050,10 @@ export interface components {
              * @default
              */
             reason: string;
+            /** Retest Nudge */
+            retest_nudge?: {
+                [key: string]: unknown;
+            } | null;
             /**
              * Was Modified
              * @default false
@@ -2757,6 +3172,8 @@ export interface components {
         WellnessDay: {
             /** Atl */
             atl?: number | null;
+            /** Cp Fitness */
+            cp_fitness?: number | null;
             /** Ctl */
             ctl?: number | null;
             /** Date */
@@ -2765,12 +3182,16 @@ export interface components {
             eftp?: number | null;
             /** Hrv */
             hrv?: number | null;
+            /** Pmax Fitness */
+            pmax_fitness?: number | null;
             /** Rhr */
             rhr?: number | null;
             /** Sleep H */
             sleep_h?: number | null;
             /** Tsb */
             tsb?: number | null;
+            /** W Prime Fitness */
+            w_prime_fitness?: number | null;
         } & {
             [key: string]: unknown;
         };
@@ -2945,6 +3366,26 @@ export interface operations {
             };
         };
     };
+    api_event_projection_api_event_projection_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventProjection"];
+                };
+            };
+        };
+    };
     api_icu_connection_api_icu_connection_get: {
         parameters: {
             query?: never;
@@ -2961,6 +3402,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["IcuConnection"];
+                };
+            };
+        };
+    };
+    api_metrics_history_api_metrics_history_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetricPoint"][];
+                };
+            };
+        };
+    };
+    api_migrations_last_run_result_api_migrations_last_run_result_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MigrationResult"];
                 };
             };
         };
@@ -3345,6 +3826,26 @@ export interface operations {
             };
         };
     };
+    api_profile_ftp_history_api_profile_ftp_history_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FtpHistory"];
+                };
+            };
+        };
+    };
     api_profile_power_curve_api_profile_power_curve_get: {
         parameters: {
             query?: never;
@@ -3581,6 +4082,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CapReverted"];
+                };
+            };
+        };
+    };
+    api_retest_nudge_snooze_api_retest_nudge_snooze_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RetestSnoozed"];
                 };
             };
         };
@@ -4021,6 +4542,126 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["WellnessDay"][];
+                };
+            };
+        };
+    };
+    api_3d_fitness_status_api_wellness_3d_fitness_status_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Fitness3dStatus"];
+                };
+            };
+        };
+    };
+    api_backfill_3d_fitness_api_wellness_backfill_3d_fitness_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Backfill3d"];
+                };
+            };
+        };
+    };
+    api_hrv_recording_dismiss_api_wellness_hrv_recording_dismiss_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HrvPromptDismissed"];
+                };
+            };
+        };
+    };
+    api_hrv_recording_status_api_wellness_hrv_recording_status_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HrvPromptStatus"];
+                };
+            };
+        };
+    };
+    api_wellness_import_hrv4training_api_wellness_import_hrv4training_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HrvImported"];
+                };
+            };
+        };
+    };
+    api_wellness_manual_hrv_api_wellness_manual_hrv_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HrvSaved"];
                 };
             };
         };

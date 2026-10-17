@@ -75,6 +75,37 @@
         "title": "AvailabilitySaved",
         "type": "object"
       },
+      "Backfill3d": {
+        "additionalProperties": true,
+        "properties": {
+          "backfilled": {
+            "default": 0,
+            "title": "Backfilled",
+            "type": "integer"
+          },
+          "failed": {
+            "default": 0,
+            "title": "Failed",
+            "type": "integer"
+          },
+          "results": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Results",
+            "type": "array"
+          },
+          "skipped": {
+            "default": 0,
+            "title": "Skipped",
+            "type": "integer"
+          }
+        },
+        "title": "Backfill3d",
+        "type": "object"
+      },
       "BackfillStarted": {
         "additionalProperties": true,
         "properties": {
@@ -825,6 +856,295 @@
         "title": "EnsureProfile",
         "type": "object"
       },
+      "EventProjection": {
+        "additionalProperties": true,
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "climb_readiness_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Climb Readiness Pct"
+          },
+          "current_ctl": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Ctl"
+          },
+          "event_climb_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Climb M"
+          },
+          "event_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Date"
+          },
+          "event_km": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Km"
+          },
+          "event_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Name"
+          },
+          "ftp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp"
+          },
+          "gap_endurance_h": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gap Endurance H"
+          },
+          "gap_power_w_per_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gap Power W Per Kg"
+          },
+          "longest_completed_ride_h": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longest Completed Ride H"
+          },
+          "longest_required_h": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longest Required H"
+          },
+          "predicted_finish_h": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Predicted Finish H"
+          },
+          "predicted_np": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Predicted Np"
+          },
+          "predicted_tss": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Predicted Tss"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "weight_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight Kg"
+          }
+        },
+        "required": [
+          "available"
+        ],
+        "title": "EventProjection",
+        "type": "object"
+      },
+      "Fitness3dStatus": {
+        "additionalProperties": true,
+        "properties": {
+          "rides_total_post_v106": {
+            "default": 0,
+            "title": "Rides Total Post V106",
+            "type": "integer"
+          },
+          "rides_with_ss": {
+            "default": 0,
+            "title": "Rides With Ss",
+            "type": "integer"
+          }
+        },
+        "title": "Fitness3dStatus",
+        "type": "object"
+      },
+      "FtpHistory": {
+        "additionalProperties": true,
+        "properties": {
+          "ftp_current": {
+            "title": "Ftp Current",
+            "type": "number"
+          },
+          "ftp_source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp Source"
+          },
+          "history": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/FtpHistoryEntry"
+            },
+            "title": "History",
+            "type": "array"
+          }
+        },
+        "required": [
+          "ftp_current"
+        ],
+        "title": "FtpHistory",
+        "type": "object"
+      },
+      "FtpHistoryEntry": {
+        "additionalProperties": true,
+        "properties": {
+          "applied": {
+            "default": false,
+            "title": "Applied",
+            "type": "boolean"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date"
+          },
+          "ftp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp"
+          },
+          "method": {
+            "default": "manual",
+            "title": "Method",
+            "type": "string"
+          },
+          "source": {
+            "default": "",
+            "title": "Source",
+            "type": "string"
+          },
+          "type": {
+            "default": "manual",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "title": "FtpHistoryEntry",
+        "type": "object"
+      },
       "FtpReviewSaved": {
         "additionalProperties": true,
         "properties": {
@@ -1022,6 +1342,115 @@
         "title": "FtpUpdated",
         "type": "object"
       },
+      "HrvImported": {
+        "additionalProperties": true,
+        "properties": {
+          "imported": {
+            "default": 0,
+            "title": "Imported",
+            "type": "integer"
+          },
+          "skipped": {
+            "default": 0,
+            "title": "Skipped",
+            "type": "integer"
+          }
+        },
+        "title": "HrvImported",
+        "type": "object"
+      },
+      "HrvPromptDismissed": {
+        "additionalProperties": true,
+        "properties": {
+          "level": {
+            "title": "Level",
+            "type": "string"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "version": {
+            "default": "",
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "level"
+        ],
+        "title": "HrvPromptDismissed",
+        "type": "object"
+      },
+      "HrvPromptStatus": {
+        "additionalProperties": true,
+        "properties": {
+          "device_product_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device Product Name"
+          },
+          "dismissal_state": {
+            "default": "none",
+            "title": "Dismissal State",
+            "type": "string"
+          },
+          "last_ride_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Ride Id"
+          },
+          "should_show_prompt": {
+            "default": false,
+            "title": "Should Show Prompt",
+            "type": "boolean"
+          },
+          "version": {
+            "default": "",
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "title": "HrvPromptStatus",
+        "type": "object"
+      },
+      "HrvSaved": {
+        "additionalProperties": true,
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "hrv_manual_rmssd": {
+            "title": "Hrv Manual Rmssd",
+            "type": "number"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "date",
+          "hrv_manual_rmssd"
+        ],
+        "title": "HrvSaved",
+        "type": "object"
+      },
       "IcuConnection": {
         "additionalProperties": true,
         "properties": {
@@ -1062,6 +1491,92 @@
           }
         },
         "title": "IcuConnection",
+        "type": "object"
+      },
+      "MetricPoint": {
+        "additionalProperties": true,
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "value": {
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "date",
+          "value"
+        ],
+        "title": "MetricPoint",
+        "type": "object"
+      },
+      "MigrationResult": {
+        "additionalProperties": true,
+        "properties": {
+          "from_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Version"
+          },
+          "rider_data_preserved": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rider Data Preserved"
+          },
+          "show_toast": {
+            "default": false,
+            "title": "Show Toast",
+            "type": "boolean"
+          },
+          "to_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Version"
+          }
+        },
+        "title": "MigrationResult",
         "type": "object"
       },
       "Ok": {
@@ -2596,6 +3111,29 @@
         "title": "RematchResult",
         "type": "object"
       },
+      "RetestSnoozed": {
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "until": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Until"
+          }
+        },
+        "title": "RetestSnoozed",
+        "type": "object"
+      },
       "RideDetail": {
         "additionalProperties": true,
         "properties": {
@@ -4059,6 +4597,18 @@
             "title": "Reason",
             "type": "string"
           },
+          "retest_nudge": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retest Nudge"
+          },
           "was_modified": {
             "default": false,
             "title": "Was Modified",
@@ -4292,6 +4842,17 @@
             ],
             "title": "Atl"
           },
+          "cp_fitness": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cp Fitness"
+          },
           "ctl": {
             "anyOf": [
               {
@@ -4329,6 +4890,17 @@
             ],
             "title": "Hrv"
           },
+          "pmax_fitness": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pmax Fitness"
+          },
           "rhr": {
             "anyOf": [
               {
@@ -4361,6 +4933,17 @@
               }
             ],
             "title": "Tsb"
+          },
+          "w_prime_fitness": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "W Prime Fitness"
           }
         },
         "required": [
@@ -4629,6 +5212,23 @@
         }
       }
     },
+    "/api/event/projection": {
+      "get": {
+        "operationId": "api_event_projection_api_event_projection_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventProjection"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/icu/connection": {
       "get": {
         "operationId": "api_icu_connection_api_icu_connection_get",
@@ -4638,6 +5238,44 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/IcuConnection"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/metrics/history": {
+      "get": {
+        "operationId": "api_metrics_history_api_metrics_history_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MetricPoint"
+                  },
+                  "title": "Response 200 Api Metrics History Api Metrics History Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/migrations/last-run-result": {
+      "get": {
+        "operationId": "api_migrations_last_run_result_api_migrations_last_run_result_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MigrationResult"
                 }
               }
             },
@@ -4969,6 +5607,23 @@
         }
       }
     },
+    "/api/profile/ftp-history": {
+      "get": {
+        "operationId": "api_profile_ftp_history_api_profile_ftp_history_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FtpHistory"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/profile/power-curve": {
       "get": {
         "operationId": "api_profile_power_curve_api_profile_power_curve_get",
@@ -5163,6 +5818,23 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CapReverted"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/retest-nudge/snooze": {
+      "post": {
+        "operationId": "api_retest_nudge_snooze_api_retest_nudge_snooze_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetestSnoozed"
                 }
               }
             },
@@ -5543,6 +6215,108 @@
                   },
                   "title": "Response 200 Api Wellness Api Wellness Get",
                   "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/wellness/3d-fitness-status": {
+      "get": {
+        "operationId": "api_3d_fitness_status_api_wellness_3d_fitness_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fitness3dStatus"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/wellness/backfill-3d-fitness": {
+      "post": {
+        "operationId": "api_backfill_3d_fitness_api_wellness_backfill_3d_fitness_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Backfill3d"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/wellness/hrv-recording-dismiss": {
+      "post": {
+        "operationId": "api_hrv_recording_dismiss_api_wellness_hrv_recording_dismiss_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrvPromptDismissed"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/wellness/hrv-recording-status": {
+      "get": {
+        "operationId": "api_hrv_recording_status_api_wellness_hrv_recording_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrvPromptStatus"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/wellness/import-hrv4training": {
+      "post": {
+        "operationId": "api_wellness_import_hrv4training_api_wellness_import_hrv4training_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrvImported"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/wellness/manual-hrv": {
+      "post": {
+        "operationId": "api_wellness_manual_hrv_api_wellness_manual_hrv_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrvSaved"
                 }
               }
             },

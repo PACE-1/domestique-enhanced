@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { NativeSelect } from "@/components/ui/native-select"
 import { Input } from "@/components/ui/input"
 import { PlanGenerate } from "@/screens/PlanGenerate"
+import { GoalEvent } from "@/screens/GoalEvent"
 import { PlanAvailability } from "@/screens/PlanAvailability"
 import { PlanRace } from "@/screens/PlanRace"
 import { PlanRedraw } from "@/screens/PlanRedraw"
@@ -116,6 +117,8 @@ export function Plan() {
 
   return (
     <div className="space-y-4">
+      <GoalEvent />
+
       <Card>
         <CardContent className="space-y-1 p-4">
           <h2 className="text-sm font-semibold">Plan</h2>

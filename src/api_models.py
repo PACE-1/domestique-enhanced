@@ -403,6 +403,7 @@ class TodaySession(_Model):
     was_modified: bool = False
     has_plan: Optional[bool] = None
     is_race: bool = False
+    retest_nudge: Optional[dict] = None   # {metric, reason, days_since, action, suggested_date, snooze_days}
 
 
 class TodayPersisted(_Model):
@@ -574,6 +575,9 @@ class WellnessDay(_Model):
     rhr: Optional[float] = None
     sleep_h: Optional[float] = None
     eftp: Optional[float] = None
+    cp_fitness: Optional[float] = None
+    w_prime_fitness: Optional[float] = None
+    pmax_fitness: Optional[float] = None
 
 
 class PowerCurvePoint(_Model):
@@ -752,4 +756,97 @@ class RidesSynced(_Model):
 class PrToastQueue(_Model):
     queue: list[dict] = []
     count: int = 0
+
+
+# ── Wellness, notices, history ──────────────────────────────────────────────
+
+class HrvSaved(_Model):
+    ok: bool = True
+    date: str
+    hrv_manual_rmssd: float
+
+
+class HrvImported(_Model):
+    imported: int = 0
+    skipped: int = 0
+
+
+class HrvPromptStatus(_Model):
+    should_show_prompt: bool = False
+    device_product_name: Optional[str] = None
+    last_ride_id: Optional[str] = None
+    dismissal_state: str = "none"       # none | version | permanent
+    version: str = ""
+
+
+class HrvPromptDismissed(_Model):
+    ok: bool = True
+    level: str
+    version: str = ""
+
+
+class RetestSnoozed(_Model):
+    ok: bool = True
+    until: Optional[str] = None
+
+
+class MetricPoint(_Model):
+    date: str
+    value: float
+    source: Optional[str] = None
+    notes: Optional[str] = None
+
+
+class FtpHistoryEntry(_Model):
+    date: Optional[str] = None
+    ftp: Optional[float] = None
+    type: str = "manual"
+    source: str = ""
+    applied: bool = False
+    method: str = "manual"
+
+
+class FtpHistory(_Model):
+    ftp_current: float
+    ftp_source: Optional[str] = None
+    history: list[FtpHistoryEntry] = []
+
+
+class EventProjection(_Model):
+    available: bool
+    reason: Optional[str] = None        # why not available
+    event_name: Optional[str] = None
+    event_date: Optional[str] = None
+    event_km: Optional[float] = None
+    event_climb_m: Optional[float] = None
+    predicted_finish_h: Optional[float] = None
+    predicted_np: Optional[float] = None
+    predicted_tss: Optional[float] = None
+    ftp: Optional[float] = None
+    weight_kg: Optional[float] = None
+    current_ctl: Optional[float] = None
+    gap_endurance_h: Optional[float] = None
+    longest_required_h: Optional[float] = None
+    longest_completed_ride_h: Optional[float] = None
+    gap_power_w_per_kg: Optional[float] = None
+    climb_readiness_pct: Optional[float] = None
+
+
+class Fitness3dStatus(_Model):
+    rides_with_ss: int = 0
+    rides_total_post_v106: int = 0
+
+
+class Backfill3d(_Model):
+    backfilled: int = 0
+    skipped: int = 0
+    failed: int = 0
+    results: list[dict] = []
+
+
+class MigrationResult(_Model):
+    show_toast: bool = False
+    from_version: Optional[str] = None
+    to_version: Optional[str] = None
+    rider_data_preserved: Optional[bool] = None
 

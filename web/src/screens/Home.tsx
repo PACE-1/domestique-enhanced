@@ -12,7 +12,9 @@ import {
   sessionsOn,
   weekSessions,
 } from "@/lib/home"
+import { BodyPerf } from "@/screens/BodyPerf"
 import { DailyCheckIn } from "@/screens/DailyCheckIn"
+import { Hrv } from "@/screens/Hrv"
 import { Panel, Row, useLoad } from "@/screens/panel"
 import { Readiness } from "@/screens/Readiness"
 import { Records } from "@/screens/Records"
@@ -53,6 +55,8 @@ export function Home() {
       <Readiness />
 
       <DailyCheckIn />
+
+      <Hrv />
 
       <Panel title="This week" load={plan} retry={retryPlan}>
         {(p) => {
@@ -96,6 +100,10 @@ export function Home() {
           )
         }}
       </Panel>
+
+      <div className="md:col-span-2">
+        <BodyPerf />
+      </div>
 
       <Panel title="Programme" load={summary} retry={retrySummary}>
         {(s) => (

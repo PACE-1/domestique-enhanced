@@ -25,6 +25,7 @@ function mock(over: Record<string, (body: unknown) => Response> = {}) {
     if (url === "/api/icu/connection") return json({ connected: true, name: "Isaac", write_ok: true })
     if (url === "/api/sync/status") return json({ last_sync: { timestamp: "2026-10-16T08:00:00" }, wellness_records: 90, activity_records: 40, auth_disabled: false })
     if (url === "/api/version") return json({ app: "domestique", version: "1.0.0", data_dir: "/data" })
+    if (url === "/api/profile/ftp-history") return json({ ftp_current: 250, ftp_source: "manual", history: [] })
     return json({}, 404)
   }))
   return calls

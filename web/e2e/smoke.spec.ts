@@ -90,7 +90,7 @@ test("Home shows the plan, this week and fitness from the typed reads", async ({
   await page.goto("#/home")
   await expect(page.getByRole("heading", { name: "Today" })).toBeVisible()
   await expect(page.getByText(/TSS planned/)).toBeVisible()
-  await expect(page.getByText("FTP", { exact: true })).toBeVisible()
+  await expect(page.getByText("FTP", { exact: true }).first()).toBeVisible()
   await expect(page.getByText(/Loading…/)).toHaveCount(0)
 })
 
@@ -297,4 +297,31 @@ test("syncing rides without intervals.icu says it is not connected", async ({ pa
   await page.goto("#/analysis")
   await page.getByRole("button", { name: "Sync from intervals.icu" }).click()
   await expect(page.getByRole("status").filter({ hasText: /not connected/ })).toBeVisible()
+})
+
+test("Home takes a manual HRV reading and shows body and performance", async ({ page, request }) => {
+  await page.goto("#/home")
+  await expect(page.getByRole("heading", { name: "Heart-rate variability" })).toBeVisible()
+  await page.getByLabel(/Today’s rMSSD/).fill("64")
+  await page.getByRole("button", { name: "Save", exact: true }).click()
+  await expect(page.getByRole("status").filter({ hasText: "Saved 64 ms" })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Body and performance" })).toBeVisible()
+  await expect(page.getByText(/Loading…/)).toHaveCount(0)
+})
+
+test("Settings sets FTP and records it in the history", async ({ page, request }) => {
+  await page.goto("#/settings")
+  await expect(page.getByRole("heading", { name: "FTP history" })).toBeVisible()
+  await page.getByLabel("Set FTP (W)").fill("241")
+  await page.getByRole("button", { name: "Set FTP", exact: true }).click()
+  await expect(page.getByText("FTP is now 241 W.")).toBeVisible()
+  const h = await (await request.get(BASE + "/api/profile/ftp-history")).json()
+  expect(h.ftp_current).toBe(241)
+})
+
+test("Analysis shows the energy-system card", async ({ page }) => {
+  await page.goto("#/analysis")
+  await expect(page.getByRole("heading", { name: "Energy systems" })).toBeVisible()
+  await expect(page.getByText(/rides have energy-system data|No energy-system data yet/).first()).toBeVisible()
+  await expect(page.getByRole("alert")).toHaveCount(0)
 })

@@ -1983,7 +1983,7 @@ def api_profiles_delete(profile_id: str):
 # v3.6.0-fix35e: post-FTP-test FTP adoption endpoint.
 # Body: {"ftp": int, "method": str, "source": str, "applied": bool}.
 # Always appends a history entry; only mutates `ftp` when applied=True.
-@app.get("/api/profile/ftp-history")
+@app.get("/api/profile/ftp-history", responses={200: {"model": api_models.FtpHistory}})
 def api_profile_ftp_history():
     """T4 (v4.1.0) — expose the ftp_test_history ledger for the UI.
 
@@ -4689,7 +4689,7 @@ async def _upload_size_guard(request, call_next):
     return await call_next(request)
 
 
-@app.post("/api/wellness/import-hrv4training")
+@app.post("/api/wellness/import-hrv4training", responses={200: {"model": api_models.HrvImported}})
 async def api_wellness_import_hrv4training(file: UploadFile = File(...)):
     """v1.1.0 IMPL-HRV-RECOVERY — HRV4Training CSV import (PATCH G16).
 
@@ -4739,7 +4739,7 @@ async def api_wellness_import_hrv4training(file: UploadFile = File(...)):
     return {"imported": imported, "skipped": skipped}
 
 
-@app.post("/api/wellness/manual-hrv")
+@app.post("/api/wellness/manual-hrv", responses={200: {"model": api_models.HrvSaved}})
 async def api_wellness_manual_hrv(request: Request):
     """v1.1.0 IMPL-HRV-RECOVERY — manual HRV entry (rMSSD ms).
 
@@ -5135,7 +5135,7 @@ def _v136_status_counts() -> dict:
     return {"rides_with_ss": K, "rides_total_post_v106": M}
 
 
-@app.get("/api/wellness/3d-fitness-status")
+@app.get("/api/wellness/3d-fitness-status", responses={200: {"model": api_models.Fitness3dStatus}})
 def api_3d_fitness_status():
     """v1.3.6 — count K of M rides that have SS data."""
     return _v136_status_counts()
@@ -5172,7 +5172,7 @@ def _v136_extract_fit_power_series(fit_path: Path) -> list:
     return out
 
 
-@app.post("/api/wellness/backfill-3d-fitness")
+@app.post("/api/wellness/backfill-3d-fitness", responses={200: {"model": api_models.Backfill3d}})
 def api_backfill_3d_fitness(auto: int = Query(0)):
     """v1.3.6 — one-shot SS backfill for post-v1.0.6 rides.
 
@@ -5466,7 +5466,7 @@ def _recent_rides_have_dfa_computed(n: int = 3) -> bool:
     return False
 
 
-@app.get("/api/wellness/hrv-recording-status")
+@app.get("/api/wellness/hrv-recording-status", responses={200: {"model": api_models.HrvPromptStatus}})
 def api_hrv_recording_status():
     """v1.0.7 IMPL-HRV-PROMPT — does the home-page toast fire?
 
@@ -5526,7 +5526,7 @@ def api_hrv_recording_status():
     }
 
 
-@app.post("/api/wellness/hrv-recording-dismiss")
+@app.post("/api/wellness/hrv-recording-dismiss", responses={200: {"model": api_models.HrvPromptDismissed}})
 def api_hrv_recording_dismiss(payload: dict = Body(...)):
     """v1.0.7 IMPL-HRV-PROMPT — record toast dismissal.
 
@@ -7530,7 +7530,7 @@ def api_version():
     }
 
 
-@app.get("/api/migrations/last-run-result")
+@app.get("/api/migrations/last-run-result", responses={200: {"model": api_models.MigrationResult}})
 def api_migrations_last_run_result():
     """Return the v1.0.2 startup migration-check result.
 
@@ -9217,7 +9217,7 @@ def api_sync_status():
 # ATHLETE METRICS APIs
 # ═══════════════════════════════════════════════════════════════════════════════
 
-@app.get("/api/metrics/history")
+@app.get("/api/metrics/history", responses={200: {"model": list[api_models.MetricPoint]}})
 def api_metrics_history(metric: str = Query(...), days: int = Query(365)):
     """Return historical values for a metric (weight, ftp, lbm, vo2max, body_fat, etc.)."""
     if metric == "w_per_kg":
@@ -10156,7 +10156,7 @@ def _retest_nudge_payload(pm=None, today: "date | None" = None) -> "dict | None"
         return None
 
 
-@app.post("/api/retest-nudge/snooze")
+@app.post("/api/retest-nudge/snooze", responses={200: {"model": api_models.RetestSnoozed}})
 def api_retest_nudge_snooze():
     """Snooze the retest banner for 14 days (persisted in athlete.json via
     the sanctioned save_athlete path, so it survives webview storage
@@ -11462,7 +11462,7 @@ def api_plan_entry_scan(
     return result
 
 
-@app.get("/api/event/projection")
+@app.get("/api/event/projection", responses={200: {"model": api_models.EventProjection}})
 def api_event_projection():
     """v4.6.7 IMPL-CAP: capability projection for the active event-prep plan.
 
