@@ -26,6 +26,7 @@ import {
   type FieldId,
   type WizardState,
 } from "@/lib/firstRun"
+import { ApiKeyConnect } from "@/screens/ApiKeyConnect"
 import { icuLinkFailureText } from "@/lib/icuReasons"
 import { getIcuConnection, getLimits, saveSetup, type IcuConnection, type Limits } from "@/lib/setup"
 
@@ -47,6 +48,7 @@ export function Setup() {
   const [link, setLink] = useState<Link>(returnFailed ? "error" : "unlinked")
   const [linkMsg, setLinkMsg] = useState(returnFailed ? icuLinkFailureText(returned.reason, returned.status) : "")
   const [connection, setConnection] = useState<IcuConnection | null>(null)
+  const [oauthAvailable, setOauthAvailable] = useState(true)
   const [connected, setConnected] = useState(false)
   const [autofill, setAutofill] = useState("")
   const [garmin, setGarmin] = useState<Msg>(null)
@@ -99,6 +101,7 @@ export function Setup() {
     if (returnFailed) return () => ctrl.abort()
     getIcuConnection()
       .then((c) => {
+        if (c && c.oauth_available === false) setOauthAvailable(false)
         if (c?.method === "oauth") {
           setConnection(c)
           setLink("linked")
@@ -294,7 +297,18 @@ export function Setup() {
                   <Button variant="outline" size="sm" onClick={connect}>Use a different account</Button>
                 ) : (
                   <>
-                    <Button onClick={connect}>{link === "error" ? "Try again" : "Sign in to intervals.icu"}</Button>
+                    {oauthAvailable && <Button onClick={connect}>{link === "error" ? "Try again" : "Sign in to intervals.icu"}</Button>}
+                    <ApiKeyConnect
+                      open={!oauthAvailable}
+                      prepare={async () => (await ensureProfile()) === true}
+                      onConnected={() =>
+                        getIcuConnection().then((c) => {
+                          setConnection(c)
+                          setLink("linked")
+                          setConnected(true)
+                        }, () => {})
+                      }
+                    />
                     <Button variant="outline" render={<a href="https://intervals.icu/signup" target="_blank" rel="noopener noreferrer" />}>
                       Create a free account
                     </Button>

@@ -221,14 +221,15 @@ jobs:
           ICU_OAUTH_CLIENT_SECRET: ${{ secrets.ICU_OAUTH_CLIENT_SECRET }}
         run: |
           if [ -z "${ICU_OAUTH_CLIENT_SECRET}" ]; then
-            # A release must never ship a placeholder. A plain build (manual
-            # run without a tag) only proves the artifact, so it may.
-            if [ "${GITHUB_REF_TYPE}" = "tag" ] || [ -n "${{ inputs.tag }}" ]; then
-              echo "::error::ICU_OAUTH_CLIENT_SECRET repo secret is not set — OAuth would ship broken."; exit 1
-            fi
-            echo "::warning::ICU_OAUTH_CLIENT_SECRET is not set — building with a placeholder; this artifact must not be released."
-            ICU_OAUTH_CLIENT_SECRET="ci-placeholder-not-a-real-secret"
+            # No secret: ship without the "Sign in with intervals.icu" button.
+            # Riders connect with their athlete ID and API key instead. A
+            # placeholder secret is never written; the app hides the button
+            # when no secret is bundled (/api/icu/connection oauth_available).
+            echo "::warning::ICU_OAUTH_CLIENT_SECRET is not set — building without OAuth sign-in (API key only)."
+            echo "OAUTH_BUNDLED=false" >> "$GITHUB_ENV"
+            exit 0
           fi
+          echo "OAUTH_BUNDLED=true" >> "$GITHUB_ENV"
           printf 'ICU_OAUTH_CLIENT_ID=%s\nICU_OAUTH_CLIENT_SECRET=%s\n' \
             "${ICU_OAUTH_CLIENT_ID:-511}" "${ICU_OAUTH_CLIENT_SECRET}" > .oauth.env
           echo "wrote .oauth.env ($(wc -c < .oauth.env) bytes)"
@@ -395,7 +396,11 @@ jobs:
           [ -z "$creason" ] || fail "pool collapse inside built artifact: $creason"
           # v3.11.3: OAuth secret LOADED by the frozen app (not merely bundled).
           secret_loaded="$(printf '%s' "$hb" | jq -r '.checks.icu_oauth.secret_loaded // false')"
-          [ "$secret_loaded" = "true" ] || fail "frozen app did not load the OAuth client secret — sign-in would fail"
+          if [ "${OAUTH_BUNDLED:-true}" = "true" ]; then
+            [ "$secret_loaded" = "true" ] || fail "frozen app did not load the OAuth client secret — sign-in would fail"
+          else
+            [ "$secret_loaded" = "false" ] || fail "no OAuth secret was bundled but the app reports one loaded"
+          fi
           # v3.11.4: Linux stays on OpenSSL + certifi + OS store (os-native is Windows-only).
           tls_backend="$(printf '%s' "$hb" | jq -r '.checks.icu_oauth.tls_backend // empty')"
           [ "$tls_backend" = "openssl" ] || fail "Linux TLS backend is '$tls_backend' (expected openssl)"
@@ -587,10 +592,13 @@ jobs:
               # Same gate the macOS job runs: prove the OAuth secret survived
               # into the bundle rather than shipping broken sign-in.
               oauth="$(find squashfs-root -name .oauth.env -print -quit)"
-              [ -n "$oauth" ] || { echo "::error::.oauth.env not bundled in the AppImage — OAuth sign-in would fail"; exit 1; }
-              grep -q "ICU_OAUTH_CLIENT_SECRET=." "$oauth" \
-                || { echo "::error::bundled .oauth.env has an empty ICU_OAUTH_CLIENT_SECRET"; exit 1; }
-              echo "OK: .oauth.env bundled with a non-empty secret"
+              if [ -z "$oauth" ]; then
+                echo "OK: built without OAuth sign-in (API key only)"
+              else
+                grep -q "ICU_OAUTH_CLIENT_SECRET=." "$oauth" \
+                  || { echo "::error::bundled .oauth.env has an empty ICU_OAUTH_CLIENT_SECRET"; exit 1; }
+                echo "OK: .oauth.env bundled with a non-empty secret"
+              fi
 
               # Xvfb goes in only AFTER the ldd sweep — it drags in half the X
               # stack and would mask a host dep the AppImage failed to declare.

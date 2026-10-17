@@ -10,6 +10,7 @@ import { getIcuConnection, getLimits, type Limits } from "@/lib/setup"
 import { CalendarPush } from "@/screens/CalendarPush"
 import { Diagnostics } from "@/screens/Diagnostics"
 import { Folders } from "@/screens/Folders"
+import { ApiKeyConnect } from "@/screens/ApiKeyConnect"
 import { FtpHistory } from "@/screens/FtpHistory"
 import { Panel, Row, useLoad } from "@/screens/panel"
 import { ZonesEditor } from "@/screens/ZonesEditor"
@@ -165,7 +166,7 @@ function Sync() {
           <p>
             {c.connected ? `Connected${c.name ? ` as ${c.name}` : ""}${c.write_ok ? "" : ", read only"}.` : "Not connected."}
           </p>
-          {c.needs_oauth_migration && <p>This connection uses an old API key. Reconnect to switch to sign-in.</p>}
+          {c.needs_oauth_migration && c.oauth_available && <p>This connection uses an API key. Reconnect to switch to sign-in.</p>}
           {status.state === "ok" && (
             <p className="text-muted-foreground">
               {status.data.activity_records} rides and {status.data.wellness_records} wellness days stored
@@ -178,9 +179,12 @@ function Sync() {
             <Button size="sm" disabled={busy || !c.connected} onClick={go}>
               {busy ? "Working…" : "Sync now"}
             </Button>
-            <a href={connectUrl} className={buttonVariants({ size: "sm", variant: "outline" })}>
-              {c.connected ? "Reconnect" : "Connect intervals.icu"}
-            </a>
+            {c.oauth_available && (
+              <a href={connectUrl} className={buttonVariants({ size: "sm", variant: "outline" })}>
+                {c.connected ? "Reconnect" : "Connect intervals.icu"}
+              </a>
+            )}
+            {(!c.connected || c.method === "apikey") && <ApiKeyConnect onConnected={retryConn} />}
             {c.connected &&
               (confirming ? (
                 <>

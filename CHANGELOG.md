@@ -13,6 +13,7 @@ The old dashboard is gone. Everything it did now lives in the new interface, whi
 - **Routes & Climbs:** a "Find me a route" box (distance, climbing, surface, finish, loops) and filters for source, surface and climb category.
 - **Analysis:** fatigue resistance, your own fitted fitness and fatigue time constants, how well the model predicted your FTP, energy-system trends, a fill-in for older rides, and a backfill of power history.
 - **Settings:** connect and disconnect intervals.icu, push to its calendar, extra workout folders, custom power zones, logs and a health check.
+- **Connect intervals.icu with an API key.** Setup and Settings take your athlete ID (optional) and an API key from intervals.icu → Settings → Developer Settings. The key is checked before it is saved. The AppImage is built without the "Sign in with intervals.icu" button, so this is how you connect there; Docker and checkouts keep the button when an OAuth secret is configured.
 - Uncaught errors in the interface are now written to the diagnostics log.
 
 ### Changes you may notice

@@ -8052,7 +8052,8 @@ def api_icu_connection():
         "name": name,
         "write_ok": _wok,
         "needs_oauth_migration": bool(key and not token),
-        "oauth_available": bool(getattr(config, "ICU_OAUTH_CLIENT_ID", "")),
+        "oauth_available": bool(getattr(config, "ICU_OAUTH_CLIENT_ID", "")
+                                and getattr(config, "ICU_OAUTH_CLIENT_SECRET", "")),
     }
 
 
