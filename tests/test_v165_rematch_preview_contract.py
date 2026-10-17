@@ -121,36 +121,3 @@ def test_redraw_route_is_registered():
         "/api/plan/re-draw missing from app.routes"
 
 
-def test_dashboard_has_chart_tooltip_wiring():
-    """v1.6.5 custom JS tooltip — SVG <title> was unreliable in WKWebView,
-    so chart segments now also carry ``data-charttip`` and a delegated
-    listener paints a positioned ``#chart-tip`` div instantly on hover.
-    Pin the wiring so a future templating change doesn't silently drop
-    any of the three pieces (CSS class, host div, listener function).
-    """
-    dash = (Path(app_module.__file__).parent / "templates" / "dashboard.html").read_text(encoding="utf-8")
-    # CSS rule for the tooltip container.
-    assert ".chart-tip" in dash, "missing .chart-tip CSS class"
-    # Host div in the DOM.
-    assert 'id="chart-tip"' in dash, "missing #chart-tip host div"
-    # Delegated handler.
-    assert "_showChartTip" in dash, "missing _showChartTip handler"
-    assert "data-charttip" in dash, "missing data-charttip attribute usage"
-
-
-def test_workout_chart_renderers_emit_data_charttip():
-    """Both chart renderers must annotate every segment with
-    ``data-charttip``. Without this the v1.6.5 custom tooltip is dark
-    on the corresponding chart even though the JS listener is wired."""
-    dash = (Path(app_module.__file__).parent / "templates" / "dashboard.html").read_text(encoding="utf-8")
-
-    # workoutProfileSVG: covers SteadyState, ramp, IntervalsT (ON+OFF), FreeRide.
-    profile_block = dash[dash.index("function workoutProfileSVG"):dash.index("async function openWorkoutDetail")]
-    # At least the SteadyState + ramp + intervals-ON branches must emit data-charttip.
-    assert profile_block.count("data-charttip") >= 3, \
-        f"workoutProfileSVG emits data-charttip too few times: {profile_block.count('data-charttip')}"
-
-    # renderPowerBlocksSVG: covers ramp + steady/interval rectangle branches.
-    blocks_block = dash[dash.index("function renderPowerBlocksSVG"):dash.index("function renderPowerBlocksSVG") + 4000]
-    assert blocks_block.count("data-charttip") >= 2, \
-        f"renderPowerBlocksSVG emits data-charttip too few times: {blocks_block.count('data-charttip')}"

@@ -383,18 +383,6 @@ class TestSessionTypeToBandLockedValues(unittest.TestCase):
         for k, v in expected.items():
             self.assertEqual(week_view.TYPE_BAND[k], v)
 
-    def test_no_second_table(self):
-        """A copy maps a session type straight to an exposure band name; only
-        week_view.py may."""
-        import re
-        from pathlib import Path
-        src = Path(__file__).resolve().parent.parent / "src"
-        entry = re.compile(r"""["']?(z2|long_z2|tempo|threshold)["']?\s*:\s*["'](low|mid|high)_aerobic["']""")
-        files = [src / "app.py", src / "training_planner.py", src / "templates" / "dashboard.html"]
-        for f in files:
-            self.assertEqual(entry.findall(f.read_text(encoding="utf-8")), [], f.name)
-        self.assertTrue(entry.findall((src / "week_view.py").read_text(encoding="utf-8")))
-
 
 if __name__ == "__main__":
     unittest.main()

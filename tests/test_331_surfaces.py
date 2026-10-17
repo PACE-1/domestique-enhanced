@@ -52,7 +52,6 @@ from test_icu_push import (  # noqa: E402,F401
 )
 
 REPO = Path(__file__).resolve().parent.parent
-DASHBOARD = REPO / "src" / "templates" / "dashboard.html"
 
 
 @pytest.fixture()
@@ -60,25 +59,6 @@ def fake(monkeypatch):
     f = FakeICU()
     monkeypatch.setattr(icp, "_http", f)
     return f
-
-
-def _extract_js_function(src: str, name: str) -> str:
-    """Slice `[async ]function <name>(...) {...}` out of dashboard.html by
-    brace count — keeps the ``async`` keyword (the test_library_search_v2
-    extractor drops it, which breaks functions that ``await``)."""
-    start = src.find(f"async function {name}")
-    if start < 0:
-        start = src.index(f"function {name}")
-    i = src.index("{", start)
-    depth = 0
-    for j in range(i, len(src)):
-        if src[j] == "{":
-            depth += 1
-        elif src[j] == "}":
-            depth -= 1
-            if depth == 0:
-                return src[start:j + 1]
-    raise AssertionError(f"unbalanced braces extracting {name}")
 
 
 def _run_node(harness: str) -> None:
@@ -91,70 +71,6 @@ def _run_node(harness: str) -> None:
 # ═══════════════════════════════════════════════════════════════════════════
 # B1 — adjusted-card blocks preview follows the EFFECTIVE session
 # ═══════════════════════════════════════════════════════════════════════════
-
-@pytest.mark.skipif(shutil.which("node") is None, reason="node not installed")
-def test_b1_preview_source_follows_effective_session():
-    src = DASHBOARD.read_text(encoding="utf-8")
-    # 3.4.1 M3: the mod?adjusted:planned choice moved into the shared
-    # _effectiveTodaySession (one decision fn for card + day modal) —
-    # extract it too; every B1 assertion below is unchanged.
-    fn = (_extract_js_function(src, "_effectiveTodaySession") + "\n"
-          + _extract_js_function(src, "_todayPreviewSource"))
-    harness = fn + """
-// The tester's exact incident: HRV-capped threshold→z2 day. The stored plan
-// still says threshold (and here even has a matched file) — the preview must
-// be the ADJUSTED type's synthetic shape, never the threshold blocks.
-let out = _todayPreviewSource({
-  was_modified: true,
-  planned: {session_type: 'threshold', duration_min: 60, tss_estimate: 90,
-            zwo_file: 'threshold_2x20.zwo'},
-  adjusted: {session_type: 'z2', duration_min: 45, tss_estimate: 35},
-});
-if (out.kind !== 'synthetic')
-  throw new Error('adjusted day must render synthetic, got ' + out.kind);
-if (out.session_type !== 'z2')
-  throw new Error('preview must use the ADJUSTED type, got ' + out.session_type);
-if (out.duration_min !== 45)
-  throw new Error('preview must use the ADJUSTED duration, got ' + out.duration_min);
-
-// Unadjusted + matched file → the real segments path (unchanged behavior).
-out = _todayPreviewSource({
-  was_modified: false,
-  planned: {session_type: 'threshold', duration_min: 60, zwo_file: 't.zwo'},
-});
-if (out.kind !== 'file' || out.zwo_file !== 't.zwo')
-  throw new Error('unadjusted matched day must chart the real file');
-
-// Unadjusted fileless (matcher storm) → synthetic of the PLANNED type.
-out = _todayPreviewSource({
-  was_modified: false,
-  planned: {session_type: 'threshold', duration_min: 60, zwo_file: ''},
-});
-if (out.kind !== 'synthetic' || out.session_type !== 'threshold')
-  throw new Error('fileless unadjusted day must render the planned type');
-
-// Adjusted to rest → no preview at all.
-out = _todayPreviewSource({
-  was_modified: true,
-  planned: {session_type: 'threshold', duration_min: 60, zwo_file: 't.zwo'},
-  adjusted: {session_type: 'rest', duration_min: 0},
-});
-if (out.kind !== 'none')
-  throw new Error('rest adjustment must suppress the preview');
-console.log('OK');
-"""
-    _run_node(harness)
-
-
-def test_b1_load_today_session_wired_to_preview_source():
-    """The pure helper must actually FEED the card: the fetch branch keys on
-    _prevSrc.zwo_file and the synthetic branch builds from _prevSrc.* — and
-    the "Approximate shape" footnote semantics stay."""
-    src = DASHBOARD.read_text(encoding="utf-8")
-    assert "const _prevSrc = _todayPreviewSource(d);" in src
-    assert "encodeURIComponent(_prevSrc.zwo_file)" in src
-    assert "buildPowerBlocks(_prevSrc.session_type, _prevSrc.duration_min" in src
-    assert "Approximate shape — ride to the zone targets above." in src
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -258,17 +174,6 @@ class TestB2RedrawWidenLadder(RedrawRetryBase):
         r = self.client.post("/api/plan/re-draw", json={"date": mon})
         self.assertEqual(r.status_code, 200, r.text)
         self.assertEqual(r.json().get("action"), "rest_day")
-
-
-def test_b2_both_redraw_buttons_show_zone_targets_message():
-    """pgRedrawSession (plan grid) and calRedrawDay (calendar) both key the
-    honest message on action === 'no_candidate' instead of 'Re-draw
-    failed'."""
-    src = DASHBOARD.read_text(encoding="utf-8")
-    for fn_name in ("pgRedrawSession", "calRedrawDay"):
-        fn = _extract_js_function(src, fn_name)
-        assert "data.action === 'no_candidate'" in fn, fn_name
-        assert "keeps its zone targets" in fn, fn_name
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -385,50 +290,6 @@ class TestB3bHttpObservability:
 # ═══════════════════════════════════════════════════════════════════════════
 # B4 — downloadGeneratedZwo uses the pywebview bridge; anchor for browsers
 # ═══════════════════════════════════════════════════════════════════════════
-
-@pytest.mark.skipif(shutil.which("node") is None, reason="node not installed")
-def test_b4_generated_zwo_bridge_then_anchor_fallback():
-    src = DASHBOARD.read_text(encoding="utf-8")
-    fn = _extract_js_function(src, "downloadGeneratedZwo")
-    assert fn.startswith("async function"), "extractor must keep async"
-    harness = fn + """
-(async () => {
-  let saved = null, clicks = 0;
-  global.fetch = async () => ({json: async () => ({ftp: 250})});
-  global.showToast = () => {};
-  global.esc = s => String(s);
-  global.buildPowerBlocks = () => [
-    {name: 'Warmup', min: 10, pctLow: 50, pctHigh: 70},
-    {name: 'Main', min: 40, pctLow: 70, pctHigh: 70},
-  ];
-  global.document = {createElement: () => ({click() { clicks++; }})};
-  global.URL = {createObjectURL: () => 'blob:fake', revokeObjectURL: () => {}};
-  if (typeof Blob === 'undefined') global.Blob = class { constructor() {} };
-
-  // Packaged app: pywebview present → native bridge, NO anchor click.
-  global.window = {pywebview: {api: {save_zwo: async (n, x, s) => {
-    saved = {n, x, s};
-    return {ok: true, path: '/tmp/x.zwo'};
-  }}}};
-  await downloadGeneratedZwo('z2', 50, 'My Ride!');
-  if (!saved) throw new Error('bridge not called when pywebview present');
-  if (saved.n !== 'My_Ride_.zwo') throw new Error('bad save name: ' + saved.n);
-  if (!saved.x.includes('<workout_file>')) throw new Error('xml not handed over');
-  if (!saved.x.includes('<SteadyState')) throw new Error('blocks not serialized');
-  if (!saved.x.includes('<Warmup')) throw new Error('ramp block lost');
-  if (saved.s !== '') throw new Error('source_file must be the empty string');
-  if (clicks !== 0) throw new Error('anchor path must not run under pywebview');
-
-  // Real browser: no pywebview → the original Blob+anchor path.
-  saved = null;
-  global.window = {};
-  await downloadGeneratedZwo('z2', 50, 'My Ride!');
-  if (saved !== null) throw new Error('bridge called without pywebview');
-  if (clicks !== 1) throw new Error('anchor fallback did not click');
-  console.log('OK');
-})().catch(e => { console.error(e && e.stack || e); process.exit(1); });
-"""
-    _run_node(harness)
 
 
 # ═══════════════════════════════════════════════════════════════════════════

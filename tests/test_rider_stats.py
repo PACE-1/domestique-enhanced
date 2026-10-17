@@ -295,15 +295,3 @@ def test_profile_failure_still_returns(monkeypatch, stats_env):
 
 # ── UI structural: card at the TOP of the Analysis tab, lazy ────────────────
 
-def test_stats_card_top_of_analysis_tab_and_lazy():
-    html = (ROOT / "src" / "templates" / "dashboard.html").read_text(encoding="utf-8")
-    sec = html.index('id="sec-analysis"')
-    card = html.index('id="rider-stats-card"')
-    fitness = html.index('id="fitness-chart"')
-    assert sec < card < fitness, "stats card must sit at the TOP of Analysis"
-    # Lazy with the tab: fetched from loadAnalysisTab, not at boot.
-    loader = html.index("function loadAnalysisTab()")
-    assert "loadRiderStats" in html[loader:loader + 2000]
-    assert "/api/rider-stats" in html
-    # Greyed staleness per source_date.
-    assert "RIDER_STATS_STALE_DAYS" in html

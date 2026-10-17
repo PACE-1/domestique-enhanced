@@ -20,7 +20,6 @@ import app
 import launcher
 
 REPO = Path(__file__).resolve().parent.parent
-DASH = REPO / "src" / "templates" / "dashboard.html"
 
 
 def _a_library_zwo() -> str:
@@ -72,37 +71,6 @@ class TestJsApiServerSideFallback(unittest.TestCase):
         res = self.api.save_fit("w.fit", "###not-b64###")
         self.assertFalse(res["ok"])
         self.assertIn("base64", res["error"].lower())
-
-
-class TestGoalSelectorRestore(unittest.TestCase):
-    """#6 — populatePlanFormFromGoal must restore the goal selector itself,
-    BEFORE plan-edate/plan-weeks (togglePlanFields would otherwise clobber the
-    restored weeks for event goals)."""
-
-    def test_restores_plan_goal_before_edate(self):
-        src = DASH.read_text(encoding="utf-8")
-        i = src.find("function populatePlanFormFromGoal")
-        self.assertGreater(i, 0)
-        # Bound the search to the FUNCTION BODY (up to the next top-level
-        # function) — a fixed char slice went stale as the function grew
-        # (template/intensity-model restore landed between goal and edate).
-        j = src.find("\nfunction ", i + 1)
-        body = src[i:j if j > i else i + 8000]
-        g = body.find("setVal('plan-goal'")
-        e = body.find("setVal('plan-edate'")
-        self.assertGreater(g, 0, "goal selector never restored (issue #6 regressed)")
-        self.assertGreater(e, 0)
-        self.assertLess(g, e, "plan-goal must be restored before plan-edate")
-
-    def test_goal_option_values_match_planner_enum(self):
-        """Setting the selector only works if the <option> values equal the
-        stored goal_type strings."""
-        src = DASH.read_text(encoding="utf-8")
-        sel = src[src.find('id="plan-goal"'):]
-        sel = sel[:sel.find("</select>")]
-        opts = set(re.findall(r'<option value="([^"]+)"', sel))
-        for gt in ("general", "event", "ftp", "vo2max", "ftp_vo2max", "ctl"):
-            self.assertIn(gt, opts, f"missing goal option {gt}")
 
 
 if __name__ == "__main__":

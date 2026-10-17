@@ -160,7 +160,7 @@ class TestFirstRun:
         assert not hasattr(app_module, "SETUP_MARKER")
         r = stub.client.get("/", follow_redirects=False)
         assert r.status_code in (302, 307)
-        assert r.headers["location"] == "/setup"
+        assert r.headers["location"] == "/v2/#/setup"
 
     def test_setup_status_reads_data_dir_only(self, stub):
         assert stub.client.get("/api/setup/status").json() == {"complete": False}
@@ -178,19 +178,18 @@ class TestFirstRun:
                 p["bootstrapped"] = True
         stub.pm._save_registry()
         r = stub.client.get("/", follow_redirects=False)
-        assert r.status_code in (302, 307) and r.headers["location"] == "/setup"
+        assert r.status_code in (302, 307) and r.headers["location"] == "/v2/#/setup"
         marker = app_module._setup_marker()
         marker.parent.mkdir(parents=True, exist_ok=True)
         marker.write_text("{}", encoding="utf-8")
-        assert stub.client.get("/", follow_redirects=False).status_code == 200
+        assert stub.client.get("/", follow_redirects=False).headers["location"] == "/v2/#/home"
 
     def test_real_install_never_redirects(self, stub):
         # create_profile-made (not bootstrapped), no marker → dashboard, and
         # the page carries the active profile id for AC2d localStorage keys.
         pid = _active_profile(stub)
         r = stub.client.get("/", follow_redirects=False)
-        assert r.status_code == 200
-        assert f"__ACTIVE_PROFILE_ID = '{pid}'" in r.text
+        assert r.headers["location"] == "/v2/#/home"
 
     @pytest.mark.skipif(not hasattr(ProfileManager, "clear_bootstrapped"),
                         reason="CORE's pm.clear_bootstrapped() not landed yet")
@@ -204,7 +203,7 @@ class TestFirstRun:
         assert r.status_code == 200, r.text
         entry = next(p for p in stub.pm.list_profiles() if p["id"] == pid)
         assert not entry.get("bootstrapped")
-        assert stub.client.get("/", follow_redirects=False).status_code == 200
+        assert stub.client.get("/", follow_redirects=False).headers["location"] == "/v2/#/home"
 
     def test_setup_save_requires_active_profile(self, stub):
         # AC6a adjacency: no active profile → 409, never a profiles-root write.
@@ -226,7 +225,7 @@ class TestWizardWithNoProfile:
         assert stub.pm.delete_profile(pid) is not False
         assert stub.pm.active_id is None
         r = stub.client.get("/", follow_redirects=False)
-        assert r.headers["location"] == "/setup"
+        assert r.headers["location"] == "/v2/#/setup"
 
     def test_ensure_then_link_then_save(self, stub):
         self._no_profile(stub)
@@ -237,7 +236,7 @@ class TestWizardWithNoProfile:
         assert stub.pm.active_id == pid
         entry = next(p for p in stub.pm.list_profiles() if p["id"] == pid)
         assert entry.get("bootstrapped") is True     # / keeps routing to the wizard
-        assert stub.client.get("/", follow_redirects=False).headers["location"] == "/setup"
+        assert stub.client.get("/", follow_redirects=False).headers["location"] == "/v2/#/setup"
 
         r = stub.client.get("/oauth/icu/start?return_to=%2Fsetup", follow_redirects=False)
         state = re.search(r"state=([^&]+)", r.headers["location"]).group(1)
@@ -268,7 +267,7 @@ class TestWizardWithNoProfile:
         stub.pm.create_profile("Ben")
         assert stub.pm.active_id is None
         assert stub.client.get("/", follow_redirects=False).headers["location"] \
-            == "/profile-picker"
+            == "/v2/#/profile-picker"
         r = stub.client.post("/api/setup/ensure-profile")
         assert r.status_code == 409, r.text
         assert r.json()["redirect"] == "/profile-picker"
@@ -296,20 +295,6 @@ class TestWizardWithNoProfile:
         assert _athlete_on_disk(stub, a).get("ftp") == 300
         assert _counts(stub, a) == (1, 1, 1)
         assert _env_on_disk(stub, a).get("ICU_ACCESS_TOKEN") == "T_ANNA"
-
-    def test_the_wizard_follows_a_409_to_the_picker(self):
-        src = (REPO / "src" / "templates" / "setup.html").read_text(encoding="utf-8")
-        ens = src[src.index("async function _ensureProfile"):]
-        ens = ens[:ens.index("\n}\n")]
-        assert "r.status === 409" in ens and "'/profile-picker'" in ens
-
-    def test_the_wizard_asks_for_a_profile_before_linking_and_saving(self):
-        src = (REPO / "src" / "templates" / "setup.html").read_text(encoding="utf-8")
-        connect = src[src.index("async function connectIcu"):]
-        connect = connect[:connect.index("\n}\n")]
-        assert connect.index("_ensureProfile()") < connect.index("/oauth/icu/start")
-        save = src[src.index("async function saveAll"):]
-        assert save.index("_ensureProfile()") < save.index("fetch('/api/setup/save'")
 
 
 class TestSetupSaveAtomicity:
@@ -619,9 +604,6 @@ class TestSyncWriteGateWiring:
 # Structural template assertions (banner, per-profile keys, wizard wiring)
 # ---------------------------------------------------------------------------
 
-def _tpl(name):
-    return (REPO / "src" / "templates" / name).read_text(encoding="utf-8")
-
 
 def _input_minmax(html, input_id):
     m = re.search(r'<input[^>]*id="%s"[^>]*>' % re.escape(input_id), html)
@@ -631,71 +613,6 @@ def _input_minmax(html, input_id):
     hi = re.search(r'max="([\d.]+)"', tag)
     assert lo and hi, f"input #{input_id} lacks min/max: {tag}"
     return float(lo.group(1)), float(hi.group(1))
-
-
-class TestTemplatesStructural:
-    def test_dashboard_banner_links_to_connection_card(self):
-        html = _tpl("dashboard.html")
-        assert "openSettingsConnections" in html
-        assert "Reconnect intervals.icu" in html
-        assert 'id="icu-connection-card"' in html
-        # The paused banner no longer points at the first-run wizard.
-        banner = html[html.index("Intervals.icu sync paused"):][:400]
-        assert 'href="/setup"' not in banner
-
-    def test_dashboard_no_athlete_id_surface(self):
-        html = _tpl("dashboard.html")
-        assert "no_athlete_id" in html
-        assert 'id="icu-conn-error"' in html
-
-    def test_dashboard_switch_account_is_disconnect_then_start(self):
-        html = _tpl("dashboard.html")
-        i = html.index("async function icuSwitchAccount")
-        body = html[i:i + 900]
-        assert "/api/icu/disconnect" in body
-        assert "/oauth/icu/start" in body
-        assert body.index("/api/icu/disconnect") < body.index("/oauth/icu/start")
-
-    def test_dashboard_per_profile_local_storage_keys(self):
-        html = _tpl("dashboard.html")
-        assert "{{ active_profile_id }}" in html
-        assert "_profileLsKey('domestiqueVolUnit')" in html
-        assert "_profileLsKey('dfa_backfill_last_run_at')" in html
-        assert "_profileLsKey('dfa_migrate_last_run_at')" in html
-
-    def test_setup_wizard_is_oauth_only(self):
-        html = _tpl("setup.html")
-        assert "icu_api_key" not in html            # creds never in the save payload
-        assert "setSource" not in html              # per-field API-key toggles gone
-        assert "use_connection" in html             # Garmin check via saved connection
-        assert "/api/icu/athlete-numbers" in html   # same auto-fill path as profile_setup
-        assert "lthr_source_hint" in html           # AC5f
-        assert "target_mode" in html                # AC5e question
-        assert "/api/setup/limits" in html          # AC5d one table
-
-    def test_profile_setup_defers_create_to_finish(self):
-        html = _tpl("profile_setup.html")
-        assert html.count("/api/profiles/create") == 1
-        assert html.index("function doFinish") < html.index("/api/profiles/create")
-        assert "swData.active !== createdId" in html   # switch response checked
-        assert "/api/setup/limits" in html
-        assert "target_mode" in html
-
-    def test_client_ranges_match_server_table(self):
-        lim = app_module.SETUP_LIMITS
-        setup = _tpl("setup.html")
-        for field, iid in [("weight", "s-weight"), ("ftp", "s-ftp"),
-                           ("lthr", "s-lthr"), ("max_hr", "s-maxhr"),
-                           ("hours_per_week", "s-hours"), ("age", "s-age"),
-                           ("cp", "s-cp"), ("wprime_j", "s-wprime")]:
-            assert _input_minmax(setup, iid) == (lim[field][0], lim[field][1]), \
-                f"setup.html #{iid} range drifted from SETUP_LIMITS[{field}]"
-        ps = _tpl("profile_setup.html")
-        for field, iid in [("ftp", "ftp"), ("weight", "weight"),
-                           ("lthr", "lthr"), ("max_hr", "max-hr"),
-                           ("age", "age"), ("cp", "cp"), ("wprime_j", "wprime")]:
-            assert _input_minmax(ps, iid) == (lim[field][0], lim[field][1]), \
-                f"profile_setup.html #{iid} range drifted from SETUP_LIMITS[{field}]"
 
 
 if __name__ == "__main__":

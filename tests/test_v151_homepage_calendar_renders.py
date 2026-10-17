@@ -97,34 +97,6 @@ def test_api_plan_stable_across_two_calls() -> None:
     assert j1 == j2, "Cache hit response drifted from cache miss response"
 
 
-def test_api_plan_card_state_v2_present_on_every_session() -> None:
-    """Every plan session must carry ``card_state_v2``.
-
-    Regression guard for v1.4.1 dashboard.html ``renderCalDay`` which
-    reads ``d.card_state_v2`` for the per-cell tint mapping. Drops or
-    renames here lose the v1.4.0 10-state UI tier silently.
-    """
-    c = TestClient(app.app)
-    r = c.get("/api/plan")
-    assert r.status_code == 200
-    plan = (r.json() or {}).get("plan_json") or {}
-    weeks = plan.get("weeks") or []
-    if not weeks:
-        # No plan persisted; nothing to validate.
-        return
-    saw_session = False
-    for w in weeks:
-        for s in (w.get("sessions") or []):
-            saw_session = True
-            assert "card_state_v2" in s, (
-                f"session missing card_state_v2: day={s.get('day')}"
-            )
-            assert "card_state" in s, (
-                f"session missing card_state: day={s.get('day')}"
-            )
-    assert saw_session, "no sessions present in plan; cannot validate fields"
-
-
 def test_api_calendar_emits_weeks_with_seven_days() -> None:
     """``/api/calendar`` must yield weeks with 7 days each.
 

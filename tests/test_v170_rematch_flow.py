@@ -248,14 +248,3 @@ def test_accept_redraw_triggers_reforecast(tmp_path, monkeypatch):
 # ── frontend wiring ─────────────────────────────────────────────────────────
 
 
-def test_dashboard_has_preview_accept_reshuffle_decline_handlers():
-    """Pin the v1.7.0 frontend wiring so a future template refactor
-    can't quietly remove any of the four functions the new UX depends on."""
-    dash = (Path(app_module.__file__).parent / "templates" / "dashboard.html").read_text(encoding="utf-8")
-    assert "function _rematchPreview" in dash
-    assert "function _rematchReshuffle" in dash or "async function _rematchReshuffle" in dash
-    assert "function _rematchAccept" in dash or "async function _rematchAccept" in dash
-    assert "function _rematchDecline" in dash
-    # Backend URLs the frontend POSTs to.
-    assert "/api/plan/preview-redraw" in dash
-    assert "/api/plan/accept-redraw" in dash

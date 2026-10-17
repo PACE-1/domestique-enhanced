@@ -23,8 +23,6 @@ import pytest
 
 import readiness as R
 
-_DASH = Path(__file__).resolve().parent.parent / "src" / "templates" / "dashboard.html"
-
 
 # ── C1: graded recency ──────────────────────────────────────────────────────
 
@@ -127,15 +125,4 @@ def test_attribution_never_moves_the_score():
 
 # ── UI contract ─────────────────────────────────────────────────────────────
 
-def test_banner_hedges_an_aging_reading_and_shows_attribution():
-    src = _DASH.read_text(encoding="utf-8")
-    assert "lower confidence" in src
-    assert "decoupling_advisory_detail || {}).attribution" in src
-    assert "unexplained" in src
 
-
-def test_missing_decoupling_names_missing_power_not_missing_samples():
-    src = _DASH.read_text(encoding="utf-8")
-    assert "No power recorded for this ride" in src
-    # The old catch-all must survive for the case it is actually true for.
-    assert "Not enough valid samples" in src

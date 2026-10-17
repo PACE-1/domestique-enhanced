@@ -77,40 +77,10 @@ class TestUnifiedTodayEndpoint(unittest.TestCase):
 class TestUnifiedTodayMarkup(unittest.TestCase):
     """Frontend guard: the 3 separate home surfaces are merged into one card."""
 
-    @classmethod
-    def setUpClass(cls):
-        from pathlib import Path
-        cls.html = (Path(__file__).resolve().parent.parent
-                    / "src" / "templates" / "dashboard.html").read_text(encoding="utf-8")
 
-    def test_one_today_card(self):
-        self.assertEqual(self.html.count('id="today-card"'), 1)
-        self.assertEqual(self.html.count('id="today-verdict"'), 1)
 
-    def test_prescription_and_legcheck_moved_into_card(self):
-        # The prescription + leg-check hosts still exist (moved, not deleted)…
-        self.assertEqual(self.html.count('id="home-recommendation"'), 1)
-        self.assertEqual(self.html.count('id="morning-log-content"'), 1)
-        # …and both now sit AFTER the unified card opens (i.e. inside it),
-        # before the next sibling card ("This Week").
-        card = self.html.index('id="today-card"')
-        week = self.html.index('>This Week<')
-        for needle in ('id="today-verdict"', 'id="home-recommendation"',
-                       'id="morning-log-content"', 'id="home-snapshot-dfa"'):
-            pos = self.html.index(needle)
-            self.assertTrue(card < pos < week, f"{needle} not inside #today-card")
 
-    def test_old_separate_surfaces_removed(self):
-        for dead in ('id="readiness-composite-card"', 'id="readiness-composite-content"',
-                     'id="morning-log-card"', "<h3>Today's Recommendation</h3>",
-                     "<h3>Readiness today</h3>", "<h3>Leg Check</h3>"):
-            self.assertNotIn(dead, self.html, f"stale surface still present: {dead}")
 
-    def test_verdict_reads_canonical_endpoint(self):
-        # loadReadinessComposite must fetch the canonical /api/readiness, not the
-        # deprecated composite endpoint (only the in-comment mention may remain).
-        self.assertIn("getElementById('today-verdict')", self.html)
-        self.assertNotIn("fetch('/api/readiness/composite')", self.html)
 
 
 if __name__ == "__main__":

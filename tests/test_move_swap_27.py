@@ -526,79 +526,11 @@ def test_a_session_nobody_moved_is_still_sized_to_its_day(frozen):
 
 # ── A16: toast text (node) ──────────────────────────────────────────────────
 
-SRC = (Path(__file__).resolve().parent.parent / "src" / "templates" / "dashboard.html"
-       ).read_text(encoding="utf-8")
-
-
-def _fn(name: str) -> str:
-    i = SRC.index(f"function {name}(")
-    if SRC[i - 6:i] == "async ":
-        i -= 6
-    depth = 0
-    for j in range(SRC.index("{", i), len(SRC)):
-        if SRC[j] == "{":
-            depth += 1
-        elif SRC[j] == "}":
-            depth -= 1
-            if depth == 0:
-                return SRC[i:j + 1]
-    raise AssertionError(name)
-
 
 def _node(js: str):
     res = subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=30)
     assert res.returncode == 0, res.stderr
     return json.loads(res.stdout)
-
-
-def test_the_toast_helper_says_where_each_session_went():
-    out = _node(_fn("_moveToastText") + """
-console.log(JSON.stringify([
-  _moveToastText({ok: true, swapped: {zwo_name: 'server B'}}, 'A', 'B', 'Tuesday', 'Wednesday'),
-  _moveToastText({ok: true, swapped: null, vacated: '2026-10-13'}, 'A', 'B', 'Tuesday', 'Wednesday'),
-  _moveToastText({ok: true, swapped: {zwo_name: 'server B'}}, 'A', '', 'Tuesday', 'Wednesday'),
-  _moveToastText({ok: true, swapped: {session_type: 'vo2max'}}, 'A', '', 'Tuesday', 'Wednesday'),
-]));
-""")
-    assert out == ["Moved A to Wednesday and B to Tuesday",
-                   "Moved A from Tuesday to Wednesday",
-                   "Moved A to Wednesday and server B to Tuesday",
-                   "Moved A to Wednesday and VO2MAX to Tuesday"]
-    assert not any("swap" in t.lower() for t in out)
-
-
-def test_the_toast_helper_names_a_skipped_partner_as_skipped():
-    # W12: a dismissed partner travels dismissed; nothing goes to the watch for
-    # it, so the toast must not read as if it were back on.
-    out = _node(_fn("_moveToastText") + """
-console.log(JSON.stringify([
-  _moveToastText({ok: true, swapped: {zwo_name: 'server B', status: 'dismissed'}}, 'A', 'B', 'Tuesday', 'Wednesday'),
-  _moveToastText({ok: true, swapped: {session_type: 'z2', status: 'dismissed'}}, 'A', '', 'Tue', 'Wed'),
-  _moveToastText({ok: true, swapped: {zwo_name: 'server B', status: 'missed'}}, 'A', 'B', 'Tuesday', 'Wednesday'),
-]));
-""")
-    assert out == ["Moved A to Wednesday; B (skipped) is now on Tuesday",
-                   "Moved A to Wed; Z2 (skipped) is now on Tue",
-                   "Moved A to Wednesday and B to Tuesday"]
-
-
-def test_the_toast_helper_never_shows_a_raw_code():
-    # W11: the structured 422 codes read as a sentence; a refusal's own
-    # sentence is shown; anything else is a plain failure.
-    out = _node(_fn("_moveToastText") + """
-console.log(JSON.stringify([
-  _moveToastText({error: 'source_session_not_found', date: '2026-10-13'}, 'A', 'B', 'Tue', 'Wed'),
-  _moveToastText({error: 'target_week_not_found', date: '2026-12-03'}, 'A', 'B', 'Tue', 'Wed'),
-  _moveToastText({error: 'That day has already been ridden.'}, 'A', 'B', 'Tue', 'Wed'),
-  _moveToastText({detail: 'Move failed'}, 'A', 'B', 'Tue', 'Wed'),
-  _moveToastText({}, 'A', 'B', 'Tue', 'Wed'),
-]));
-""")
-    assert out == ["Couldn't find that session. Try refreshing.",
-                   "That day is outside your plan.",
-                   "Move failed: That day has already been ridden.",
-                   "Move failed.",
-                   "Move failed."]
 
 
 _DROP_ENV = """
@@ -617,73 +549,6 @@ function ev(src, validClass) {
            dataTransfer: { getData: () => src } };
 }
 """
-
-
-def test_the_calendar_drop_names_both_sessions_and_shows_a_refusal():
-    js = _DROP_ENV + _fn("calDragEnd") + "\n" + _fn("_moveToastText") + "\n" + _fn("calDrop") + """
-global.window = { _calData: { weeks: [ { days: [
-  { date: '2026-10-13', planned: { name: 'Endurance 60' } },
-  { date: '2026-10-14', planned: { name: 'Sweet Spot 2x20' } },
-] } ] } };
-(async () => {
-  respond(200, { ok: true, moved: {}, vacated: null, swapped: { zwo_name: 'ss_2x20' } });
-  await calDrop(ev('2026-10-13', 'cal-dropping-valid'), '2026-10-14', 0);
-  respond(200, { ok: true, moved: {}, vacated: '2026-10-13', swapped: null });
-  await calDrop(ev('2026-10-13', 'cal-dropping-valid'), '2026-10-14', 0);
-  respond(409, { error: 'That day has already been ridden.' });
-  await calDrop(ev('2026-10-13', 'cal-dropping-valid'), '2026-10-14', 0);
-  respond(500, { detail: 'Move failed' });
-  await calDrop(ev('2026-10-13', 'cal-dropping-valid'), '2026-10-14', 0);
-  respond(422, { error: 'target_week_not_found', date: '2026-10-14' });
-  await calDrop(ev('2026-10-13', 'cal-dropping-valid'), '2026-10-14', 0);
-  respond(422, { error: 'source_session_not_found', date: '2026-10-13' });
-  await calDrop(ev('2026-10-13', 'cal-dropping-valid'), '2026-10-14', 0);
-  respond(200, { ok: true, moved: {}, vacated: null, swapped: { zwo_name: 'ss_2x20', status: 'dismissed' } });
-  await calDrop(ev('2026-10-13', 'cal-dropping-valid'), '2026-10-14', 0);
-  console.log(JSON.stringify(toasts));
-})();
-"""
-    assert _node(js) == [
-        "Moved Endurance 60 to Wednesday and Sweet Spot 2x20 to Tuesday",
-        "Moved Endurance 60 from Tuesday to Wednesday",
-        "Move failed: That day has already been ridden.",
-        "Move failed.",
-        "That day is outside your plan.",
-        "Couldn't find that session. Try refreshing.",
-        "Moved Endurance 60 to Wednesday; Sweet Spot 2x20 (skipped) is now on Tuesday",
-    ]
-
-
-def test_the_plan_grid_drop_names_both_sessions():
-    js = _DROP_ENV + _fn("pgDragEnd") + "\n" + _fn("_moveToastText") + "\n" + _fn("pgDrop") + """
-global.window = { _planData: { weeks: [ { sessions: [
-  { day: '2026-10-13', day_name: 'Tue', zwo_name: 'Endurance 60', session_type: 'z2' },
-  { day: '2026-10-14', day_name: 'Wed', zwo_name: '', session_type: 'sweetspot' },
-] } ] } };
-(async () => {
-  respond(200, { ok: true, moved: {}, vacated: null, swapped: { zwo_name: 'server name' } });
-  await pgDrop(ev('2026-10-13', 'pg-dropping-valid'), '2026-10-14', 0);
-  respond(409, { error: "Days with two sessions can't be changed by dragging yet." });
-  await pgDrop(ev('2026-10-13', 'pg-dropping-valid'), '2026-10-14', 0);
-  respond(422, { error: 'target_week_not_found', date: '2026-10-14' });
-  await pgDrop(ev('2026-10-13', 'pg-dropping-valid'), '2026-10-14', 0);
-  respond(422, { error: 'source_session_not_found', date: '2026-10-13' });
-  await pgDrop(ev('2026-10-13', 'pg-dropping-valid'), '2026-10-14', 0);
-  respond(500, { detail: 'Move failed' });
-  await pgDrop(ev('2026-10-13', 'pg-dropping-valid'), '2026-10-14', 0);
-  respond(200, { ok: true, moved: {}, vacated: null, swapped: { zwo_name: 'server name', status: 'dismissed' } });
-  await pgDrop(ev('2026-10-13', 'pg-dropping-valid'), '2026-10-14', 0);
-  console.log(JSON.stringify(toasts));
-})();
-"""
-    assert _node(js) == [
-        "Moved Endurance 60 to Wed and SWEETSPOT to Tue",
-        "Move failed: Days with two sessions can't be changed by dragging yet.",
-        "That day is outside your plan.",
-        "Couldn't find that session. Try refreshing.",
-        "Move failed.",
-        "Moved Endurance 60 to Wed; SWEETSPOT (skipped) is now on Tue",
-    ]
 
 
 # ── W16: a "busy" debounced calendar push is re-armed once ──────────────────

@@ -29,67 +29,6 @@ from fastapi.testclient import TestClient
 from app import app
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-DASHBOARD_FILE = REPO_ROOT / "src/templates/dashboard.html"
-
-
-def test_energy_system_canvas_in_template():
-    """The host div for the secondary chart must be present and ID-targetable."""
-    html = DASHBOARD_FILE.read_text()
-    assert 'id="energy-system-chart"' in html, (
-        "missing #energy-system-chart host div — render target removed"
-    )
-
-
-def test_energy_system_chart_called_from_load_home():
-    """SUPERSEDED by v2.5.0 P3.1 (G12): the energy-system chart moved to the
-    Analysis tab and deliberately no longer boot-renders from loadHome() —
-    home paints a compact sparkline instead; the full charts lazy-load on tab
-    open. The v1.3.2 concern (chart missing until a range click) is covered by
-    loadAnalysisTab() calling loadFitnessChart(), which still chains
-    energySystemChart() — asserted below instead."""
-    html = DASHBOARD_FILE.read_text()
-    assert "loadAnalysisTab" in html
-    start = html.index("function loadAnalysisTab")
-    body = html[start:start + 1200]
-    assert "loadFitnessChart" in body, "Analysis tab must paint the fitness chart"
-    return
-
-
-def _superseded_original_v132():
-    """Original v1.3.2 assertion kept for reference (no longer runs)."""
-    html = DASHBOARD_FILE.read_text()
-    # Slice from `async function loadHome()` to the next top-level `async function`
-    # / `function` boundary, then assert the call is inside.
-    start = html.index("async function loadHome()")
-    # Use the next async-function declaration as a coarse-but-safe upper bound.
-    rest = html[start + len("async function loadHome()"):]
-    next_async = rest.find("\nasync function ")
-    next_func = rest.find("\nfunction ")
-    candidates = [c for c in (next_async, next_func) if c >= 0]
-    end_offset = min(candidates) if candidates else len(rest)
-    body = rest[:end_offset]
-    assert "energySystemChart(" in body, (
-        "energySystemChart() not called from loadHome() — chart will be empty "
-        "until user clicks a date-range button"
-    )
-
-
-def test_energy_system_chart_still_called_from_load_fitness_chart():
-    """Don't regress the original v1.0.6 wiring: the chart should also paint
-    when the user switches date ranges via loadFitnessChart()."""
-    html = DASHBOARD_FILE.read_text()
-    start = html.index("async function loadFitnessChart")
-    rest = html[start:]
-    # Find function close (next top-level function declaration).
-    next_async = rest[1:].find("\nasync function ")
-    next_func = rest[1:].find("\nfunction ")
-    candidates = [c for c in (next_async, next_func) if c >= 0]
-    end_offset = min(candidates) if candidates else len(rest)
-    body = rest[:end_offset]
-    assert "energySystemChart(" in body, (
-        "loadFitnessChart() no longer calls energySystemChart() — date-range "
-        "buttons would stop refreshing the secondary chart"
-    )
 
 
 def test_wellness_endpoint_returns_three_fitness_arrays():

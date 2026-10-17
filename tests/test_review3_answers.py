@@ -144,25 +144,3 @@ def test_the_sync_loop_applies_the_eftp_only_when_opted_in():
         assert (len(applied), len(fetched)) == (expect, expect)
 
 
-def test_the_calendar_cell_and_today_carry_the_riders_marks():
-    """T2. The skip fix's server halves: the calendar cell's status and move
-    mark (the strip and the day modal read them) and today's zwo_name."""
-    today = clock.today()
-    tmp = Path(tempfile.mkdtemp())
-    plan = _week_plan(today)
-    for s in plan["weeks"][0]["sessions"]:
-        s.update(zwo_file="endurance_steady_74pct_70min.zwo", zwo_name="Endurance Steady (70min)")
-        if s["day"] == today.isoformat():
-            s.update(status="dismissed", user_moved=True)
-    (tmp / "current_plan.json").write_text(json.dumps(plan))
-    with patch.object(app_module, "_plan_dir", return_value=tmp), \
-         patch.object(app_module, "_kick_lazy_icu_sync", return_value=False):
-        c = TestClient(app_module.app)
-        cal = c.get("/api/calendar").json()
-        cell = next(d for w in cal["weeks"] for d in w["days"] if d["date"] == today.isoformat())["planned"]
-        assert (cell["status"], cell["user_moved"]) == ("dismissed", True)
-        assert c.get("/api/today-session").json()["planned"]["zwo_name"] == "Endurance Steady (70min)"
-    src = (Path(app_module.__file__).parent / "templates" / "dashboard.html").read_text(encoding="utf-8")
-    synth = src[src.index("  const synth = {"):]
-    synth = synth[:synth.index("};")]
-    assert "status: p.status || 'pending'" in synth

@@ -17,10 +17,6 @@ import unittest
 from pathlib import Path
 
 
-_DASHBOARD = (
-    Path(__file__).resolve().parent.parent / "src" / "templates" / "dashboard.html"
-)
-
 # v1.6.1 codes added for homepage panel instrumentation. Each must appear
 # at least once in dashboard.html.
 _V161_FRONTEND_CODES = (
@@ -47,38 +43,6 @@ _V161_FRONTEND_CODES = (
 )
 
 
-class FrontendCodeWiringTests(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.template_text = _DASHBOARD.read_text(encoding="utf-8")
-
-    def test_dashboard_template_exists(self):
-        self.assertTrue(_DASHBOARD.is_file(),
-                        f"templates/dashboard.html missing at {_DASHBOARD}")
-
-    def test_each_v161_frontend_code_referenced(self):
-        missing = [c for c in _V161_FRONTEND_CODES
-                   if c not in self.template_text]
-        self.assertEqual(missing, [],
-                         f"v1.6.1 frontend codes missing from "
-                         f"templates/dashboard.html: {missing}")
-
-    def test_diag_helper_invoked_for_v161_codes(self):
-        """Each v1.6.1 code should appear inside a ``_diagFrontendError(``
-        call (string-literal check). Catches the case where a code is
-        named in a comment but never actually emitted.
-        """
-        # Trim down to lines that mention _diagFrontendError so the
-        # substring check below has a tight scope.
-        emit_lines = [
-            line for line in self.template_text.splitlines()
-            if "_diagFrontendError" in line
-        ]
-        emit_blob = "\n".join(emit_lines)
-        not_emitted = [c for c in _V161_FRONTEND_CODES if c not in emit_blob]
-        self.assertEqual(not_emitted, [],
-                         f"codes never appear inside a _diagFrontendError "
-                         f"call: {not_emitted}")
 
 
 if __name__ == "__main__":

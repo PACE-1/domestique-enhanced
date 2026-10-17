@@ -31,7 +31,6 @@ import pytest
 from fastapi.testclient import TestClient
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-DASHBOARD_FILE = REPO_ROOT / "src/templates/dashboard.html"
 
 
 @pytest.fixture(scope="module")
@@ -87,29 +86,3 @@ def test_api_today_session_warm_under_1000ms(client):
 #    Pre-fix this single await blocked every card painted below it
 #    (recent-activities, body-perf-card, power-curve-chart,
 #    readiness-composite-content) for 200-700ms warm and far worse cold.
-def test_load_home_does_not_await_load_today_session():
-    html = DASHBOARD_FILE.read_text(encoding="utf-8")
-
-    # Find the body of loadHome().
-    start = html.find("async function loadHome()")
-    assert start >= 0, "loadHome() not found in dashboard.html"
-    # Find the next top-level function definition to bound the search.
-    end = html.find("\nasync function loadReadinessComposite", start + 1)
-    assert end > start, "could not locate loadHome() end boundary"
-    body = html[start:end]
-
-    # Locate the loadTodaySession call site — there must be exactly one.
-    assert "loadTodaySession()" in body, (
-        "loadTodaySession() call missing from loadHome() — moved? renamed?"
-    )
-
-    # The call must NOT be preceded by `await` on the same line, since that
-    # would re-introduce the blocking behaviour the v1.3.3 fix removed.
-    for line in body.splitlines():
-        if "loadTodaySession()" in line and "//" not in line.split("loadTodaySession()")[0]:
-            stripped = line.strip()
-            assert not stripped.startswith("await "), (
-                "loadHome() awaits loadTodaySession() — that blocks every "
-                "card painted below it. Drop the `await` so it runs alongside "
-                "the other tail loaders (loadMorningLog, loadBodyPerf, etc.)."
-            )

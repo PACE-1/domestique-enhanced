@@ -1,5 +1,27 @@
 # Changelog
 
+## v1.0.1 — One interface (2026-10-17)
+
+The old dashboard is gone. Everything it did now lives in the new interface, which is the only one the app opens. Your data folder (`~/.domestique`) is unchanged.
+
+### What moved into the new interface
+
+- **Rides:** import a FIT file, sync from intervals.icu, open a ride for its charts, zones, intervals and personal records, rate how hard it was, review an FTP test and choose the new FTP, mark a ride as a race, download or delete it.
+- **Home:** this week and last week against the plan (with an overreach warning), HRV entry and import, body and performance numbers, retest reminders, goal event, FTP history, the DFA α1 value.
+- **Training Plan:** a month calendar where you drag a session to another day of its week, advanced plan options with a preview of the phases and a scan of past rides, Update plan, `.zwo` and `.fit` downloads and a push to intervals.icu for each session, race import from intervals.icu, a note when your fitness has drifted from what the plan assumes, and an automatic refresh when the plan is over a week old.
+- **Workout Library:** filter by type and tag, only workouts that suit gravel and cobbles, an outdoor variant of the `.zwo` download, and a `.fit` download.
+- **Routes & Climbs:** a "Find me a route" box (distance, climbing, surface, finish, loops) and filters for source, surface and climb category.
+- **Analysis:** fatigue resistance, your own fitted fitness and fatigue time constants, how well the model predicted your FTP, energy-system trends, a fill-in for older rides, and a backfill of power history.
+- **Settings:** connect and disconnect intervals.icu, push to its calendar, extra workout folders, custom power zones, logs and a health check.
+- Uncaught errors in the interface are now written to the diagnostics log.
+
+### Changes you may notice
+
+- Opening `/` (or the old `/setup`, `/profile-picker`, `/profile-setup` addresses) sends you to the new interface under `/v2`.
+- The small power-block pictures on completed days of the old plan grid and the mini power profile in each library row are not carried over. The ride page and the opened workout show the same data.
+- Packaged apps (AppImage) now bundle the new interface. In v1.0.0 they did not, so this is the first AppImage that has it.
+- Running the server from a checkout needs the interface built once: `cd web && pnpm install && pnpm build`.
+
 ## v1.0.0 — A new interface and a safer server (2026-10-16)
 
 This is the first release of the Domestique Enhanced fork. Its version number starts over at 1.0.0, so an install that still reports 3.x is not offered it as an upgrade: download it from the release page. Your data folder (`~/.domestique`) is unchanged.

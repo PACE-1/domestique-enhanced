@@ -134,15 +134,3 @@ def test_vo2max_session_drops_to_threshold(tmp_path, monkeypatch):
     assert body.get("new_type") == "threshold"
 
 
-def test_dashboard_handler_branches_on_action():
-    """Pin the frontend toast wiring: applyReadinessTierDown must branch
-    on data.action so each error reason gets its own user-facing message."""
-    dash = (Path(app_module.__file__).parent / "templates"
-            / "dashboard.html").read_text(encoding="utf-8")
-    # The handler exists.
-    assert ("function applyReadinessTierDown" in dash
-            or "async function applyReadinessTierDown" in dash)
-    # Branches on each of the three v1.8.3 actions.
-    assert "'already_at_bottom'" in dash
-    assert "'unknown_type'" in dash
-    assert "'already_easy'" in dash

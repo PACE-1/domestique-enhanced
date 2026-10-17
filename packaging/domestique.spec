@@ -35,10 +35,9 @@ VERSION = (_spec_dir.parent / "VERSION").read_text(encoding="utf-8").strip()
 # All entries unconditional — these directories MUST exist for the app to run
 # and conditional guards caused silent "missing assets" bugs in older builds.
 datas = [
-    ("../src/templates", "templates"),
+    ("../web/dist", "web/dist"),            # the web interface, built by `pnpm build` before PyInstaller
     ("../src/courses", "courses"),
     ("../src/workouts", "workouts"),          # 1,753 scientific workout templates
-    ("../src/static", "static"),
     ("../assets", "assets"),
     ("../src/routes.json", "."),
     ("../src/profiles_indexed.json", "."),

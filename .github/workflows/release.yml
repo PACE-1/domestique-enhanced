@@ -56,6 +56,16 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Build the web interface
+        run: |
+          corepack enable
+          corepack prepare pnpm@12.11.2 --activate
+          cd web && pnpm install --frozen-lockfile && pnpm build
+
       - name: Install create-dmg
         run: brew install create-dmg || echo "create-dmg already installed"
 
@@ -223,6 +233,22 @@ jobs:
             "${ICU_OAUTH_CLIENT_ID:-511}" "${ICU_OAUTH_CLIENT_SECRET}" > .oauth.env
           echo "wrote .oauth.env ($(wc -c < .oauth.env) bytes)"
 
+      # The AppImage serves the web interface from web/dist, which PyInstaller
+      # bundles; without this step the app would start with no interface.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Build the web interface
+        run: |
+          set -eux
+          corepack enable
+          corepack prepare pnpm@12.11.2 --activate
+          cd web
+          pnpm install --frozen-lockfile
+          pnpm build
+          test -f dist/index.html
+
       - name: Build AppImage
         env:
           # appimagetool is itself an AppImage and a GitHub job container has
@@ -348,6 +374,8 @@ jobs:
           # 3. localhost verbatim — the window loads http://127.0.0.1:22400, so
           #    an assertion that only ever hits 127.0.0.1 would sail past a
           #    hostname-resolution break the user would hit immediately.
+          curl -fsS --max-time 5 http://localhost:22400/v2/ | grep -q 'id="root"' \
+            || fail "the web interface is not served: /v2/ has no app root (web/dist missing from the bundle?)"
           body="$(curl -fsS --max-time 5 http://localhost:22400/api/version)" \
             || fail "the GUI instance did not answer on http://localhost:22400"
           served="$(printf '%s' "$body" | jq -r .version)"

@@ -20,9 +20,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import icu_calendar_push as icp  # noqa: E402
 from test_icu_push import stub, _apikey  # noqa: E402,F401  (stub is a fixture)
-from test_331_surfaces import _extract_js_function  # noqa: E402
 
-DASHBOARD = Path(__file__).resolve().parent.parent / "src" / "templates" / "dashboard.html"
 TODAY = date(2026, 10, 13)
 
 
@@ -154,86 +152,3 @@ def _run(js):
     return json.loads(res.stdout)
 
 
-def _fns(*names):
-    src = DASHBOARD.read_text(encoding="utf-8")
-    return "\n".join(_extract_js_function(src, n) for n in names) + "\nlet _icuRaces = [];\n"
-
-
-@needs_node
-def test_defaults_earliest_a_is_the_goal_later_a_is_b_other_sports_skip():
-    out = _run(_fns("_icuRaceDefaults") + """
-console.log(JSON.stringify(_icuRaceDefaults([
-  {priority: 'A', sport: 'Ride'}, {priority: 'A', sport: 'VirtualRide'},
-  {priority: 'C', sport: ''}, {priority: 'A', sport: 'Run'}, {priority: 'B', sport: 'GravelRide'}])));""")
-    assert out == ["A", "B", "C", "skip", "B"]
-
-
-@needs_node
-def test_picking_a_second_goal_demotes_the_first():
-    out = _run(_fns("icuRacePickChanged") + """
-const a = {value: 'A'}, b = {value: 'B'}, c = {value: 'C'};
-const document = {querySelectorAll: () => [a, b, c]};
-b.value = 'A'; icuRacePickChanged(b);
-console.log(JSON.stringify([a.value, b.value, c.value]));""")
-    assert out == ["B", "A", "C"]
-
-
-@needs_node
-def test_apply_fills_the_goal_and_adds_b_c_rows_once():
-    out = _run(_DOM + _fns("icuRacesApply") + """
-_icuRaces = [
-  {date: '2026-11-10', name: 'Early C', priority: 'C', distance_km: null},
-  {date: '2026-12-01', name: 'Gran Fondo', priority: 'A', distance_km: 160},
-  {date: '2026-11-20', name: 'Hills', priority: 'B', distance_km: 112.4},
-  {date: '2027-01-15', name: 'After the goal', priority: 'B', distance_km: null},
-  {date: '2026-11-25', name: 'A run', priority: 'C', distance_km: null},
-];
-picks = [{dataset: {i: '0'}, value: 'C'}, {dataset: {i: '1'}, value: 'A'},
-         {dataset: {i: '2'}, value: 'B'}, {dataset: {i: '3'}, value: 'B'},
-         {dataset: {i: '4'}, value: 'skip'}];
-addBcRaceRow({date: '2026-12-01', priority: 'B', name: 'same day as the goal'});
-addBcRaceRow({date: '2026-11-10', priority: 'C', name: 'already there'});
-const res = icuRacesApply();
-const again = icuRacesApply();
-console.log(JSON.stringify({goal: els['plan-goal'].value, edate: els['plan-edate'].value,
-  ename: els['plan-ename'].value, ekm: els['plan-ekm'].value, toggled, synced,
-  rows: bcRows.map(r => [r.ev.date, r.ev.priority, r.ev.name]),
-  added: res.added, later: res.later, again: again.added, toast: toasts[0]}));""")
-    assert out["goal"] == "event" and out["toggled"] == 1
-    assert (out["edate"], out["ename"], out["ekm"]) == ("2026-12-01", "Gran Fondo", 160)
-    assert out["rows"] == [["2026-11-10", "C", "already there"], ["2026-11-20", "B", "Hills"]]
-    assert (out["added"], out["later"], out["again"]) == (1, 1, 0)
-    assert out["toast"].startswith("Added Gran Fondo on 2026-12-01 as the plan goal and 1 B/C race.")
-    assert "1 race is after your goal and not in this plan." in out["toast"]
-
-
-@needs_node
-def test_apply_without_a_goal_keeps_the_goal_type_and_adds_all_b_c():
-    out = _run(_DOM + _fns("icuRacesApply") + """
-_icuRaces = [{date: '2027-03-01', name: 'Spring B', priority: 'B', distance_km: 90}];
-picks = [{dataset: {i: '0'}, value: 'B'}];
-icuRacesApply();
-console.log(JSON.stringify({goal: els['plan-goal'].value, edate: els['plan-edate'].value,
-  rows: bcRows.map(r => [r.ev.date, r.ev.priority, r.ev.event_km])}));""")
-    assert out == {"goal": "ftp", "edate": "", "rows": [["2027-03-01", "B", 90]]}
-
-
-@needs_node
-def test_b_c_after_the_goal_already_in_the_builder_are_left_out():
-    """Grill L4/L5: no A picked in the table, but the builder already has an
-    event goal: races after it have no week. And a goal race without a
-    distance clears the old event's distance."""
-    out = _run(_DOM + _fns("icuRacesApply") + """
-els['plan-goal'].value = 'event';
-els['plan-edate'].value = '2026-12-01';
-_icuRaces = [{date: '2027-02-10', name: 'Late B', priority: 'B', distance_km: null},
-             {date: '2026-11-10', name: 'Early C', priority: 'C', distance_km: null}];
-picks = [{dataset: {i: '0'}, value: 'B'}, {dataset: {i: '1'}, value: 'C'}];
-const res = icuRacesApply();
-_icuRaces = [{date: '2027-01-20', name: 'Hill climb', priority: 'A', distance_km: null}];
-picks = [{dataset: {i: '0'}, value: 'A'}];
-icuRacesApply();
-console.log(JSON.stringify({added: res.added, later: res.later, ekm: els['plan-ekm'].value,
-  rows: bcRows.map(r => r.ev.date)}));""")
-    assert (out["added"], out["later"]) == (1, 1)
-    assert out["rows"] == ["2026-11-10"] and out["ekm"] == ""

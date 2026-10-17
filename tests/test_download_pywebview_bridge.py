@@ -109,7 +109,6 @@ class TestSaveFit(_BridgeTestCase):
         self.assertIn("base64", res["error"].lower())
 
 
-
 class TestSaveCrs(_BridgeTestCase):
     """Course downloads did nothing on Windows and Linux: the buttons used
     <a download> and window.open(), which the app window never turns into a
@@ -140,13 +139,6 @@ class TestSaveCrs(_BridgeTestCase):
         cfp.assert_called_once_with("basque", "c.crs")
         self.assertEqual(Path(target).read_bytes(), b"[COURSE DATA]\n")
 
-    def test_both_course_buttons_use_the_bridge(self):
-        html = (REPO_ROOT / "src" / "templates" / "dashboard.html").read_text(encoding="utf-8")
-        self.assertNotIn("/download\" class=\"btn btn-primary\" download>Download CRS", html)
-        self.assertNotIn("window.open(`/api/course/", html)
-        self.assertIn("onclick=\"downloadCrsFile(this.dataset.region, this.dataset.file)\"", html)
-        self.assertIn("await downloadCrsFile(region, filename);", html)
-        self.assertIn("window.pywebview.api.save_crs(", html)
 
 if __name__ == "__main__":
     unittest.main()

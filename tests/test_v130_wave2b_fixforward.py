@@ -43,53 +43,10 @@ import app as app_module
 # W2B-G1 — duplicate loadPowerCurve declaration removed
 # ───────────────────────────────────────────────────────────────────────────────
 
-class W2BG1DuplicateLoadPowerCurve(unittest.TestCase):
-    """W2B-G1: dashboard.html had two `async function loadPowerCurve(...)`
-    declarations. Hoisting → second wins → fetched a dead route. The fix
-    deletes the legacy block. Test asserts at most one declaration exists.
-    """
-
-    def test_only_one_loadpowercurve_declaration(self):
-        repo = Path(__file__).resolve().parent.parent
-        html = (repo / "src" / "templates" / "dashboard.html").read_text(
-            encoding="utf-8")
-        decls = re.findall(r"^async function loadPowerCurve\(",
-                           html, re.MULTILINE)
-        self.assertEqual(len(decls), 1,
-                          f"expected 1 loadPowerCurve declaration, got "
-                          f"{len(decls)}")
-        # The legacy implementation hit /api/power-curve?days=...&compare_days=
-        # via fetch(...). That fetch call must be gone — only the leftover
-        # comment in the W2B-G1 fix marker is allowed to mention the URL.
-        self.assertNotIn("fetch('/api/power-curve?days=", html)
-        self.assertNotIn('fetch("/api/power-curve?days=', html)
-
 
 # ───────────────────────────────────────────────────────────────────────────────
 # W2B-G3 — PR badge XSS hardening
 # ───────────────────────────────────────────────────────────────────────────────
-
-class W2BG3PRBadgeXSS(unittest.TestCase):
-    """W2B-G3: `escJs(prevId)` was interpolated INSIDE an HTML attribute
-    (`onclick="openRideDetail('...')"`) — escJs handles JS strings but not
-    HTML-attribute breakouts. Fix: data-attribute + delegated click.
-    """
-
-    def test_pr_badge_uses_data_attr_not_inline_onclick(self):
-        repo = Path(__file__).resolve().parent.parent
-        html = (repo / "src" / "templates" / "dashboard.html").read_text(
-            encoding="utf-8")
-        # The vulnerable pattern was:
-        #   `onclick="openRideDetail('${escJs(prevId)}')"`
-        self.assertNotIn("openRideDetail('${escJs(prevId)}')", html,
-                         "inline onclick with escJs(prevId) is XSS-shaped")
-        # The replacement uses data-prev-ride-id + a delegated handler.
-        self.assertIn('data-prev-ride-id="${esc(prevId)}"', html)
-        # The delegated registration uses dataset.prDelegated as a guard.
-        self.assertIn("dataset.prDelegated", html,
-                       "expected delegated click registration")
-        # And reads the ride id back via getAttribute('data-prev-ride-id').
-        self.assertIn("getAttribute('data-prev-ride-id')", html)
 
 
 # ───────────────────────────────────────────────────────────────────────────────
@@ -114,15 +71,6 @@ class W2BG4ToastQueueEndpoint(unittest.TestCase):
         self.assertIn("count", body)
         self.assertIsInstance(body["queue"], list)
         self.assertIsInstance(body["count"], int)
-
-    def test_dashboard_wires_drain_function(self):
-        repo = Path(__file__).resolve().parent.parent
-        html = (repo / "src" / "templates" / "dashboard.html").read_text(
-            encoding="utf-8")
-        # The toast-queue path must appear in a fetch call.
-        self.assertIn("/api/profile/pr-toast-queue?drain=1", html)
-        # And the drain function must be defined.
-        self.assertIn("drainPRToastQueue", html)
 
 
 # ───────────────────────────────────────────────────────────────────────────────
@@ -218,31 +166,6 @@ class W2BG6KjThresholdValidation(unittest.TestCase):
 # ───────────────────────────────────────────────────────────────────────────────
 # W2B-G7 — loadFatigueResistance passes window_days
 # ───────────────────────────────────────────────────────────────────────────────
-
-class W2BG7WindowDaysPropagated(unittest.TestCase):
-    """W2B-G7: the dashboard fetcher hardcoded `?kj_threshold=...` and
-    forgot `window_days`. The endpoint then defaulted to 365 even though
-    the user might want a different window. Fix passes window_days
-    explicitly.
-    """
-
-    def test_dashboard_passes_window_days(self):
-        repo = Path(__file__).resolve().parent.parent
-        html = (repo / "src" / "templates" / "dashboard.html").read_text(
-            encoding="utf-8")
-        # The fetch URL must include window_days now.
-        self.assertIn("window_days=", html,
-                       "loadFatigueResistance must pass window_days")
-        # Specifically inside loadFatigueResistance — find the function
-        # body and assert window_days appears within it.
-        m = re.search(
-            r"async function loadFatigueResistance.*?\n\}",
-            html, re.DOTALL)
-        self.assertIsNotNone(m,
-                              "loadFatigueResistance not found in dashboard")
-        body = m.group(0)
-        self.assertIn("window_days=", body)
-        self.assertIn("_fatigueResistanceWindowDays", body)
 
 
 # ───────────────────────────────────────────────────────────────────────────────
@@ -408,40 +331,10 @@ class W2BG10RealThreadingBackfillRace(unittest.TestCase):
 # W2B-G11 — PR sort puts tier='first' first
 # ───────────────────────────────────────────────────────────────────────────────
 
-class W2BG11FirstTierSortOrder(unittest.TestCase):
-    """W2B-G11: previous sort `Number(b.exceedance_pct||0)` left
-    `tier='first'` (null exceedance → 0) at the bottom. Fix promotes
-    first-tier above major/minor.
-    """
-
-    def test_sort_promotes_first_tier(self):
-        repo = Path(__file__).resolve().parent.parent
-        html = (repo / "src" / "templates" / "dashboard.html").read_text(
-            encoding="utf-8")
-        # The new sort uses _tierRank.
-        self.assertIn("_tierRank", html)
-        # The sort comparator must rank first > major > minor.
-        self.assertIn("=== 'first' ? 2 : (t === 'major' ? 1 : 0)", html)
-
 
 # ───────────────────────────────────────────────────────────────────────────────
 # W2B-G15 — n_long_rides_at_threshold removed
 # ───────────────────────────────────────────────────────────────────────────────
-
-class W2BG15RemovedDeadField(unittest.TestCase):
-    """W2B-G15: the renderer read `d.n_long_rides_at_threshold` but the
-    API never set it — silent dead-branch. Fix removes the read.
-    """
-
-    def test_dashboard_no_longer_reads_n_long_rides_at_threshold(self):
-        repo = Path(__file__).resolve().parent.parent
-        html = (repo / "src" / "templates" / "dashboard.html").read_text(
-            encoding="utf-8")
-        # The dead read pattern was `d.n_long_rides_at_threshold`.
-        # The fix-forward comment may mention the field name so we only
-        # ban the actual property access form.
-        self.assertNotIn("d.n_long_rides_at_threshold", html)
-        self.assertNotIn("n_long_rides_at_threshold ||", html)
 
 
 if __name__ == "__main__":

@@ -10,23 +10,6 @@ import re
 import subprocess
 from pathlib import Path
 
-_SRC = (Path(__file__).resolve().parent.parent / "src" / "templates" / "dashboard.html"
-        ).read_text(encoding="utf-8")
-
-
-def _fitness_chart_src() -> str:
-    i = _SRC.index("function fitnessChart(")
-    j = _SRC.index("function metricColor(")
-    return _SRC[i:j]
-
-
-def test_ff_hover_maps_through_screen_ctm():
-    fn = _fitness_chart_src()
-    assert "getScreenCTM" in fn, "hover must use the CTM screen→viewBox transform"
-    assert "(e.clientX - ctm.e) / ctm.a" in fn, "CTM inverse arithmetic missing"
-    # Linear fallback stays for detached-svg edge (and ONLY as fallback).
-    assert "rect.width) * W" in fn
-
 
 def test_ctm_inverse_arithmetic_letterboxed():
     """Node-proof: with a letterboxed CTM (scale a, offset e), the inverse
