@@ -31,17 +31,13 @@ except NameError:
     _spec_dir = Path(os.path.abspath(os.getcwd()))
 VERSION = (_spec_dir.parent / "VERSION").read_text(encoding="utf-8").strip()
 
-# Data files to bundle (templates, courses, JSON, CSV).
+# Data files to bundle (web build, workouts, JSON, CSV).
 # All entries unconditional — these directories MUST exist for the app to run
 # and conditional guards caused silent "missing assets" bugs in older builds.
 datas = [
     ("../web/dist", "web/dist"),            # the web interface, built by `pnpm build` before PyInstaller
-    ("../src/courses", "courses"),
     ("../src/workouts", "workouts"),          # 1,753 scientific workout templates
     ("../assets", "assets"),
-    ("../src/routes.json", "."),
-    ("../src/profiles_indexed.json", "."),
-    ("../src/surface_types.json", "."),
     ("../VERSION", "."),
     # 3.3.1 hotfix (v3.3.0 storm): workout_facts._clc() loads the classifier
     # by FILE PATH (Path(__file__).parent / "scripts" / "classify_library_

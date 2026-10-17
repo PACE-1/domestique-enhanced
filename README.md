@@ -4,7 +4,6 @@ Latest: **[v1.0.1 — One interface](https://github.com/PACE-1/domestique-enhanc
 
 
 See also:
-- [COURSES_LICENSE.md](docs/COURSES_LICENSE.md) — route and elevation data provenance.
 - [TRADEMARKS.md](docs/TRADEMARKS.md) — trademark policy.
 - [docs/cycling_apps.md](docs/cycling_apps.md) — comparison of free cycling apps accepting ZWO/FIT.
 - [docs/workout_sources.md](docs/workout_sources.md) — workout library provenance.

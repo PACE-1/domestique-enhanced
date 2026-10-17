@@ -33,7 +33,6 @@ describe("Library", () => {
   it("filters by type and tag, narrows to gravel-suitable workouts, and clears", async () => {
     const urls = mock((u) =>
       u.startsWith("/api/workouts/tags") ? json({ tags: ["ftp_test", "outdoor"] })
-      : u.startsWith("/api/surface-types") ? json({ routes: {}, gravel_workouts: [{ name: "Gravel grinder" }] })
       : json([row(1, { Protocol: "VO2max", Name: "Intervals" }), row(2, { Protocol: "Sweet Spot", Name: "Steady" })]))
     render(<Library />)
     await screen.findByText("Sweet Spot 1")

@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- **Dropdown lists are readable in the dark theme.** They were white with white text.
+- **The route catalog is removed.** It held 622 fixed routes in 26 regions (Europe, the US mainland, game worlds) and nothing for most of the world, and a route could not be sent to a Garmin. The Routes & Climbs screen, the route and course downloads, and the bundled course data are gone. Routes and climbs come back when they can be pulled from Garmin.
+- The setup wizard no longer asks for a routes folder.
+- `docker-compose.dev.yml` runs the API and the interface with live reload for development.
+
 ## v1.0.1 — One interface (2026-10-17)
 
 The old dashboard is gone. Everything it did now lives in the new interface, which is the only one the app opens. Your data folder (`~/.domestique`) is unchanged.

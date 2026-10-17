@@ -1060,54 +1060,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/routes": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["api_routes_api_routes_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/routes/regions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["api_routes_regions_api_routes_regions_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/routes/suggest": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["api_routes_suggest_api_routes_suggest_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/settings": {
         parameters: {
             query?: never;
@@ -1182,22 +1134,6 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["setup_ensure_profile_api_setup_ensure_profile_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/surface-types": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["api_surface_types_api_surface_types_get"];
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -3343,43 +3279,6 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
-        /** RealWorldMeta */
-        RealWorldMeta: {
-            /**
-             * Count
-             * @default 0
-             */
-            count: number;
-            /**
-             * Regions
-             * @default []
-             */
-            regions: components["schemas"]["RealWorldRegion"][];
-            /**
-             * Title
-             * @default
-             */
-            title: string;
-        } & {
-            [key: string]: unknown;
-        };
-        /** RealWorldRegion */
-        RealWorldRegion: {
-            /**
-             * Count
-             * @default 0
-             */
-            count: number;
-            /** Region */
-            region: string;
-            /**
-             * Title
-             * @default
-             */
-            title: string;
-        } & {
-            [key: string]: unknown;
-        };
         /** RedrawAccepted */
         RedrawAccepted: {
             /**
@@ -3430,49 +3329,6 @@ export interface components {
             zwo_file?: string | null;
             /** Zwo Name */
             zwo_name?: string | null;
-        } & {
-            [key: string]: unknown;
-        };
-        /** RegionWorld */
-        RegionWorld: {
-            /**
-             * Blurb
-             * @default
-             */
-            blurb: string;
-            /**
-             * Count
-             * @default 0
-             */
-            count: number;
-            /**
-             * Emoji
-             * @default
-             */
-            emoji: string;
-            /** Region */
-            region: string;
-            /**
-             * Source
-             * @default
-             */
-            source: string;
-            /**
-             * Title
-             * @default
-             */
-            title: string;
-        } & {
-            [key: string]: unknown;
-        };
-        /** RegionsList */
-        RegionsList: {
-            real_world_meta?: components["schemas"]["RealWorldMeta"] | null;
-            /**
-             * Worlds
-             * @default []
-             */
-            worlds: components["schemas"]["RegionWorld"][];
         } & {
             [key: string]: unknown;
         };
@@ -3740,134 +3596,6 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
-        /** RouteSuggestion */
-        RouteSuggestion: {
-            /**
-             * Match Score
-             * @default 0
-             */
-            match_score: number;
-            /**
-             * Rationale
-             * @default
-             */
-            rationale: string;
-            route: components["schemas"]["RouteSummary"];
-        } & {
-            [key: string]: unknown;
-        };
-        /** RouteSuggestions */
-        RouteSuggestions: {
-            /**
-             * Count
-             * @default 0
-             */
-            count: number;
-            /** Empty Hint */
-            empty_hint?: {
-                [key: string]: unknown;
-            } | null;
-            /**
-             * Filters Applied
-             * @default {}
-             */
-            filters_applied: {
-                [key: string]: unknown;
-            };
-            /**
-             * Results
-             * @default []
-             */
-            results: components["schemas"]["RouteSuggestion"][];
-        } & {
-            [key: string]: unknown;
-        };
-        /** RouteSummary */
-        RouteSummary: {
-            /** Category */
-            category?: string | null;
-            /**
-             * Climb M
-             * @default 0
-             */
-            climb_m: number;
-            /** Crs Region */
-            crs_region?: string | null;
-            /** Difficulty Score */
-            difficulty_score?: number | null;
-            /**
-             * Distance Km
-             * @default 0
-             */
-            distance_km: number;
-            /** Est Duration Min Z2 */
-            est_duration_min_z2?: number | null;
-            /** Est Tss */
-            est_tss?: number | null;
-            /** File */
-            file?: string | null;
-            /** Id */
-            id: string;
-            /** Loop */
-            loop?: boolean | null;
-            /** Max Grade */
-            max_grade?: number | null;
-            /**
-             * Name
-             * @default
-             */
-            name: string;
-            /**
-             * Preview Profile
-             * @default []
-             */
-            preview_profile: number[][];
-            /** Primary Surface */
-            primary_surface?: string | null;
-            /**
-             * Region
-             * @default
-             */
-            region: string;
-            /**
-             * Source
-             * @default
-             */
-            source: string;
-            /** Surface Mix Pct */
-            surface_mix_pct?: {
-                [key: string]: unknown;
-            } | null;
-            /**
-             * Tags
-             * @default []
-             */
-            tags: string[];
-            /** Terrain */
-            terrain?: string | null;
-        } & {
-            [key: string]: unknown;
-        };
-        /** RoutesList */
-        RoutesList: {
-            /**
-             * Returned
-             * @default 0
-             */
-            returned: number;
-            /**
-             * Routes
-             * @default []
-             */
-            routes: components["schemas"]["RouteSummary"][];
-            /**
-             * Total Matching
-             * @default 0
-             */
-            total_matching: number;
-        } & {
-            [key: string]: unknown;
-        };
         /** SessionDismissed */
         SessionDismissed: {
             /** Dismissed */
@@ -4016,25 +3744,6 @@ export interface components {
              * @default
              */
             workout_dir: string;
-        } & {
-            [key: string]: unknown;
-        };
-        /** SurfaceTypes */
-        SurfaceTypes: {
-            /**
-             * Gravel Workouts
-             * @default []
-             */
-            gravel_workouts: {
-                [key: string]: unknown;
-            }[];
-            /**
-             * Routes
-             * @default {}
-             */
-            routes: {
-                [key: string]: unknown;
-            };
         } & {
             [key: string]: unknown;
         };
@@ -5974,66 +5683,6 @@ export interface operations {
             };
         };
     };
-    api_routes_api_routes_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RoutesList"];
-                };
-            };
-        };
-    };
-    api_routes_regions_api_routes_regions_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RegionsList"];
-                };
-            };
-        };
-    };
-    api_routes_suggest_api_routes_suggest_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RouteSuggestions"];
-                };
-            };
-        };
-    };
     api_settings_api_settings_get: {
         parameters: {
             query?: never;
@@ -6170,26 +5819,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EnsureProfile"];
-                };
-            };
-        };
-    };
-    api_surface_types_api_surface_types_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SurfaceTypes"];
                 };
             };
         };

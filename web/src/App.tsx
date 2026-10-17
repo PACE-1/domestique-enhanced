@@ -9,7 +9,6 @@ import { Plan } from "@/screens/Plan"
 import { ProfilePicker } from "@/screens/ProfilePicker"
 import { ProfileSetup } from "@/screens/ProfileSetup"
 import { RideDetail } from "@/screens/RideDetail"
-import { Routes } from "@/screens/Routes"
 import { Setup } from "@/screens/Setup"
 import { Settings } from "@/screens/Settings"
 import { Shuffle } from "@/screens/Shuffle"
@@ -39,7 +38,7 @@ export function App() {
   const tab = isTab(route) ? route : "home"
   return (
     <AppShell tab={tab}>
-      {tab === "dfa" ? <Dfa /> : tab === "home" ? <Home /> : tab === "plan" ? <Plan /> : tab === "library" ? <Library /> : tab === "picker" ? <Shuffle /> : tab === "courses" ? <Routes /> : tab === "analysis" ? <Analysis /> : <Settings />}
+      {tab === "dfa" ? <Dfa /> : tab === "home" ? <Home /> : tab === "plan" ? <Plan /> : tab === "library" ? <Library /> : tab === "picker" ? <Shuffle /> : tab === "analysis" ? <Analysis /> : <Settings />}
     </AppShell>
   )
 }

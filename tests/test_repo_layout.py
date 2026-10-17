@@ -25,9 +25,8 @@ CODE_DIR = Path(tp.__file__).resolve().parent
 
 # ── Layer 3: sibling data targets exist next to the modules ─────────────────
 
-_SIBLING_DIRS = ("workouts", "courses", "profiles")
-_SIBLING_FILES = ("routes.json", "profiles_indexed.json",
-                  "surface_types.json", "config.py")
+_SIBLING_DIRS = ("workouts",)
+_SIBLING_FILES = ("config.py",)
 
 
 def test_module_sibling_dirs_exist():
@@ -127,7 +126,7 @@ def test_spec_datas_destinations_pinned():
 def test_spec_bundles_the_critical_data():
     entries, _ = _spec_datas()
     dests = {d for _, d in entries}
-    for needed in ("workouts", "web/dist", "courses"):
+    for needed in ("workouts", "web/dist"):
         assert needed in dests, f"spec no longer bundles {needed}/"
     # VERSION must land at the bundle root.
     assert any(d == "." and s.endswith("VERSION") for s, d in entries)

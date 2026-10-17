@@ -29,20 +29,3 @@ def test_the_download_route_the_ui_links_to_serves_a_file():
     r = c.get(f"/api/workout/download/{row['File']}")
     assert r.status_code == 200
     assert "attachment" in r.headers.get("content-disposition", "")
-
-
-def test_routes_and_regions_validate_and_the_course_download_works():
-    import app
-    c = TestClient(app.app)
-    r = c.get("/api/routes?limit=3")
-    assert r.status_code == 200
-    listing = api_models.RoutesList.model_validate(r.json())
-    assert listing.total_matching >= listing.returned == len(listing.routes) > 0
-    first = listing.routes[0]
-    assert first.preview_profile and first.crs_region and first.file
-    reg = api_models.RegionsList.model_validate(c.get("/api/routes/regions").json())
-    assert reg.worlds
-    d = c.get(f"/api/course/{first.crs_region}/{first.file}/download")
-    assert d.status_code == 200
-    loops = c.get("/api/routes?limit=5&loop_only=true").json()["routes"]
-    assert all(x["loop"] for x in loops)

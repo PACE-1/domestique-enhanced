@@ -4,7 +4,7 @@ import type { Limits, TargetMode } from "@/lib/setup"
 // Field ids and the localStorage shape match the legacy first-run wizard, so a rider mid-setup keeps their state.
 export const FIELD_IDS = [
   "s-weight", "s-ftp", "s-lthr", "s-maxhr", "s-age", "s-sex", "s-cp", "s-wprime",
-  "s-workout-dir", "s-gpx-dir", "s-hours",
+  "s-workout-dir", "s-hours",
 ] as const
 export type FieldId = (typeof FIELD_IDS)[number]
 
@@ -23,7 +23,7 @@ export interface WizardState {
 export const INITIAL: WizardState = {
   values: {
     "s-weight": "72", "s-ftp": "250", "s-lthr": "175", "s-maxhr": "196", "s-age": "", "s-sex": "",
-    "s-cp": "", "s-wprime": "", "s-workout-dir": "", "s-gpx-dir": "", "s-hours": "8",
+    "s-cp": "", "s-wprime": "", "s-workout-dir": "", "s-hours": "8",
   },
   touched: [],
   icuOrigin: [],
@@ -97,9 +97,7 @@ export function buildPayload(s: WizardState): Record<string, unknown> {
   num("s-wprime", "wprime_j", (x) => parseInt(x, 10))
   if (t.has("s-sex")) out.sex = s.values["s-sex"]
   const wd = s.values["s-workout-dir"].trim()
-  const gd = s.values["s-gpx-dir"].trim()
   if (t.has("s-workout-dir") && wd) out.workout_dir = wd
-  if (t.has("s-gpx-dir") && gd) out.gpx_dir = gd
   num("s-hours", "hours_per_week", parseFloat)
   if (s.daysTouched) out.available_days = s.days.map(Number).sort((a, b) => a - b)
   if (s.restTouched) out.rest_days = s.rest.map(Number).sort((a, b) => a - b)
@@ -155,7 +153,7 @@ export function restore(base: WizardState, o: Record<string, unknown> | null): W
   }
 }
 
-export interface SetupDefaults { workout_dir?: string; gpx_dir?: string; weight?: number; ftp?: number; lthr?: number; max_hr?: number }
+export interface SetupDefaults { workout_dir?: string; weight?: number; ftp?: number; lthr?: number; max_hr?: number }
 export const getDefaults = (signal?: AbortSignal) => api<SetupDefaults>("/api/setup/defaults", { signal })
 export const getAthleteNumbers = () =>
   api<{ ok?: boolean; ftp?: number; weight?: number; lthr?: number; max_hr?: number }>("/api/icu/athlete-numbers")

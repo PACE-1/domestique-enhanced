@@ -78,7 +78,6 @@ export function Setup() {
         const values = { ...base.values }
         const touched: FieldId[] = []
         if (d.workout_dir) { values["s-workout-dir"] = d.workout_dir; touched.push("s-workout-dir") }
-        if (d.gpx_dir) { values["s-gpx-dir"] = d.gpx_dir; touched.push("s-gpx-dir") }
         if (d.weight) values["s-weight"] = String(d.weight)
         if (d.ftp) values["s-ftp"] = String(d.ftp)
         if (d.lthr) values["s-lthr"] = String(d.lthr)
@@ -408,12 +407,11 @@ export function Setup() {
               <h2 className="text-lg font-semibold">Workout &amp; Route Folders</h2>
               <p className="text-sm text-muted-foreground">
                 Domestique comes with a full <b>workout library built in</b>, which is always used, so you can leave
-                both folders empty. If you keep your own workout files on this computer, add that folder: its workouts
+                the folder empty. If you keep your own workout files on this computer, add that folder: its workouts
                 join the built-in library. Click <b>Browse</b> to pick one. You can change this anytime in <b>Settings</b>.
               </p>
               {([
                 ["s-workout-dir", "Extra workouts folder (optional)", "~/Documents/Workouts", "Your own structured workout files (.zwo); they are added to the built-in library"],
-                ["s-gpx-dir", "Routes folder (optional)", "~/Documents/GPX/cyclinglocations", "Ride routes in .gpx format, used to suggest outdoor courses — skip it if you don't ride with routes"],
               ] as [FieldId, string, string, string][]).map(([id, label, ph, hint]) => (
                 <div key={id} className="grid gap-1.5">
                   <Label htmlFor={id}>{label}</Label>

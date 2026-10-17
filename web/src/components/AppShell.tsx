@@ -8,7 +8,6 @@ export const TABS = [
   { id: "home", label: "Home" },
   { id: "picker", label: "Workout Shuffle" },
   { id: "library", label: "Workout Library" },
-  { id: "courses", label: "Routes & Climbs" },
   { id: "plan", label: "Training Plan" },
   { id: "analysis", label: "Analysis" },
   { id: "dfa", label: "DFA α1" },

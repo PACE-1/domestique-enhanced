@@ -235,16 +235,6 @@ test("Workout shuffle suggests workouts", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Shuffle again" })).toBeVisible()
 })
 
-test("Routes lists courses, filters them, and opens one", async ({ page }) => {
-  await page.goto("#/courses")
-  await expect(page.getByText(/^Showing \d+ of \d+/)).toBeVisible()
-  await page.getByRole("checkbox", { name: "Loops only" }).click()
-  await expect(page.getByText(/^Showing \d+ of \d+/)).toBeVisible()
-  await page.getByRole("listitem").first().getByRole("button").click()
-  await expect(page.getByRole("img", { name: /^Elevation profile/ })).toBeVisible()
-  await expect(page.getByRole("link", { name: "Download course (.crs)" })).toBeVisible()
-})
-
 test("Analysis shows its cards with empty states and no errors", async ({ page }) => {
   await page.goto("#/analysis")
   await expect(page.getByRole("heading", { name: "Fitness and form" })).toBeVisible()
@@ -419,13 +409,6 @@ test("Library filters by type and downloads the outdoor variant", async ({ page 
   await page.getByRole("checkbox", { name: "Outdoor variant for downloads" }).click()
   await expect(page.getByRole("alert")).toHaveCount(0)
   await expect(page.getByRole("button", { name: "Clear filters" })).toBeVisible()
-})
-
-test("Routes suggests routes for a ride length", async ({ page }) => {
-  await page.goto("#/courses")
-  await page.getByRole("button", { name: "Suggest routes" }).click()
-  await expect(page.getByRole("button", { name: "Show others" })).toBeVisible()
-  await expect(page.getByRole("alert")).toHaveCount(0)
 })
 
 test("Home shows this week and last week", async ({ page }) => {
