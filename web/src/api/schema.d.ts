@@ -4,6 +4,22 @@
  */
 
 export interface paths {
+    "/api/daily-log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_daily_log_api_daily_log_get"];
+        put?: never;
+        post: operations["api_daily_log_post_api_daily_log_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/icu/connection": {
         parameters: {
             query?: never;
@@ -36,6 +52,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/plan/accept-redraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_plan_accept_redraw_api_plan_accept_redraw_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/plan/add-race": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_plan_add_race_api_plan_add_race_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/plan/auto-adjust": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_plan_auto_adjust_api_plan_auto_adjust_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/plan/continuous/deload-revert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_continuous_deload_revert_api_plan_continuous_deload_revert_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/plan/dismiss-session": {
         parameters: {
             query?: never;
@@ -46,6 +126,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["api_plan_dismiss_session_api_plan_dismiss_session_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/plan/ftp-test-type": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_plan_ftp_test_type_api_plan_ftp_test_type_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -100,6 +196,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/plan/preview-redraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_plan_preview_redraw_api_plan_preview_redraw_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/plan/regenerate": {
         parameters: {
             query?: never;
@@ -110,6 +222,38 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["api_plan_regenerate_dynamic_api_plan_regenerate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/plan/rematch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_plan_rematch_api_plan_rematch_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/plan/save-availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_save_availability_api_plan_save_availability_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -260,6 +404,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/readiness": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_readiness_api_readiness_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/readiness/apply-tier-down": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_readiness_apply_tier_down_api_readiness_apply_tier_down_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/readiness/revert-cap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_readiness_revert_cap_api_readiness_revert_cap_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/rider-stats": {
         parameters: {
             query?: never;
@@ -324,10 +516,101 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/today-session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_today_session_api_today_session_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/today-session/persist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_today_session_persist_api_today_session_persist_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AutoAdjustResult */
+        AutoAdjustResult: {
+            /**
+             * Actions
+             * @default []
+             */
+            actions: {
+                [key: string]: unknown;
+            }[];
+            /** Applied */
+            applied?: boolean | null;
+            /**
+             * Dry Run
+             * @default false
+             */
+            dry_run: boolean;
+            /**
+             * Note
+             * @default
+             */
+            note: string;
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
+            /**
+             * Scope
+             * @default today
+             */
+            scope: string;
+            /**
+             * Sessions Modified
+             * @default 0
+             */
+            sessions_modified: number;
+            /**
+             * Severity
+             * @default normal
+             */
+            severity: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** AvailabilitySaved */
+        AvailabilitySaved: {
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
+            /**
+             * Sessions Modified
+             * @default 0
+             */
+            sessions_modified: number;
+        } & {
+            [key: string]: unknown;
+        };
         /** BackfillStarted */
         BackfillStarted: {
             /** Status */
@@ -357,6 +640,81 @@ export interface components {
             state?: string | null;
             /** Task Id */
             task_id?: string | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** CapReverted */
+        CapReverted: {
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
+            /** Restored */
+            restored?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Reverted
+             * @default true
+             */
+            reverted: boolean;
+        } & {
+            [key: string]: unknown;
+        };
+        /** DailyLogEntry */
+        DailyLogEntry: {
+            /** Date */
+            date: string;
+            /** Fatigue */
+            fatigue?: number | null;
+            /** Hooper Index */
+            hooper_index?: number | null;
+            /** Mood */
+            mood?: number | null;
+            /** Notes */
+            notes?: string | null;
+            /** Readiness To Train */
+            readiness_to_train?: number | null;
+            /** Sleep Quality */
+            sleep_quality?: number | null;
+            /** Soreness */
+            soreness?: number | null;
+            /** Stress */
+            stress?: number | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** DailyLogRead */
+        DailyLogRead: {
+            /**
+             * History
+             * @default []
+             */
+            history: components["schemas"]["DailyLogEntry"][];
+            today?: components["schemas"]["DailyLogEntry"] | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** DailyLogSaved */
+        DailyLogSaved: {
+            entry: components["schemas"]["DailyLogEntry"];
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
+        } & {
+            [key: string]: unknown;
+        };
+        /** DeloadReverted */
+        DeloadReverted: {
+            /** Reason */
+            reason?: string | null;
+            /** Reverted */
+            reverted: boolean;
+            /** Week Num */
+            week_num?: number | null;
         } & {
             [key: string]: unknown;
         };
@@ -484,6 +842,34 @@ export interface components {
              * @default true
              */
             ok: boolean;
+        } & {
+            [key: string]: unknown;
+        };
+        /** FtpTestTypeSet */
+        FtpTestTypeSet: {
+            /** Display Name */
+            display_name?: string | null;
+            /** Duration Min */
+            duration_min?: number | null;
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
+            /** Test Type */
+            test_type: string;
+            /** Tss Estimate */
+            tss_estimate?: number | null;
+            /**
+             * Zwo File
+             * @default
+             */
+            zwo_file: string;
+            /**
+             * Zwo Name
+             * @default
+             */
+            zwo_name: string;
         } & {
             [key: string]: unknown;
         };
@@ -932,6 +1318,128 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** RaceAdded */
+        RaceAdded: {
+            /** Added */
+            added?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
+            plan_json?: components["schemas"]["PlanJson"] | null;
+            /** Regen Info */
+            regen_info?: {
+                [key: string]: unknown;
+            } | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** Readiness */
+        Readiness: {
+            /** Decoupling Advisory */
+            decoupling_advisory?: boolean | null;
+            /** Dfa Cap Applied */
+            dfa_cap_applied?: boolean | null;
+            readiness?: components["schemas"]["ReadinessAdvice"] | null;
+            /** Score 0 100 */
+            score_0_100?: number | null;
+            /**
+             * Severity
+             * @default normal
+             */
+            severity: string;
+            /**
+             * Severity Reasons
+             * @default []
+             */
+            severity_reasons: string[];
+            /** Source */
+            source?: string | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** ReadinessAdvice */
+        ReadinessAdvice: {
+            /**
+             * Advice
+             * @default
+             */
+            advice: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** RedrawAccepted */
+        RedrawAccepted: {
+            /**
+             * Day
+             * @default
+             */
+            day: string;
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
+            /**
+             * Sessions Modified
+             * @default 0
+             */
+            sessions_modified: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** RedrawCandidate */
+        RedrawCandidate: {
+            /** Action */
+            action?: string | null;
+            /**
+             * Day
+             * @default
+             */
+            day: string;
+            /** Duration Min */
+            duration_min?: number | null;
+            /** Exhausted */
+            exhausted?: boolean | null;
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
+            /** Reason */
+            reason?: string | null;
+            /** Session Type */
+            session_type?: string | null;
+            /** Tss Estimate */
+            tss_estimate?: number | null;
+            /** Variation */
+            variation?: number | null;
+            /** Zwo File */
+            zwo_file?: string | null;
+            /** Zwo Name */
+            zwo_name?: string | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /**
+         * RematchResult
+         * @description Preview (apply=0) or result (apply=1). `action` is set when there is no current week.
+         */
+        RematchResult: {
+            /** Action */
+            action?: string | null;
+            /** Apply */
+            apply?: boolean | null;
+            /** Changed */
+            changed?: number | null;
+            /** Ok */
+            ok?: boolean | null;
+        } & {
+            [key: string]: unknown;
+        };
         /** RiderStats */
         RiderStats: {
             /** Body */
@@ -1077,6 +1585,104 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** TierDownApplied */
+        TierDownApplied: {
+            /** Action */
+            action?: string | null;
+            /**
+             * Day
+             * @default
+             */
+            day: string;
+            /** Duration Min */
+            duration_min?: number | null;
+            /** New Tss */
+            new_tss?: number | null;
+            /** New Type */
+            new_type?: string | null;
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
+            /** Old Tss */
+            old_tss?: number | null;
+            /** Old Type */
+            old_type?: string | null;
+            /** Zwo Name */
+            zwo_name?: string | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** TodayPersisted */
+        TodayPersisted: {
+            /**
+             * Adapted Reason
+             * @default
+             */
+            adapted_reason: string;
+            /** Day */
+            day: string;
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
+            /** Session Type */
+            session_type: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** TodaySession */
+        TodaySession: {
+            adjusted?: components["schemas"]["TodaySessionPlan"] | null;
+            /** Adjustment Reason */
+            adjustment_reason?: string | null;
+            /** Has Plan */
+            has_plan?: boolean | null;
+            /**
+             * Is Race
+             * @default false
+             */
+            is_race: boolean;
+            planned?: components["schemas"]["TodaySessionPlan"] | null;
+            /**
+             * Reason
+             * @default
+             */
+            reason: string;
+            /**
+             * Was Modified
+             * @default false
+             */
+            was_modified: boolean;
+        } & {
+            [key: string]: unknown;
+        };
+        /** TodaySessionPlan */
+        TodaySessionPlan: {
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /**
+             * Duration Min
+             * @default 0
+             */
+            duration_min: number;
+            /** Session Type */
+            session_type: string;
+            /**
+             * Tss Estimate
+             * @default 0
+             */
+            tss_estimate: number;
+            /** Zwo Name */
+            zwo_name?: string | null;
+        } & {
+            [key: string]: unknown;
+        };
         /** UnavailableMarked */
         UnavailableMarked: {
             /**
@@ -1122,6 +1728,46 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    api_daily_log_api_daily_log_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DailyLogRead"];
+                };
+            };
+        };
+    };
+    api_daily_log_post_api_daily_log_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DailyLogSaved"];
+                };
+            };
+        };
+    };
     api_icu_connection_api_icu_connection_get: {
         parameters: {
             query?: never;
@@ -1162,6 +1808,86 @@ export interface operations {
             };
         };
     };
+    api_plan_accept_redraw_api_plan_accept_redraw_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RedrawAccepted"];
+                };
+            };
+        };
+    };
+    api_plan_add_race_api_plan_add_race_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RaceAdded"];
+                };
+            };
+        };
+    };
+    api_plan_auto_adjust_api_plan_auto_adjust_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutoAdjustResult"];
+                };
+            };
+        };
+    };
+    api_continuous_deload_revert_api_plan_continuous_deload_revert_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeloadReverted"];
+                };
+            };
+        };
+    };
     api_plan_dismiss_session_api_plan_dismiss_session_post: {
         parameters: {
             query?: never;
@@ -1178,6 +1904,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SessionDismissed"];
+                };
+            };
+        };
+    };
+    api_plan_ftp_test_type_api_plan_ftp_test_type_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FtpTestTypeSet"];
                 };
             };
         };
@@ -1242,6 +1988,26 @@ export interface operations {
             };
         };
     };
+    api_plan_preview_redraw_api_plan_preview_redraw_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RedrawCandidate"];
+                };
+            };
+        };
+    };
     api_plan_regenerate_dynamic_api_plan_regenerate_post: {
         parameters: {
             query?: never;
@@ -1258,6 +2024,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PlanRegenerated"];
+                };
+            };
+        };
+    };
+    api_plan_rematch_api_plan_rematch_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RematchResult"];
+                };
+            };
+        };
+    };
+    api_save_availability_api_plan_save_availability_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AvailabilitySaved"];
                 };
             };
         };
@@ -1462,6 +2268,66 @@ export interface operations {
             };
         };
     };
+    api_readiness_api_readiness_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Readiness"];
+                };
+            };
+        };
+    };
+    api_readiness_apply_tier_down_api_readiness_apply_tier_down_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TierDownApplied"];
+                };
+            };
+        };
+    };
+    api_readiness_revert_cap_api_readiness_revert_cap_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CapReverted"];
+                };
+            };
+        };
+    };
     api_rider_stats_api_rider_stats_get: {
         parameters: {
             query?: never;
@@ -1538,6 +2404,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SyncProgress"];
+                };
+            };
+        };
+    };
+    api_today_session_api_today_session_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TodaySession"];
+                };
+            };
+        };
+    };
+    api_today_session_persist_api_today_session_persist_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TodayPersisted"];
                 };
             };
         };

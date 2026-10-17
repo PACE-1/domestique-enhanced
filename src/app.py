@@ -3924,7 +3924,7 @@ def _local_sleep_metrics(days: int = 14) -> dict:
     return compute_sleep_metrics_from_wellness(list(reversed(records)))
 
 
-@app.get("/api/readiness")
+@app.get("/api/readiness", responses={200: {"model": api_models.Readiness}})
 def api_readiness(subjective: float = Query(None)):
     training = cached("training", get_today_metrics)
     sleep = cached("sleep", get_sleep_metrics)
@@ -4045,7 +4045,7 @@ def api_readiness(subjective: float = Query(None)):
     }
 
 
-@app.post("/api/readiness/revert-cap")
+@app.post("/api/readiness/revert-cap", responses={200: {"model": api_models.CapReverted}})
 async def api_readiness_revert_cap(request: Request):
     """FIX-CONTRACT C6 — rider-opt-out for today's DFA/decoupling cap.
 
@@ -4115,7 +4115,7 @@ async def api_readiness_revert_cap(request: Request):
 # page as a separate card and is consumed by the planner advisory only when
 # status='dynamic_weights'. See readiness_composite.py for the contract.
 
-@app.post("/api/readiness/apply-tier-down")
+@app.post("/api/readiness/apply-tier-down", responses={200: {"model": api_models.TierDownApplied}})
 async def api_readiness_apply_tier_down(request: Request):
     """v1.7.5 — apply a one-tier intensity drop to today's planned session.
 
@@ -4297,7 +4297,7 @@ async def api_readiness_apply_tier_down(request: Request):
         return JSONResponse({"detail": "tier-down failed"}, 500)
 
 
-@app.post("/api/plan/auto-adjust")
+@app.post("/api/plan/auto-adjust", responses={200: {"model": api_models.AutoAdjustResult}})
 async def api_plan_auto_adjust(request: Request):
     """v1.8.0 §F1 — Automated TSB+HRV → planner with Hooper override.
 
@@ -9245,7 +9245,7 @@ async def api_metrics_log(request: Request):
 # DAILY LOG (Morning Questionnaire) APIs
 # ═══════════════════════════════════════════════════════════════════════════════
 
-@app.get("/api/daily-log")
+@app.get("/api/daily-log", responses={200: {"model": api_models.DailyLogRead}})
 def api_daily_log(days: int = Query(14)):
     """Return today's log entry + recent history."""
     today = db.get_daily_log_today()
@@ -9253,7 +9253,7 @@ def api_daily_log(days: int = Query(14)):
     return {"today": today, "history": history}
 
 
-@app.post("/api/daily-log")
+@app.post("/api/daily-log", responses={200: {"model": api_models.DailyLogSaved}})
 async def api_daily_log_post(request: Request):
     """Submit or update today's morning questionnaire.
 
@@ -9912,7 +9912,7 @@ def api_week_summary(week_offset: int = Query(0)):
     }
 
 
-@app.post("/api/today-session/persist")
+@app.post("/api/today-session/persist", responses={200: {"model": api_models.TodayPersisted}})
 async def api_today_session_persist(request: Request):
     """F6 (v4.1.0) — persist today's adapted session back to the plan JSON.
 
@@ -10492,7 +10492,7 @@ def _advance_continuous_deload(plan: dict, json_path: Path, cur_idx: int,
     return _deload_chip_payload(rec)
 
 
-@app.post("/api/plan/continuous/deload-revert")
+@app.post("/api/plan/continuous/deload-revert", responses={200: {"model": api_models.DeloadReverted}})
 async def api_continuous_deload_revert(request: Request):
     """Revert affordance for the advanced deload (mirrors the DFA auto-swap
     revert): restores the snapshot for the REMAINING days of the week (past
@@ -10537,7 +10537,7 @@ async def api_continuous_deload_revert(request: Request):
         return JSONResponse({"detail": "revert failed"}, 500)
 
 
-@app.get("/api/today-session")
+@app.get("/api/today-session", responses={200: {"model": api_models.TodaySession}})
 def api_today_session():
     """Return today's adjusted session based on readiness + HRV protocol.
 
@@ -12253,7 +12253,7 @@ async def api_mark_unavailable(request: Request):
         return JSONResponse({"detail": "Plan update failed"}, 500)
 
 
-@app.post("/api/plan/save-availability")
+@app.post("/api/plan/save-availability", responses={200: {"model": api_models.AvailabilitySaved}})
 async def api_save_availability(request: Request):
     """Save the monthly availability calendar data to the plan JSON.
 
@@ -13006,7 +13006,7 @@ async def api_plan_regenerate_dynamic(request: Request):
         return JSONResponse({"error": str(e)}, 500)
 
 
-@app.post("/api/plan/add-race")
+@app.post("/api/plan/add-race", responses={200: {"model": api_models.RaceAdded}})
 async def api_plan_add_race(request: Request):
     """IP-1 — add a B/C race to the EXISTING plan and re-periodize forward.
 
@@ -16360,7 +16360,7 @@ def _reconcile_current_week(plan: dict, today: date) -> "tuple[int, dict | None]
     return n, preview
 
 
-@app.post("/api/plan/rematch")
+@app.post("/api/plan/rematch", responses={200: {"model": api_models.RematchResult}})
 async def api_plan_rematch(request: Request, apply: int = Query(0)):
     """Rematch sessions to actual activities (fix26 §6.3, §6.9).
 
@@ -16752,7 +16752,7 @@ def _accept_redraw_apply(plan: dict, day_iso: str, candidate: dict) -> dict:
         return {"ok": True, "day": day_iso, "sessions_modified": 0, "reforecast": "skipped"}
 
 
-@app.post("/api/plan/preview-redraw")
+@app.post("/api/plan/preview-redraw", responses={200: {"model": api_models.RedrawCandidate}})
 async def api_plan_preview_redraw(request: Request):
     """v1.7.0 — preview a rematch candidate without persisting.
 
@@ -16785,7 +16785,7 @@ async def api_plan_preview_redraw(request: Request):
         return {"ok": False, "action": "invalid", "day": day_iso, "reason": reason}
 
 
-@app.post("/api/plan/accept-redraw")
+@app.post("/api/plan/accept-redraw", responses={200: {"model": api_models.RedrawAccepted}})
 async def api_plan_accept_redraw(request: Request):
     """v1.7.0 — accept a previewed rematch candidate.
 
@@ -17061,7 +17061,7 @@ _FTP_TEST_PREFERRED_FILE = {
 }
 
 
-@app.post("/api/plan/ftp-test-type")
+@app.post("/api/plan/ftp-test-type", responses={200: {"model": api_models.FtpTestTypeSet}})
 async def api_plan_ftp_test_type(request: Request):
     """v3.2.0 — per-session FTP-test choice. The rider picks ramp or 20-min in
     the workout modal (no global setting); this swaps THAT ftp_test session's

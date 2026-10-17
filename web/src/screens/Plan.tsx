@@ -4,8 +4,12 @@ import type { PlanRead, PlanWeek } from "@/api/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { PlanGenerate } from "@/screens/PlanGenerate"
+import { PlanAvailability } from "@/screens/PlanAvailability"
+import { PlanRace } from "@/screens/PlanRace"
+import { PlanRedraw } from "@/screens/PlanRedraw"
+import { PlanRematch } from "@/screens/PlanRematch"
 import { PlanTimeOff } from "@/screens/PlanTimeOff"
-import { currentWeek, dismissSession, fmtMinutes, getPlan, isoDay, moveSession, plannedTss, SWAP_TYPES, swapSessionType, weekSessions } from "@/lib/home"
+import { currentWeek, dismissSession, FTP_TEST_TYPES, fmtMinutes, getPlan, isoDay, moveSession, plannedTss, revertDeload, setFtpTestType, SWAP_TYPES, swapSessionType, weekSessions, type Availability } from "@/lib/home"
 
 type Load = { state: "loading" } | { state: "ok"; plan: PlanRead } | { state: "error"; message: string }
 
@@ -28,8 +32,8 @@ export function Plan() {
   const [busy, setBusy] = useState<string | null>(null)
   const [actionError, setActionError] = useState("")
   const [moving, setMoving] = useState<{ day: string; to: string } | null>(null)
-  const [replacing, setReplacing] = useState(false)
-  const [timeOff, setTimeOff] = useState(false)
+  const [tool, setTool] = useState<"timeoff" | "race" | "availability" | "rematch" | "replace" | null>(null)
+  const [redrawing, setRedrawing] = useState<string | null>(null)
   const [swapping, setSwapping] = useState<{ day: string; type: string; minutes: number } | null>(null)
   const today = isoDay()
 
@@ -92,6 +96,21 @@ export function Plan() {
   const week = weeks[i]
   const sessions = weekSessions(week)
   const goal = plan.goal
+  const deload = (plan as { deload_advance?: { reverted?: boolean; week_num?: number } }).deload_advance
+  const canUndoDeload = !!deload && !deload.reverted
+  const undoDeload = async () => {
+    setBusy("deload")
+    setActionError("")
+    try {
+      const r = await revertDeload()
+      if (!r.reverted) setActionError(`Nothing was undone (${(r.reason ?? "no change").replace(/_/g, " ")}).`)
+      setLoad({ state: "ok", plan: await getPlan() })
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : String(e))
+    } finally {
+      setBusy(null)
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -163,6 +182,32 @@ export function Plan() {
                       >
                         Change type
                       </Button>
+                    )}
+                    {canToggle && !dismissed && redrawing !== s.day && (
+                      <Button size="sm" variant="ghost" aria-label={`Other workout ${dayLabel(s.day)}`} onClick={() => setRedrawing(s.day)}>
+                        Other workout
+                      </Button>
+                    )}
+                    {redrawing === s.day && (
+                      <PlanRedraw day={s.day} onDone={async () => { setRedrawing(null); setLoad({ state: "ok", plan: await getPlan() }) }} onCancel={() => setRedrawing(null)} />
+                    )}
+                    {canToggle && !dismissed && s.session_type === "ftp_test" && (
+                      <select
+                        aria-label={`Test type ${dayLabel(s.day)}`}
+                        className="rounded-md border px-2 py-1 text-sm"
+                        value={String((s as { ftp_test_type?: string }).ftp_test_type ?? "")}
+                        disabled={busy === s.day}
+                        onChange={(e) => change(s.day, () => setFtpTestType(s.day, e.target.value))}
+                      >
+                        <option value="" disabled>
+                          Test type…
+                        </option>
+                        {FTP_TEST_TYPES.map(([id, label]) => (
+                          <option key={id} value={id}>
+                            {label}
+                          </option>
+                        ))}
+                      </select>
                     )}
                     {swapping?.day === s.day && (
                       <span className="flex flex-wrap items-center gap-2">
@@ -237,20 +282,42 @@ export function Plan() {
         </CardContent>
       </Card>
 
-      {timeOff ? (
-        <PlanTimeOff onDone={() => { setTimeOff(false); run() }} onCancel={() => setTimeOff(false)} />
-      ) : (
-        <Button variant="outline" size="sm" onClick={() => setTimeOff(true)}>
-          Time off…
-        </Button>
+      {tool === "timeoff" && <PlanTimeOff onDone={() => { setTool(null); run() }} onCancel={() => setTool(null)} />}
+      {tool === "race" && <PlanRace onDone={() => { setTool(null); setIndex(null); run() }} onCancel={() => setTool(null)} />}
+      {tool === "availability" && (
+        <PlanAvailability
+          weekStart={week.start}
+          today={today}
+          stored={((plan as { availability?: Availability }).availability ?? {}) as Availability}
+          onDone={() => { setTool(null); run() }}
+          onCancel={() => setTool(null)}
+        />
       )}
-
-      {replacing ? (
-        <PlanGenerate hasPlan onDone={() => { setReplacing(false); setIndex(null); run() }} />
-      ) : (
-        <Button variant="outline" size="sm" onClick={() => setReplacing(true)}>
-          Replace the plan…
-        </Button>
+      {tool === "rematch" && <PlanRematch onDone={() => { setTool(null); run() }} onCancel={() => setTool(null)} />}
+      {tool === "replace" && <PlanGenerate hasPlan onDone={() => { setTool(null); setIndex(null); run() }} />}
+      {tool === null && (
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" size="sm" onClick={() => setTool("timeoff")}>
+            Time off…
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setTool("race")}>
+            Add a race…
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setTool("availability")}>
+            Availability…
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setTool("rematch")}>
+            Match rides…
+          </Button>
+          {canUndoDeload && (
+            <Button variant="outline" size="sm" disabled={busy === "deload"} onClick={undoDeload}>
+              Undo the deload
+            </Button>
+          )}
+          <Button variant="outline" size="sm" onClick={() => setTool("replace")}>
+            Replace the plan…
+          </Button>
+        </div>
       )}
     </div>
   )
