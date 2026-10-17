@@ -16948,7 +16948,7 @@ def _swap_session_type_apply(plan: dict, day_iso: str, new_type: str, new_dur: i
             "sessions_modified": sessions_modified}
 
 
-@app.post("/api/plan/swap-type")
+@app.post("/api/plan/swap-type", responses={200: {"model": api_models.SessionSwapped}})
 async def api_plan_swap_type(request: Request):
     """v2.3.0 — swap a single day to a DIFFERENT training type + duration, then
     reforecast the rest. The swapped day is pinned; Rematch still works after.
