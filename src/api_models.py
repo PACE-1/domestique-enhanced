@@ -291,3 +291,23 @@ class SessionSwapped(_Model):
     zwo_file: str = ""
     zwo_name: str = ""
     sessions_modified: Optional[int] = None   # later sessions the reforecast rebalanced
+
+
+class UnavailablePeriod(_Model):
+    start: str
+    end: str
+    type: str = "holiday"
+    daily_tss: float = 0
+    reason: str = ""
+
+
+class UnavailableMarked(_Model):
+    ok: bool = True
+    period: UnavailablePeriod
+    plan_json: Optional[PlanJson] = None
+
+
+class PlanRegenerated(_Model):
+    ok: bool = True
+    plan_json: Optional[PlanJson] = None
+    regen_info: Optional[dict] = None

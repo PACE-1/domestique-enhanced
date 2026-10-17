@@ -12208,7 +12208,7 @@ async def api_plan_reforecast():
         return JSONResponse({"detail": "Plan update failed"}, 500)
 
 
-@app.post("/api/plan/mark-unavailable")
+@app.post("/api/plan/mark-unavailable", responses={200: {"model": api_models.UnavailableMarked}})
 async def api_mark_unavailable(request: Request):
     """Mark a date range as unavailable (holiday/injury/illness)."""
     body = await _get_json_body(request)
@@ -12236,6 +12236,8 @@ async def api_mark_unavailable(request: Request):
                 date.fromisoformat(period["end"])
             except (ValueError, TypeError):
                 return JSONResponse({"error": "Invalid date format (use YYYY-MM-DD)"}, 400)
+            if period["end"] < period["start"]:
+                return JSONResponse({"error": "end must not be before start"}, 400)
 
             unavailable = plan.get("unavailable_periods", [])
             unavailable.append(period)
@@ -12950,7 +12952,7 @@ def _apply_plan_update(
     return plan, "rebalanced", info, status
 
 
-@app.post("/api/plan/regenerate")
+@app.post("/api/plan/regenerate", responses={200: {"model": api_models.PlanRegenerated}})
 async def api_plan_regenerate_dynamic(request: Request):
     """Regenerate plan from today after missed training/injury/holiday.
 

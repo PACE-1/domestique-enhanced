@@ -130,3 +130,17 @@ test("the Plan can be replaced by a new one built from the form", async ({ page,
   const plan = await (await request.get("http://127.0.0.1:" + (process.env.E2E_PORT ?? 22488) + "/api/plan")).json()
   expect(plan.plan_json.weeks.length).toBeGreaterThanOrEqual(6)
 })
+
+test("time off can be recorded and the plan rebuilt around it", async ({ page, request }) => {
+  await page.goto("#/plan")
+  await page.getByRole("button", { name: "Time off…" }).click()
+  const day = (n: number) => { const d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10) }
+  await page.getByLabel("First day").fill(day(3))
+  await page.getByLabel("Last day").fill(day(5))
+  await page.getByLabel("Reason").selectOption("illness")
+  await page.getByRole("button", { name: "Save and rebuild plan" }).click()
+  await expect(page.getByRole("button", { name: "Time off…" })).toBeVisible()
+  await expect(page.getByRole("alert")).toHaveCount(0)
+  const plan = await (await request.get("http://127.0.0.1:" + (process.env.E2E_PORT ?? 22488) + "/api/plan")).json()
+  expect(plan.plan_json.unavailable_periods.at(-1)).toMatchObject({ start: day(3), end: day(5), type: "illness" })
+})
