@@ -1,9 +1,5 @@
 # Changelog
 
-## v1.0.2 — Right-sized AppImage (2026-10-17)
-
-- **The AppImage no longer enlarges the interface by an extra 25 percent.** The old dashboard needed that boost; the new interface is already a comfortable size, so it looked oversized on large and high-resolution screens. The window also uses a little more width on wide screens. Set `QT_SCALE_FACTOR` yourself if you want a different size.
-
 ## v1.0.1 — One interface (2026-10-17)
 
 The old dashboard is gone. Everything it did now lives in the new interface, which is the only one the app opens. Your data folder (`~/.domestique`) is unchanged.
@@ -18,6 +14,7 @@ The old dashboard is gone. Everything it did now lives in the new interface, whi
 - **Analysis:** fatigue resistance, your own fitted fitness and fatigue time constants, how well the model predicted your FTP, energy-system trends, a fill-in for older rides, and a backfill of power history.
 - **Settings:** connect and disconnect intervals.icu, push to its calendar, extra workout folders, custom power zones, logs and a health check.
 - **Connect intervals.icu with an API key.** Setup and Settings take your athlete ID (optional) and an API key from intervals.icu → Settings → Developer Settings. The key is checked before it is saved. The AppImage is built without the "Sign in with intervals.icu" button, so this is how you connect there; Docker and checkouts keep the button when an OAuth secret is configured.
+- **The AppImage no longer enlarges the interface by an extra 25 percent.** That boost was for the old dashboard; the new interface is already a comfortable size, so it looked oversized on large and high-resolution screens. The window also uses a little more width on wide screens. Set `QT_SCALE_FACTOR` yourself for a different size.
 - Uncaught errors in the interface are now written to the diagnostics log.
 
 ### Changes you may notice
