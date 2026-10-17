@@ -1,8 +1,8 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react"
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { afterEach, describe, expect, it, vi } from "vitest"
 
-import { courseUrl } from "@/lib/routes"
+import { courseUrl, pickFive } from "@/lib/routes"
 import { Elevation, Routes } from "@/screens/Routes"
 
 const route = (n: number, over = {}) => ({
@@ -71,5 +71,59 @@ describe("Routes", () => {
     fail = false
     await userEvent.click(screen.getByRole("button", { name: "Retry" }))
     expect(await screen.findByText("No routes match.")).toBeTruthy()
+  })
+})
+
+describe("Route finder and extra filters", () => {
+  const suggest = (n: number) => ({ route: route(n), match_score: 1 - n / 100, rationale: `fits ${n}` })
+  function stub(handler: (url: string, init?: RequestInit) => Response) {
+    const calls: { url: string; body: unknown }[] = []
+    vi.stubGlobal("fetch", vi.fn(async (url: string, init?: RequestInit) => {
+      calls.push({ url, body: init?.body ? JSON.parse(String(init.body)) : undefined })
+      return handler(url, init)
+    }))
+    return calls
+  }
+
+  it("suggests routes for the wanted distance, climbing and surface, and swaps min and max if reversed", async () => {
+    const calls = stub((u) => (u.startsWith("/api/routes/suggest") ? json({ count: 2, results: [suggest(1), suggest(2)] }) : u.startsWith("/api/routes/regions") ? json(REGIONS) : json({ total_matching: 0, returned: 0, routes: [] })))
+    render(<Routes />)
+    const finder = within(screen.getByRole("heading", { name: "Find me a route" }).closest("div")!.parentElement!)
+    await userEvent.clear(finder.getByLabelText("Shortest (km)"))
+    await userEvent.type(finder.getByLabelText("Shortest (km)"), "80")
+    await userEvent.click(finder.getByRole("button", { name: "Gravel" }))
+    await userEvent.click(finder.getByRole("button", { name: "Suggest routes" }))
+    expect(await screen.findByText(/fits 1 \(match 99%\)/)).toBeTruthy()
+    const sent = calls.find((c) => c.url === "/api/routes/suggest")!.body as Record<string, unknown>
+    expect(sent.distance_km).toEqual({ min: 60, max: 80 })
+    expect(sent.surface).toEqual(["gravel"])
+    expect(sent.max_results).toBe(20)
+  })
+
+  it("offers the one filter to drop when nothing fits", async () => {
+    stub((u) => (u.startsWith("/api/routes/suggest") ? json({ count: 0, results: [], empty_hint: { filter: "loop", filter_label: "the loop-only filter", would_match: 14 } }) : u.startsWith("/api/routes/regions") ? json(REGIONS) : json({ total_matching: 0, returned: 0, routes: [] })))
+    render(<Routes />)
+    await userEvent.click(screen.getByRole("button", { name: "Suggest routes" }))
+    expect(await screen.findByText(/Drop the loop-only filter to see 14 routes/)).toBeTruthy()
+  })
+
+  it("sends the source, surface and climb category filters", async () => {
+    const urls = mock(() => json({ total_matching: 1, returned: 1, routes: [route(1)] }))
+    render(<Routes />)
+    await screen.findByText("Route 1")
+    await userEvent.selectOptions(screen.getByLabelText("Source"), "real")
+    await userEvent.click(within(screen.getByRole("group", { name: "Climb category" })).getByRole("button", { name: "HC" }))
+    await waitFor(() => expect(urls.at(-1)).toContain("source=real"))
+    expect(urls.at(-1)).toContain("category=hc")
+  })
+})
+
+describe("pickFive", () => {
+  const items = Array.from({ length: 20 }, (_, i) => ({ route: route(i), match_score: 1 - i / 100, rationale: "" }))
+  it("returns the list as is when there are five or fewer, else five distinct best-first", () => {
+    expect(pickFive(items.slice(0, 3))).toHaveLength(3)
+    const five = pickFive(items, () => 0.5)
+    expect(new Set(five.map((x) => x.route.id)).size).toBe(5)
+    expect(five.map((x) => x.match_score)).toEqual([...five.map((x) => x.match_score)].sort((a, b) => b - a))
   })
 })

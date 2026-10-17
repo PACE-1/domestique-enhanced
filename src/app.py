@@ -6956,7 +6956,7 @@ def api_routes(
 
 
 
-@app.post("/api/routes/suggest")
+@app.post("/api/routes/suggest", responses={200: {"model": api_models.RouteSuggestions}})
 async def api_routes_suggest(request: Request):
     """Rank + return top N routes matching user picker input."""
     body = await _get_json_body(request)

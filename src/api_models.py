@@ -1091,3 +1091,16 @@ class WorkoutTags(_Model):
 class SurfaceTypes(_Model):
     routes: dict = {}                 # route file -> surface
     gravel_workouts: list[dict] = []  # workouts that pair well with gravel and cobbles
+
+
+class RouteSuggestion(_Model):
+    route: RouteSummary
+    match_score: float = 0
+    rationale: str = ""
+
+
+class RouteSuggestions(_Model):
+    count: int = 0
+    filters_applied: dict = {}
+    results: list[RouteSuggestion] = []
+    empty_hint: Optional[dict] = None   # {filter, filter_label, would_match}: the one filter to drop for the most routes

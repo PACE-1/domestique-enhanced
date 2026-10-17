@@ -5006,6 +5006,67 @@
         "title": "RidesSynced",
         "type": "object"
       },
+      "RouteSuggestion": {
+        "additionalProperties": true,
+        "properties": {
+          "match_score": {
+            "default": 0,
+            "title": "Match Score",
+            "type": "number"
+          },
+          "rationale": {
+            "default": "",
+            "title": "Rationale",
+            "type": "string"
+          },
+          "route": {
+            "$ref": "#/components/schemas/RouteSummary"
+          }
+        },
+        "required": [
+          "route"
+        ],
+        "title": "RouteSuggestion",
+        "type": "object"
+      },
+      "RouteSuggestions": {
+        "additionalProperties": true,
+        "properties": {
+          "count": {
+            "default": 0,
+            "title": "Count",
+            "type": "integer"
+          },
+          "empty_hint": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Empty Hint"
+          },
+          "filters_applied": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Filters Applied",
+            "type": "object"
+          },
+          "results": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/RouteSuggestion"
+            },
+            "title": "Results",
+            "type": "array"
+          }
+        },
+        "title": "RouteSuggestions",
+        "type": "object"
+      },
       "RouteSummary": {
         "additionalProperties": true,
         "properties": {
@@ -7838,6 +7899,23 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/RegionsList"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/routes/suggest": {
+      "post": {
+        "operationId": "api_routes_suggest_api_routes_suggest_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouteSuggestions"
                 }
               }
             },

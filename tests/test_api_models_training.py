@@ -29,3 +29,12 @@ def test_banister_validation_and_fatigue_resistance_validate(c):
 def test_race_flag_on_an_unknown_activity_is_a_404_and_a_bad_id_a_400(c):
     assert c.post("/api/activity/nope/race", json={"is_race": True}).status_code == 404
     assert c.post("/api/activity/a b/race", json={"is_race": True}).status_code == 400
+
+
+def test_route_suggestions_and_tags_and_surfaces_validate(c):
+    s = api_models.RouteSuggestions.model_validate(
+        c.post("/api/routes/suggest", json={"distance_km": {"min": 20, "max": 60}, "max_results": 5}).json())
+    assert s.count == len(s.results)
+    assert all(r.route.id for r in s.results)
+    assert isinstance(api_models.WorkoutTags.model_validate(c.get("/api/workouts/tags").json()).tags, list)
+    assert api_models.SurfaceTypes.model_validate(c.get("/api/surface-types").json()).routes is not None

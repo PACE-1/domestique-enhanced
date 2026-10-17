@@ -7,7 +7,9 @@ import { Label } from "@/components/ui/label"
 import { NativeSelect } from "@/components/ui/native-select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
-import { courseUrl, getRegions, listRoutes, ROUTE_PAGE, type RouteQuery } from "@/lib/routes"
+import { CATEGORIES, courseUrl, getRegions, listRoutes, ROUTE_PAGE, SURFACES, type RouteQuery } from "@/lib/routes"
+import { Chips } from "@/screens/Chips"
+import { RouteFinder } from "@/screens/RouteFinder"
 
 /** Elevation against distance. `points` are [km, metres] pairs. */
 export function Elevation({ points, label }: { points: number[][]; label: string }) {
@@ -26,7 +28,7 @@ export function Elevation({ points, label }: { points: number[][]; label: string
   )
 }
 
-function RouteRow({ r }: { r: RouteSummary }) {
+export function RouteRow({ r }: { r: RouteSummary }) {
   const [open, setOpen] = useState(false)
   const url = courseUrl(r)
   const mix = r.surface_mix_pct as Record<string, number> | null | undefined
@@ -68,7 +70,7 @@ type Load = { state: "loading" } | { state: "ok"; data: RoutesList } | { state: 
 const num = (v: string) => (v === "" ? null : Number(v))
 
 export function Routes() {
-  const [q, setQ] = useState<RouteQuery>({ search: "", region: "", minKm: null, maxKm: null, loopOnly: false })
+  const [q, setQ] = useState<RouteQuery>({ search: "", region: "", minKm: null, maxKm: null, loopOnly: false, source: "any", surfaces: [], categories: [] })
   const [applied, setApplied] = useState(q)
   const [load, setLoad] = useState<Load>({ state: "loading" })
   const [regions, setRegions] = useState<RegionsList | null>(null)
@@ -94,6 +96,7 @@ export function Routes() {
   const badRange = q.minKm !== null && q.maxKm !== null && q.minKm > q.maxKm
   return (
     <div className="space-y-4">
+      <RouteFinder />
       <Card>
         <CardContent className="space-y-3 p-4">
           <h2 className="text-sm font-semibold">Routes and climbs</h2>
@@ -131,6 +134,18 @@ export function Routes() {
               Loops only
             </Label>
           </div>
+          <div className="flex flex-wrap items-end gap-2 text-sm">
+            <Label className="flex-col items-start gap-1">
+              Source
+              <NativeSelect value={q.source} onChange={(e) => setQ({ ...q, source: e.target.value as RouteQuery["source"] })}>
+                <option value="any">All routes</option>
+                <option value="real">Real-world</option>
+                <option value="virtual">Virtual</option>
+              </NativeSelect>
+            </Label>
+          </div>
+          <Chips label="Surface" options={SURFACES} value={q.surfaces} onChange={(surfaces) => setQ({ ...q, surfaces })} />
+          <Chips label="Climb category" options={CATEGORIES} value={q.categories} onChange={(categories) => setQ({ ...q, categories })} />
           {badRange && <p className="text-sm">“From” is longer than “To”.</p>}
         </CardContent>
       </Card>

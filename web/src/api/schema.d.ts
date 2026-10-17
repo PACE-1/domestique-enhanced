@@ -1060,6 +1060,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/routes/suggest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_routes_suggest_api_routes_suggest_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/settings": {
         parameters: {
             query?: never;
@@ -3626,6 +3642,48 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** RouteSuggestion */
+        RouteSuggestion: {
+            /**
+             * Match Score
+             * @default 0
+             */
+            match_score: number;
+            /**
+             * Rationale
+             * @default
+             */
+            rationale: string;
+            route: components["schemas"]["RouteSummary"];
+        } & {
+            [key: string]: unknown;
+        };
+        /** RouteSuggestions */
+        RouteSuggestions: {
+            /**
+             * Count
+             * @default 0
+             */
+            count: number;
+            /** Empty Hint */
+            empty_hint?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Filters Applied
+             * @default {}
+             */
+            filters_applied: {
+                [key: string]: unknown;
+            };
+            /**
+             * Results
+             * @default []
+             */
+            results: components["schemas"]["RouteSuggestion"][];
+        } & {
+            [key: string]: unknown;
+        };
         /** RouteSummary */
         RouteSummary: {
             /** Category */
@@ -5730,6 +5788,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RegionsList"];
+                };
+            };
+        };
+    };
+    api_routes_suggest_api_routes_suggest_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RouteSuggestions"];
                 };
             };
         };
