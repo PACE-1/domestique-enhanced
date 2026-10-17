@@ -1248,6 +1248,60 @@
         "title": "DfaRides",
         "type": "object"
       },
+      "DfaSnapshot": {
+        "additionalProperties": true,
+        "properties": {
+          "last_computed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Computed At"
+          },
+          "message": {
+            "default": "",
+            "title": "Message",
+            "type": "string"
+          },
+          "n_fetch_failed": {
+            "default": 0,
+            "title": "N Fetch Failed",
+            "type": "integer"
+          },
+          "n_no_rr_data": {
+            "default": 0,
+            "title": "N No Rr Data",
+            "type": "integer"
+          },
+          "n_recent_total": {
+            "default": 0,
+            "title": "N Recent Total",
+            "type": "integer"
+          },
+          "n_rides": {
+            "default": 0,
+            "title": "N Rides",
+            "type": "integer"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "title": "DfaSnapshot",
+        "type": "object"
+      },
       "DfaThreshold": {
         "additionalProperties": true,
         "properties": {
@@ -7612,6 +7666,23 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/BanisterValidation"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/profile/dfa-alpha1": {
+      "get": {
+        "operationId": "api_profile_dfa_alpha1_api_profile_dfa_alpha1_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DfaSnapshot"
                 }
               }
             },

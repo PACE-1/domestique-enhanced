@@ -13,6 +13,7 @@ import {
   weekSessions,
 } from "@/lib/home"
 import { BodyPerf } from "@/screens/BodyPerf"
+import { DfaSnapshotCard } from "@/screens/DfaSnapshot"
 import { DailyCheckIn } from "@/screens/DailyCheckIn"
 import { Hrv } from "@/screens/Hrv"
 import { Panel, Row, useLoad } from "@/screens/panel"
@@ -56,6 +57,8 @@ export function Home() {
       <LastWeek />
 
       <Records />
+
+      <DfaSnapshotCard />
 
       <Readiness />
 

@@ -2888,7 +2888,7 @@ def api_profile_fatigue_resistance(window_days: int = Query(365, ge=1, le=3650),
         return result
 
 
-@app.get("/api/profile/dfa-alpha1")
+@app.get("/api/profile/dfa-alpha1", responses={200: {"model": api_models.DfaSnapshot}})
 def api_profile_dfa_alpha1():
     """v1.8.9 Bug 7 (master §7) — DFA α1 snapshot for the homepage.
 

@@ -38,3 +38,12 @@ def test_route_suggestions_and_tags_and_surfaces_validate(c):
     assert all(r.route.id for r in s.results)
     assert isinstance(api_models.WorkoutTags.model_validate(c.get("/api/workouts/tags").json()).tags, list)
     assert api_models.SurfaceTypes.model_validate(c.get("/api/surface-types").json()).routes is not None
+
+
+def test_dfa_snapshot_and_week_summary_and_auto_recalc_validate(c):
+    d = api_models.DfaSnapshot.model_validate(c.get("/api/profile/dfa-alpha1").json())
+    assert d.n_rides >= 0
+    w = api_models.WeekSummary.model_validate(c.get("/api/week-summary?week_offset=-1").json())
+    assert w.week_start < w.week_end and w.week_offset == -1
+    r = api_models.PlanAutoRecalc.model_validate(c.post("/api/plan/auto-recalc").json())
+    assert r.action == "no_plan"

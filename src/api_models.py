@@ -1134,3 +1134,13 @@ class PlanAutoRecalc(_Model):
     days_since_recalc: Optional[int] = None
     weeks_regenerated: Optional[int] = None
     plan_json: Optional[PlanJson] = None
+
+
+class DfaSnapshot(_Model):
+    value: Optional[float] = None            # None when no ride has a computed value yet
+    n_rides: int = 0
+    last_computed_at: Optional[str] = None
+    n_recent_total: int = 0
+    n_no_rr_data: int = 0
+    n_fetch_failed: int = 0
+    message: str = ""

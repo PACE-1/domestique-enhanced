@@ -1,4 +1,4 @@
-import type { BackfillStatus, DfaRides, SyncProgress } from "@/api/types"
+import type { BackfillStatus, DfaRides, DfaSnapshot, SyncProgress } from "@/api/types"
 import { api } from "@/lib/api"
 
 export type { BackfillStatus, DfaRide, DfaRides, DfaThreshold as Threshold, SyncProgress } from "@/api/types"
@@ -29,3 +29,6 @@ export const syncProgress = () => api<SyncProgress>("/api/sync/progress")
 export const BACKFILL_KEY = "dfa_backfill_last_run_at"
 export const MIGRATE_KEY = "dfa_migrate_last_run_at"
 export const MIGRATE_THROTTLE_MS = 10 * 60 * 1000
+
+/** The latest computed DFA α1, for the Home page. */
+export const getSnapshot = () => api<DfaSnapshot>("/api/profile/dfa-alpha1")

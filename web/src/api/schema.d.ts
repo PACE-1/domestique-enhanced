@@ -612,6 +612,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/profile/dfa-alpha1": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_profile_dfa_alpha1_api_profile_dfa_alpha1_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/profile/dfa-backfill": {
         parameters: {
             query?: never;
@@ -1969,6 +1985,40 @@ export interface components {
              * @default []
              */
             rides: components["schemas"]["DfaRide"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** DfaSnapshot */
+        DfaSnapshot: {
+            /** Last Computed At */
+            last_computed_at?: string | null;
+            /**
+             * Message
+             * @default
+             */
+            message: string;
+            /**
+             * N Fetch Failed
+             * @default 0
+             */
+            n_fetch_failed: number;
+            /**
+             * N No Rr Data
+             * @default 0
+             */
+            n_no_rr_data: number;
+            /**
+             * N Recent Total
+             * @default 0
+             */
+            n_recent_total: number;
+            /**
+             * N Rides
+             * @default 0
+             */
+            n_rides: number;
+            /** Value */
+            value?: number | null;
         } & {
             [key: string]: unknown;
         };
@@ -5340,6 +5390,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BanisterValidation"];
+                };
+            };
+        };
+    };
+    api_profile_dfa_alpha1_api_profile_dfa_alpha1_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DfaSnapshot"];
                 };
             };
         };
