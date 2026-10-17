@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.2 — Right-sized AppImage (2026-10-17)
+
+- **The AppImage no longer enlarges the interface by an extra 25 percent.** The old dashboard needed that boost; the new interface is already a comfortable size, so it looked oversized on large and high-resolution screens. The window also uses a little more width on wide screens. Set `QT_SCALE_FACTOR` yourself if you want a different size.
+
 ## v1.0.1 — One interface (2026-10-17)
 
 The old dashboard is gone. Everything it did now lives in the new interface, which is the only one the app opens. Your data folder (`~/.domestique`) is unchanged.
