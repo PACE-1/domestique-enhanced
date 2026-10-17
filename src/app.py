@@ -6874,7 +6874,7 @@ def api_migrations_last_run_result():
 _UPDATE_CHECK_CACHE_TTL_S = 6 * 60 * 60  # 6 hours
 # Release channel: this fork's own repository, never upstream (#16). Override with
 # SHEPHERD_RELEASE_REPO=<owner>/<repo>; upstream binaries are not offered as upgrades.
-_RELEASE_REPO = (os.environ.get("SHEPHERD_RELEASE_REPO") or "PACE-1/domestique-enhanced").strip().strip("/")
+_RELEASE_REPO = (os.environ.get("SHEPHERD_RELEASE_REPO") or "PACE-1/shepherd").strip().strip("/")
 _GITHUB_RELEASES_LATEST_URL = f"https://api.github.com/repos/{_RELEASE_REPO}/releases/latest"
 _RELEASE_BODY_MAX_CHARS = 8192
 _RELEASE_BODY_TRUNCATION_SUFFIX = "\n\n… (full release notes on GitHub)"

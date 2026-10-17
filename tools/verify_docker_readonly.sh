@@ -2,11 +2,11 @@
 # Prove the bundled assets can stay read-only (#15): run the image with a
 # read-only root filesystem, generate a plan, read it back and export a FIT.
 # Only /data (the volume) and /tmp are writable.
-# Usage: tools/verify_docker_readonly.sh [image]   (builds domestique-enhanced:readonly-check if omitted)
+# Usage: tools/verify_docker_readonly.sh [image]   (builds shepherd:readonly-check if omitted)
 set -euo pipefail
 cd "$(dirname "$0")/.."
 IMG=${1:-}
-if [ -z "$IMG" ]; then IMG=domestique-enhanced:readonly-check; docker build -q -t "$IMG" . >/dev/null; fi
+if [ -z "$IMG" ]; then IMG=shepherd:readonly-check; docker build -q -t "$IMG" . >/dev/null; fi
 TOKEN=readonly-check-token; VOL=de-readonly-$$; NAME=$VOL-srv; PORT=22493
 cleanup() { docker rm -f "$NAME" >/dev/null 2>&1 || true; docker volume rm "$VOL" >/dev/null 2>&1 || true; }
 trap cleanup EXIT
