@@ -2040,7 +2040,7 @@ def api_profile_ftp_history():
     }
 
 
-@app.post("/api/profile/update-ftp")
+@app.post("/api/profile/update-ftp", responses={200: {"model": api_models.FtpUpdated}})
 def api_profile_update_ftp(body: dict):
     from profile_manager import ProfileManager
     try:
@@ -17728,7 +17728,7 @@ def _parse_fit_stats(fit_path: Path) -> dict:
     return out
 
 
-@app.post("/api/ride/import")
+@app.post("/api/ride/import", responses={200: {"model": api_models.RideImported}})
 async def api_ride_import(
     fit_file: UploadFile = File(...),
 ):
@@ -18811,7 +18811,7 @@ def _maybe_queue_pr_toasts(added_paths: list[Path]) -> None:
     _write_pr_toast_queue(queue)
 
 
-@app.post("/api/ride/{ride_id}/rpe")
+@app.post("/api/ride/{ride_id}/rpe", responses={200: {"model": api_models.RideRpeSaved}})
 async def api_ride_rpe(ride_id: str, request: Request):
     """v3.5.6 — store the rider's session RPE for a ride.
 
@@ -18882,7 +18882,7 @@ async def api_ride_rpe(ride_id: str, request: Request):
             "scale": "foster_cr10" if rpe is not None else None}
 
 
-@app.get("/api/ride/{ride_id}/prs")
+@app.get("/api/ride/{ride_id}/prs", responses={200: {"model": api_models.RidePrs}})
 def api_ride_prs(ride_id: str):
     """v1.3.0 — return the cached PR list for a ride.
 
@@ -18920,7 +18920,7 @@ def api_ride_prs(ride_id: str):
     return {"ride_id": ride_id, "prs": prs}
 
 
-@app.get("/api/profile/pr-toast-queue")
+@app.get("/api/profile/pr-toast-queue", responses={200: {"model": api_models.PrToastQueue}})
 def api_profile_pr_toast_queue(drain: int = Query(0)):
     """v1.3.0 IMPL-PR-DETECTION (W2B-G4 fix) — read pending PR toasts.
 
@@ -19102,7 +19102,7 @@ def _detect_plan_load_alert() -> bool:
         return False
 
 
-@app.post("/api/rides/sync")
+@app.post("/api/rides/sync", responses={200: {"model": api_models.RidesSynced}})
 def api_rides_sync(force: int = Query(0)):
     """v4.4.0 — pull last 90 days of ICU activities into the local rides
     store and return counts.
@@ -19264,7 +19264,7 @@ def _project_intervals_for_display(rec: dict) -> dict:
     return rec
 
 
-@app.get("/api/ride/{ride_id}/detail")
+@app.get("/api/ride/{ride_id}/detail", responses={200: {"model": api_models.RideDetail}})
 def api_ride_full_detail(ride_id: str, include: str = Query("")):
     """v4.4.0 — return the full normalized ride record (MASTER §3 schema).
 
@@ -19937,7 +19937,7 @@ def _fit_power_series_1hz(fit_path: Path) -> list[int]:
     return _resample_series_1hz(ts, pw)
 
 
-@app.get("/api/ride/{ride_id}/ftp-test-analysis")
+@app.get("/api/ride/{ride_id}/ftp-test-analysis", responses={200: {"model": api_models.FtpTestAnalysis}})
 def api_ride_ftp_test_analysis(ride_id: str):
     """v3.11.3 — the FTP-test analysis view: the recognised protocol, the
     1 Hz power trace, and WHERE the number came from (scored window, the
@@ -20007,7 +20007,7 @@ def api_ride_ftp_test_analysis(ride_id: str):
     }
 
 
-@app.post("/api/ride/{ride_id}/ftp-test-review")
+@app.post("/api/ride/{ride_id}/ftp-test-review", responses={200: {"model": api_models.FtpReviewSaved}})
 async def api_ride_ftp_test_review(ride_id: str, request: Request):
     """FTP-tests IP W2c — persist the rider's verdict on a test suggestion
     (accepted / declined / edited) onto the ICU ride envelope, so the post-

@@ -825,6 +825,102 @@
         "title": "EnsureProfile",
         "type": "object"
       },
+      "FtpReviewSaved": {
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "persisted": {
+            "default": false,
+            "title": "Persisted",
+            "type": "boolean"
+          }
+        },
+        "title": "FtpReviewSaved",
+        "type": "object"
+      },
+      "FtpTestAnalysis": {
+        "additionalProperties": true,
+        "properties": {
+          "halted": {
+            "default": false,
+            "title": "Halted",
+            "type": "boolean"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "prior_ftp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prior Ftp"
+          },
+          "ride_id": {
+            "title": "Ride Id",
+            "type": "string"
+          },
+          "series": {
+            "default": [],
+            "items": {
+              "type": "integer"
+            },
+            "title": "Series",
+            "type": "array"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "step_s": {
+            "default": 1,
+            "title": "Step S",
+            "type": "integer"
+          },
+          "suggestion": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Suggestion",
+            "type": "object"
+          },
+          "total_s": {
+            "default": 0,
+            "title": "Total S",
+            "type": "integer"
+          },
+          "windows": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Windows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "ride_id"
+        ],
+        "title": "FtpTestAnalysis",
+        "type": "object"
+      },
       "FtpTestTypeSet": {
         "additionalProperties": true,
         "properties": {
@@ -885,6 +981,45 @@
           "test_type"
         ],
         "title": "FtpTestTypeSet",
+        "type": "object"
+      },
+      "FtpUpdated": {
+        "additionalProperties": true,
+        "properties": {
+          "ftp": {
+            "title": "Ftp",
+            "type": "number"
+          },
+          "ftp_source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp Source"
+          },
+          "ftp_test_history": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Ftp Test History",
+            "type": "array"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ftp"
+        ],
+        "title": "FtpUpdated",
         "type": "object"
       },
       "IcuConnection": {
@@ -1668,6 +1803,27 @@
         "title": "PowerCurvePoint",
         "type": "object"
       },
+      "PrToastQueue": {
+        "additionalProperties": true,
+        "properties": {
+          "count": {
+            "default": 0,
+            "title": "Count",
+            "type": "integer"
+          },
+          "queue": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Queue",
+            "type": "array"
+          }
+        },
+        "title": "PrToastQueue",
+        "type": "object"
+      },
       "ProfileCreated": {
         "additionalProperties": true,
         "properties": {
@@ -2440,6 +2596,385 @@
         "title": "RematchResult",
         "type": "object"
       },
+      "RideDetail": {
+        "additionalProperties": true,
+        "properties": {
+          "avg_cadence": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Cadence"
+          },
+          "avg_hr": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Hr"
+          },
+          "avg_power_w": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Power W"
+          },
+          "decoupling_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decoupling Pct"
+          },
+          "dfa_alpha1": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dfa Alpha1"
+          },
+          "distance_km": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance Km"
+          },
+          "duration_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration S"
+          },
+          "efforts": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Efforts",
+            "type": "array"
+          },
+          "elevation_m": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Elevation M"
+          },
+          "ftp_at_ride": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp At Ride"
+          },
+          "hr_max": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hr Max"
+          },
+          "if_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "If Pct"
+          },
+          "intervals": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Intervals",
+            "type": "array"
+          },
+          "kcal": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kcal"
+          },
+          "kj": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kj"
+          },
+          "moving_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Moving S"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          },
+          "np_w": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Np W"
+          },
+          "prs": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Prs",
+            "type": "array"
+          },
+          "ride_id": {
+            "title": "Ride Id",
+            "type": "string"
+          },
+          "rpe": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rpe"
+          },
+          "samples": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Samples"
+          },
+          "source": {
+            "default": "",
+            "title": "Source",
+            "type": "string"
+          },
+          "sport": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sport"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "time_in_zone": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time In Zone"
+          },
+          "tss": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tss"
+          }
+        },
+        "required": [
+          "ride_id"
+        ],
+        "title": "RideDetail",
+        "type": "object"
+      },
+      "RideImported": {
+        "additionalProperties": true,
+        "properties": {
+          "bytes": {
+            "default": 0,
+            "title": "Bytes",
+            "type": "integer"
+          },
+          "icu_upload": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Icu Upload",
+            "type": "object"
+          },
+          "parsed_stats": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Parsed Stats",
+            "type": "object"
+          },
+          "ride_id": {
+            "title": "Ride Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ride_id"
+        ],
+        "title": "RideImported",
+        "type": "object"
+      },
+      "RidePrs": {
+        "additionalProperties": true,
+        "properties": {
+          "prs": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Prs",
+            "type": "array"
+          },
+          "ride_id": {
+            "title": "Ride Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ride_id"
+        ],
+        "title": "RidePrs",
+        "type": "object"
+      },
+      "RideRpeSaved": {
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "ride_id": {
+            "title": "Ride Id",
+            "type": "string"
+          },
+          "rpe": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rpe"
+          },
+          "scale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scale"
+          }
+        },
+        "required": [
+          "ride_id"
+        ],
+        "title": "RideRpeSaved",
+        "type": "object"
+      },
       "RideSummary": {
         "additionalProperties": true,
         "properties": {
@@ -2649,6 +3184,56 @@
           }
         },
         "title": "RiderStats",
+        "type": "object"
+      },
+      "RidesSynced": {
+        "additionalProperties": true,
+        "properties": {
+          "added": {
+            "default": 0,
+            "title": "Added",
+            "type": "integer"
+          },
+          "plan_adapted": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan Adapted"
+          },
+          "plan_load_alert": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan Load Alert"
+          },
+          "skipped": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skipped"
+          },
+          "total": {
+            "default": 0,
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "title": "RidesSynced",
         "type": "object"
       },
       "RouteSummary": {
@@ -4401,6 +4986,40 @@
         }
       }
     },
+    "/api/profile/pr-toast-queue": {
+      "get": {
+        "operationId": "api_profile_pr_toast_queue_api_profile_pr_toast_queue_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrToastQueue"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/profile/update-ftp": {
+      "post": {
+        "operationId": "api_profile_update_ftp_api_profile_update_ftp_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FtpUpdated"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/profiles": {
       "get": {
         "operationId": "api_profiles_api_profiles_get",
@@ -4552,6 +5171,108 @@
         }
       }
     },
+    "/api/ride/import": {
+      "post": {
+        "operationId": "api_ride_import_api_ride_import_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RideImported"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/ride/{ride_id}/detail": {
+      "get": {
+        "operationId": "api_ride_full_detail_api_ride__ride_id__detail_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RideDetail"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/ride/{ride_id}/ftp-test-analysis": {
+      "get": {
+        "operationId": "api_ride_ftp_test_analysis_api_ride__ride_id__ftp_test_analysis_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FtpTestAnalysis"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/ride/{ride_id}/ftp-test-review": {
+      "post": {
+        "operationId": "api_ride_ftp_test_review_api_ride__ride_id__ftp_test_review_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FtpReviewSaved"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/ride/{ride_id}/prs": {
+      "get": {
+        "operationId": "api_ride_prs_api_ride__ride_id__prs_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RidePrs"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/ride/{ride_id}/rpe": {
+      "post": {
+        "operationId": "api_ride_rpe_api_ride__ride_id__rpe_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RideRpeSaved"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/rider-stats": {
       "get": {
         "operationId": "api_rider_stats_api_rider_stats_get",
@@ -4582,6 +5303,23 @@
                   },
                   "title": "Response 200 Api Rides Api Rides Get",
                   "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/rides/sync": {
+      "post": {
+        "operationId": "api_rides_sync_api_rides_sync_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RidesSynced"
                 }
               }
             },

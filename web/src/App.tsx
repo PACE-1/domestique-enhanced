@@ -8,6 +8,7 @@ import { Library } from "@/screens/Library"
 import { Plan } from "@/screens/Plan"
 import { ProfilePicker } from "@/screens/ProfilePicker"
 import { ProfileSetup } from "@/screens/ProfileSetup"
+import { RideDetail } from "@/screens/RideDetail"
 import { Routes } from "@/screens/Routes"
 import { Setup } from "@/screens/Setup"
 import { Settings } from "@/screens/Settings"
@@ -28,6 +29,13 @@ export function App() {
   if (route === "profile-picker") return <ProfilePicker />
   if (route === "profile-setup") return <ProfileSetup />
   if (route === "setup") return <Setup />
+  const [head, ...rest] = route.split("/")
+  if (head === "ride" && rest.length)
+    return (
+      <AppShell tab="analysis">
+        <RideDetail id={decodeURIComponent(rest.join("/"))} />
+      </AppShell>
+    )
   const tab = isTab(route) ? route : "home"
   return (
     <AppShell tab={tab}>

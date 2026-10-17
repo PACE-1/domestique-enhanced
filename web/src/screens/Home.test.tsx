@@ -35,6 +35,7 @@ function mockApi(over: Record<string, () => Response> = {}) {
     if (url === "/api/programme/summary") return json(SUMMARY)
     if (url === "/api/readiness") return json({ severity: "normal", score_0_100: 80, severity_reasons: [] })
     if (url === "/api/today-session") return json({ planned: null, adjusted: null, was_modified: false })
+    if (url.startsWith("/api/profile/pr-toast-queue")) return json({ queue: [], count: 0 })
     if (url === "/api/daily-log") return json({ today: null, history: [] })
     return json({}, 404)
   }))

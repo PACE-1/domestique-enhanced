@@ -356,6 +356,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/profile/pr-toast-queue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_profile_pr_toast_queue_api_profile_pr_toast_queue_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/profile/update-ftp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_profile_update_ftp_api_profile_update_ftp_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/profiles": {
         parameters: {
             query?: never;
@@ -484,6 +516,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/ride/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_ride_import_api_ride_import_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ride/{ride_id}/detail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_ride_full_detail_api_ride__ride_id__detail_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ride/{ride_id}/ftp-test-analysis": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_ride_ftp_test_analysis_api_ride__ride_id__ftp_test_analysis_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ride/{ride_id}/ftp-test-review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_ride_ftp_test_review_api_ride__ride_id__ftp_test_review_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ride/{ride_id}/prs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_ride_prs_api_ride__ride_id__prs_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ride/{ride_id}/rpe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_ride_rpe_api_ride__ride_id__rpe_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/rider-stats": {
         parameters: {
             query?: never;
@@ -510,6 +638,22 @@ export interface paths {
         get: operations["api_rides_api_rides_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/rides/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_rides_sync_api_rides_sync_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1037,6 +1181,71 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** FtpReviewSaved */
+        FtpReviewSaved: {
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
+            /**
+             * Persisted
+             * @default false
+             */
+            persisted: boolean;
+        } & {
+            [key: string]: unknown;
+        };
+        /** FtpTestAnalysis */
+        FtpTestAnalysis: {
+            /**
+             * Halted
+             * @default false
+             */
+            halted: boolean;
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
+            /** Prior Ftp */
+            prior_ftp?: number | null;
+            /** Ride Id */
+            ride_id: string;
+            /**
+             * Series
+             * @default []
+             */
+            series: number[];
+            /** Source */
+            source?: string | null;
+            /**
+             * Step S
+             * @default 1
+             */
+            step_s: number;
+            /**
+             * Suggestion
+             * @default {}
+             */
+            suggestion: {
+                [key: string]: unknown;
+            };
+            /**
+             * Total S
+             * @default 0
+             */
+            total_s: number;
+            /**
+             * Windows
+             * @default []
+             */
+            windows: {
+                [key: string]: unknown;
+            }[];
+        } & {
+            [key: string]: unknown;
+        };
         /** FtpTestTypeSet */
         FtpTestTypeSet: {
             /** Display Name */
@@ -1062,6 +1271,27 @@ export interface components {
              * @default
              */
             zwo_name: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** FtpUpdated */
+        FtpUpdated: {
+            /** Ftp */
+            ftp: number;
+            /** Ftp Source */
+            ftp_source?: string | null;
+            /**
+             * Ftp Test History
+             * @default []
+             */
+            ftp_test_history: {
+                [key: string]: unknown;
+            }[];
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
         } & {
             [key: string]: unknown;
         };
@@ -1480,6 +1710,23 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** PrToastQueue */
+        PrToastQueue: {
+            /**
+             * Count
+             * @default 0
+             */
+            count: number;
+            /**
+             * Queue
+             * @default []
+             */
+            queue: {
+                [key: string]: unknown;
+            }[];
+        } & {
+            [key: string]: unknown;
+        };
         /** ProfileCreated */
         ProfileCreated: {
             /** Id */
@@ -1809,6 +2056,146 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** RideDetail */
+        RideDetail: {
+            /** Avg Cadence */
+            avg_cadence?: number | null;
+            /** Avg Hr */
+            avg_hr?: number | null;
+            /** Avg Power W */
+            avg_power_w?: number | null;
+            /** Decoupling Pct */
+            decoupling_pct?: number | null;
+            /** Dfa Alpha1 */
+            dfa_alpha1?: number | null;
+            /** Distance Km */
+            distance_km?: number | null;
+            /** Duration S */
+            duration_s?: number | null;
+            /**
+             * Efforts
+             * @default []
+             */
+            efforts: {
+                [key: string]: unknown;
+            }[];
+            /** Elevation M */
+            elevation_m?: number | null;
+            /** Ftp At Ride */
+            ftp_at_ride?: number | null;
+            /** Hr Max */
+            hr_max?: number | null;
+            /** If Pct */
+            if_pct?: number | null;
+            /**
+             * Intervals
+             * @default []
+             */
+            intervals: {
+                [key: string]: unknown;
+            }[];
+            /** Kcal */
+            kcal?: number | null;
+            /** Kj */
+            kj?: number | null;
+            /** Moving S */
+            moving_s?: number | null;
+            /**
+             * Name
+             * @default
+             */
+            name: string;
+            /** Np W */
+            np_w?: number | null;
+            /**
+             * Prs
+             * @default []
+             */
+            prs: {
+                [key: string]: unknown;
+            }[];
+            /** Ride Id */
+            ride_id: string;
+            /** Rpe */
+            rpe?: number | null;
+            /** Samples */
+            samples?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Source
+             * @default
+             */
+            source: string;
+            /** Sport */
+            sport?: string | null;
+            /** Started At */
+            started_at?: string | null;
+            /** Time In Zone */
+            time_in_zone?: {
+                [key: string]: unknown;
+            } | null;
+            /** Tss */
+            tss?: number | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** RideImported */
+        RideImported: {
+            /**
+             * Bytes
+             * @default 0
+             */
+            bytes: number;
+            /**
+             * Icu Upload
+             * @default {}
+             */
+            icu_upload: {
+                [key: string]: unknown;
+            };
+            /**
+             * Parsed Stats
+             * @default {}
+             */
+            parsed_stats: {
+                [key: string]: unknown;
+            };
+            /** Ride Id */
+            ride_id: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** RidePrs */
+        RidePrs: {
+            /**
+             * Prs
+             * @default []
+             */
+            prs: {
+                [key: string]: unknown;
+            }[];
+            /** Ride Id */
+            ride_id: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** RideRpeSaved */
+        RideRpeSaved: {
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
+            /** Ride Id */
+            ride_id: string;
+            /** Rpe */
+            rpe?: number | null;
+            /** Scale */
+            scale?: string | null;
+        } & {
+            [key: string]: unknown;
+        };
         /** RideSummary */
         RideSummary: {
             /** Avg Power W */
@@ -1877,6 +2264,27 @@ export interface components {
             season?: {
                 [key: string]: unknown;
             } | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** RidesSynced */
+        RidesSynced: {
+            /**
+             * Added
+             * @default 0
+             */
+            added: number;
+            /** Plan Adapted */
+            plan_adapted?: string | null;
+            /** Plan Load Alert */
+            plan_load_alert?: boolean | null;
+            /** Skipped */
+            skipped?: string | null;
+            /**
+             * Total
+             * @default 0
+             */
+            total: number;
         } & {
             [key: string]: unknown;
         };
@@ -2957,6 +3365,46 @@ export interface operations {
             };
         };
     };
+    api_profile_pr_toast_queue_api_profile_pr_toast_queue_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrToastQueue"];
+                };
+            };
+        };
+    };
+    api_profile_update_ftp_api_profile_update_ftp_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FtpUpdated"];
+                };
+            };
+        };
+    };
     api_profiles_api_profiles_get: {
         parameters: {
             query?: never;
@@ -3137,6 +3585,126 @@ export interface operations {
             };
         };
     };
+    api_ride_import_api_ride_import_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RideImported"];
+                };
+            };
+        };
+    };
+    api_ride_full_detail_api_ride__ride_id__detail_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RideDetail"];
+                };
+            };
+        };
+    };
+    api_ride_ftp_test_analysis_api_ride__ride_id__ftp_test_analysis_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FtpTestAnalysis"];
+                };
+            };
+        };
+    };
+    api_ride_ftp_test_review_api_ride__ride_id__ftp_test_review_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FtpReviewSaved"];
+                };
+            };
+        };
+    };
+    api_ride_prs_api_ride__ride_id__prs_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RidePrs"];
+                };
+            };
+        };
+    };
+    api_ride_rpe_api_ride__ride_id__rpe_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RideRpeSaved"];
+                };
+            };
+        };
+    };
     api_rider_stats_api_rider_stats_get: {
         parameters: {
             query?: never;
@@ -3173,6 +3741,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RideSummary"][];
+                };
+            };
+        };
+    };
+    api_rides_sync_api_rides_sync_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RidesSynced"];
                 };
             };
         };

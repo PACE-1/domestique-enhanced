@@ -15,6 +15,7 @@ import {
 import { DailyCheckIn } from "@/screens/DailyCheckIn"
 import { Panel, Row, useLoad } from "@/screens/panel"
 import { Readiness } from "@/screens/Readiness"
+import { Records } from "@/screens/Records"
 
 export function Home() {
   const [plan, retryPlan] = useLoad<PlanRead>(getPlan)
@@ -46,6 +47,8 @@ export function Home() {
           )
         }}
       </Panel>
+
+      <Records />
 
       <Readiness />
 

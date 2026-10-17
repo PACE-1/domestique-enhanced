@@ -15,8 +15,15 @@ export function useLoad<T>(fetcher: () => Promise<T>) {
       (e: unknown) => setValue({ state: "error", message: e instanceof Error ? e.message : String(e) }),
     )
   }, [fetcher])
+  // Re-reads without flipping to "Loading…", so a card keeps its content (and any message in it) while it refreshes.
+  const refresh = useCallback(() => {
+    fetcher().then(
+      (data) => setValue({ state: "ok", data }),
+      () => {},
+    )
+  }, [fetcher])
   useEffect(run, [run])
-  return [value, run] as const
+  return [value, run, refresh] as const
 }
 
 export function Panel<T>({

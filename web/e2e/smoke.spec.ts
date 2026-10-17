@@ -277,3 +277,24 @@ test("Settings shows the version and says intervals.icu is not connected", async
   await expect(page.getByText(/Not connected/)).toBeVisible()
   await expect(page.getByRole("button", { name: "Sync now" })).toBeDisabled()
 })
+
+test("a FIT ride can be imported, rated, downloaded and deleted", async ({ page }) => {
+  await page.goto("#/analysis")
+  await page.locator('input[type="file"]').setInputFiles("e2e/fixtures/ride.fit")
+  await page.getByRole("button", { name: "Import ride" }).click()
+  await expect(page.getByRole("status").filter({ hasText: "Ride imported." })).toBeVisible()
+  await page.getByRole("link", { name: "Open it" }).click()
+  await expect(page.getByRole("link", { name: "Download .fit" })).toBeVisible()
+  await page.getByLabel(/How hard was it/).fill("7")
+  await page.getByRole("button", { name: "Save rating" }).click()
+  await expect(page.getByText("Rating saved.")).toBeVisible()
+  await page.getByRole("button", { name: "Delete ride…" }).click()
+  await page.getByRole("button", { name: "Yes, delete this ride" }).click()
+  await expect(page.getByText("Ride deleted.")).toBeVisible()
+})
+
+test("syncing rides without intervals.icu says it is not connected", async ({ page }) => {
+  await page.goto("#/analysis")
+  await page.getByRole("button", { name: "Sync from intervals.icu" }).click()
+  await expect(page.getByRole("status").filter({ hasText: /not connected/ })).toBeVisible()
+})

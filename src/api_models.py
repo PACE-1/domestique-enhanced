@@ -675,3 +675,81 @@ class UpdateCheck(_Model):
     checked_at: Optional[str] = None
     error: Optional[str] = None
 
+
+# ── Rides: import, detail, rpe, ftp test ────────────────────────────────────
+
+class RideImported(_Model):
+    ride_id: str
+    bytes: int = 0
+    parsed_stats: dict = {}
+    icu_upload: dict = {}              # {ok, skipped, needs_reconnect, detail}
+
+
+class RideDetail(RideSummary):
+    moving_s: Optional[int] = None
+    if_pct: Optional[float] = None
+    kj: Optional[float] = None
+    kcal: Optional[int] = None
+    avg_hr: Optional[int] = None
+    hr_max: Optional[int] = None
+    avg_cadence: Optional[int] = None
+    ftp_at_ride: Optional[float] = None
+    decoupling_pct: Optional[float] = None
+    dfa_alpha1: Optional[float] = None
+    rpe: Optional[int] = None
+    time_in_zone: Optional[dict] = None   # {"z1": seconds, … "z7"}
+    intervals: list[dict] = []
+    efforts: list[dict] = []
+    prs: list[dict] = []
+    samples: Optional[dict] = None     # with ?include=samples: {t_s, power_w, hr_bpm, cadence_rpm, elevation_m}
+
+
+class RideRpeSaved(_Model):
+    ok: bool = True
+    ride_id: str
+    rpe: Optional[int] = None
+    scale: Optional[str] = None
+
+
+class RidePrs(_Model):
+    ride_id: str
+    prs: list[dict] = []
+
+
+class FtpTestAnalysis(_Model):
+    ok: bool = True
+    ride_id: str
+    source: Optional[str] = None
+    suggestion: dict = {}              # {ftp, method, window_start_s, window_end_s, ...}
+    halted: bool = False
+    total_s: int = 0
+    step_s: int = 1
+    series: list[int] = []
+    windows: list[dict] = []
+    prior_ftp: Optional[float] = None
+
+
+class FtpReviewSaved(_Model):
+    ok: bool = True
+    persisted: bool = False
+
+
+class FtpUpdated(_Model):
+    ok: bool = True
+    ftp: float
+    ftp_source: Optional[str] = None
+    ftp_test_history: list[dict] = []
+
+
+class RidesSynced(_Model):
+    added: int = 0
+    total: int = 0
+    skipped: Optional[str] = None
+    plan_load_alert: Optional[bool] = None
+    plan_adapted: Optional[str] = None
+
+
+class PrToastQueue(_Model):
+    queue: list[dict] = []
+    count: int = 0
+
