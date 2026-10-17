@@ -102,4 +102,40 @@ describe("Plan", () => {
     await userEvent.click(await screen.findByRole("button", { name: /^Dismiss / }))
     expect((await screen.findByRole("alert")).textContent).toContain("race day is fixed")
   })
+
+  it("moves a session to a chosen day and re-reads the plan", async () => {
+    const posts: unknown[] = []
+    vi.stubGlobal("fetch", vi.fn(async (url: string, init?: RequestInit) => {
+      if (url === "/api/plan/move-session") {
+        posts.push(JSON.parse(String(init?.body)))
+        return new Response(JSON.stringify({ ok: true, moved: {}, vacated: null, swapped: null }))
+      }
+      return new Response(JSON.stringify(PLAN))
+    }))
+    render(<Plan />)
+    const day = PLAN.plan_json.weeks[1].sessions[0].day
+    const target = addDays(3)
+    await userEvent.click(await screen.findByRole("button", { name: /^Move / }))
+    const input = screen.getByLabelText("Move to") as HTMLInputElement
+    expect((screen.getByRole("button", { name: "Move here" }) as HTMLButtonElement).disabled).toBe(true)
+    await userEvent.type(input, target)
+    await userEvent.click(screen.getByRole("button", { name: "Move here" }))
+    await waitFor(() => expect(posts).toEqual([{ date: day, new_date: target }]))
+    await waitFor(() => expect(screen.queryByLabelText("Move to")).toBeNull())
+  })
+
+  it("keeps the move open and shows the refusal when the server says no", async () => {
+    vi.stubGlobal("fetch", vi.fn(async (url: string) =>
+      url === "/api/plan/move-session"
+        ? new Response(JSON.stringify({ error: "That day is already ridden" }), { status: 409 })
+        : new Response(JSON.stringify(PLAN))))
+    render(<Plan />)
+    await userEvent.click(await screen.findByRole("button", { name: /^Move / }))
+    await userEvent.type(screen.getByLabelText("Move to"), addDays(3))
+    await userEvent.click(screen.getByRole("button", { name: "Move here" }))
+    expect((await screen.findByRole("alert")).textContent).toContain("already ridden")
+    expect(screen.getByLabelText("Move to")).toBeTruthy()
+    await userEvent.click(screen.getByRole("button", { name: "Cancel" }))
+    expect(screen.queryByLabelText("Move to")).toBeNull()
+  })
 })

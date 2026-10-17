@@ -273,3 +273,10 @@ class RiderStats(_Model):
 class SessionDismissed(_Model):
     ok: bool = True
     dismissed: bool
+
+
+class SessionMoved(_Model):
+    ok: bool = True
+    moved: Optional[PlanSession] = None
+    vacated: Optional[str] = None      # date the move left empty, if any
+    swapped: Optional[PlanSession] = None   # the session now on the source date, on a swap

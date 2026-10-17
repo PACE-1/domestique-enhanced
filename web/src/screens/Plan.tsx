@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react"
 import type { PlanRead, PlanWeek } from "@/api/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { currentWeek, dismissSession, fmtMinutes, getPlan, isoDay, plannedTss, weekSessions } from "@/lib/home"
+import { currentWeek, dismissSession, fmtMinutes, getPlan, isoDay, moveSession, plannedTss, weekSessions } from "@/lib/home"
 
 type Load = { state: "loading" } | { state: "ok"; plan: PlanRead } | { state: "error"; message: string }
 
@@ -25,6 +25,7 @@ export function Plan() {
   const [index, setIndex] = useState<number | null>(null)
   const [busy, setBusy] = useState<string | null>(null)
   const [actionError, setActionError] = useState("")
+  const [moving, setMoving] = useState<{ day: string; to: string } | null>(null)
   const today = isoDay()
 
   const run = useCallback(() => {
@@ -37,18 +38,24 @@ export function Plan() {
   useEffect(run, [run])
 
   // Dismiss or restore the day's session, then re-read the plan in place (no loading flash).
-  const toggleDismissed = async (day: string, undo: boolean) => {
+  const change = async (day: string, action: () => Promise<unknown>) => {
     setBusy(day)
     setActionError("")
     try {
-      await dismissSession(day, undo)
+      await action()
       const plan = await getPlan()
       setLoad({ state: "ok", plan })
+      return true
     } catch (e) {
       setActionError(e instanceof Error ? e.message : String(e))
+      return false
     } finally {
       setBusy(null)
     }
+  }
+  const toggleDismissed = (day: string, undo: boolean) => change(day, () => dismissSession(day, undo))
+  const confirmMove = async () => {
+    if (moving && (await change(moving.day, () => moveSession(moving.day, moving.to)))) setMoving(null)
   }
 
   if (load.state === "loading") return <p className="text-sm text-muted-foreground">Loading…</p>
@@ -132,6 +139,34 @@ export function Plan() {
                     <span className="text-muted-foreground">
                       {fmtMinutes(s.duration_min)} · {Math.round(s.tss_estimate)} TSS{extra ? ` · ${extra}` : ""}
                     </span>
+                    {canToggle && !dismissed && moving?.day !== s.day && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        aria-label={`Move ${dayLabel(s.day)}`}
+                        onClick={() => setMoving({ day: s.day, to: "" })}
+                      >
+                        Move
+                      </Button>
+                    )}
+                    {moving?.day === s.day && (
+                      <span className="flex items-center gap-2">
+                        <input
+                          type="date"
+                          aria-label="Move to"
+                          className="rounded-md border px-2 py-1 text-sm"
+                          min={today}
+                          value={moving.to}
+                          onChange={(e) => setMoving({ day: s.day, to: e.target.value })}
+                        />
+                        <Button size="sm" disabled={!moving.to || busy === s.day} onClick={confirmMove}>
+                          Move here
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => setMoving(null)}>
+                          Cancel
+                        </Button>
+                      </span>
+                    )}
                     {canToggle && (
                       <Button
                         size="sm"
@@ -153,7 +188,7 @@ export function Plan() {
               Couldn’t change that session: {actionError}
             </p>
           )}
-          <p className="text-xs text-muted-foreground">Moving, swapping and regenerating still happen in the current dashboard.</p>
+          <p className="text-xs text-muted-foreground">Swapping type and regenerating still happen in the current dashboard.</p>
         </CardContent>
       </Card>
     </div>

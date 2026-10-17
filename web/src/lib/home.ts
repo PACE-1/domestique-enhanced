@@ -1,4 +1,4 @@
-import type { PlanJson, PlanRead, PlanSession, PlanWeek, ProgrammeSummary, RiderStats, SessionDismissed } from "@/api/types"
+import type { PlanJson, PlanRead, PlanSession, PlanWeek, ProgrammeSummary, RiderStats, SessionDismissed, SessionMoved } from "@/api/types"
 import { api } from "@/lib/api"
 
 export const getPlan = () => api<PlanRead>("/api/plan")
@@ -6,6 +6,10 @@ export const getSummary = () => api<ProgrammeSummary>("/api/programme/summary")
 /** Dismiss (or restore) the session on a day. The server applies it to every session on that date. */
 export const dismissSession = (date: string, undo = false) =>
   api<SessionDismissed>("/api/plan/dismiss-session", { method: "POST", json: { date, undo } })
+
+/** Move the session on `date` to `newDate`. Onto a day with one session the two swap; a ridden or crowded day is refused. */
+export const moveSession = (date: string, newDate: string) =>
+  api<SessionMoved>("/api/plan/move-session", { method: "POST", json: { date, new_date: newDate } })
 
 export const getStats = () => api<RiderStats>("/api/rider-stats")
 
