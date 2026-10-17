@@ -3,6 +3,8 @@ import { useCallback, useState } from "react"
 import type { PickerResult } from "@/api/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
 import { getPicker } from "@/lib/library"
 import { WorkoutCard } from "@/screens/WorkoutCard"
 
@@ -29,14 +31,14 @@ export function Shuffle() {
         <CardContent className="space-y-3 p-4">
           <h2 className="text-sm font-semibold">Workout shuffle</h2>
           <div className="flex flex-wrap items-end gap-3 text-sm">
-            <label className="flex flex-col gap-1">
+            <Label className="flex-col items-start gap-1">
               How do you feel? ({feel} of 10)
               <input type="range" min={1} max={10} value={feel} onChange={(e) => setFeel(Number(e.target.value))} />
-            </label>
-            <label className="flex flex-col gap-1">
+            </Label>
+            <Label className="flex-col items-start gap-1">
               Time available (min)
-              <input type="number" min={20} max={300} className="w-24 rounded-md border px-2 py-1" value={duration} onChange={(e) => setDuration(Number(e.target.value))} />
-            </label>
+              <Input type="number" min={20} max={300} className="w-24" value={duration} onChange={(e) => setDuration(Number(e.target.value))} />
+            </Label>
             <Button size="sm" disabled={bad || load.state === "loading"} onClick={go}>
               {load.state === "ok" ? "Shuffle again" : "Suggest workouts"}
             </Button>

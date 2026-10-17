@@ -2,6 +2,8 @@ import { useState } from "react"
 
 import type { DailyLogRead } from "@/api/types"
 import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { NativeSelect } from "@/components/ui/native-select"
 import { getDailyLog, saveDailyLog, type DailyLogInput } from "@/lib/home"
 import { Panel, useLoad } from "@/screens/panel"
 
@@ -34,10 +36,10 @@ function Form({ initial, done }: { initial: DailyLogInput; done: () => void }) {
     <div className="space-y-2 text-sm">
       <p className="text-muted-foreground">1 is best, 7 is worst.</p>
       {FIELDS.map(([key, label]) => (
-        <label key={key} className="flex items-center justify-between gap-4">
+        <Label key={key} className="flex items-center justify-between gap-4">
           {label}
-          <select
-            className="rounded-md border px-2 py-1"
+          <NativeSelect
+            
             value={v[key]}
             onChange={(e) => setV({ ...v, [key]: Number(e.target.value) })}
           >
@@ -46,8 +48,8 @@ function Form({ initial, done }: { initial: DailyLogInput; done: () => void }) {
                 {n}
               </option>
             ))}
-          </select>
-        </label>
+          </NativeSelect>
+        </Label>
       ))}
       <Button size="sm" disabled={busy} onClick={submit}>
         Save check-in

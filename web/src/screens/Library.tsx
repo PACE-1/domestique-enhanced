@@ -3,6 +3,9 @@ import { useEffect, useState } from "react"
 import type { WorkoutRow } from "@/api/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
+import { NativeSelect } from "@/components/ui/native-select"
+import { Input } from "@/components/ui/input"
 import { listWorkouts, PAGE, SORTS, type WorkoutQuery } from "@/lib/library"
 import { WorkoutCard } from "@/screens/WorkoutCard"
 
@@ -40,28 +43,28 @@ export function Library() {
         <CardContent className="space-y-3 p-4">
           <h2 className="text-sm font-semibold">Workout library</h2>
           <div className="flex flex-wrap items-end gap-2 text-sm">
-            <label className="flex flex-col gap-1">
+            <Label className="flex-col items-start gap-1">
               Search
-              <input type="search" className="rounded-md border px-2 py-1" placeholder="3x16, vo2, sweet spot…" value={q.search} onChange={(e) => setQ({ ...q, search: e.target.value })} />
-            </label>
-            <label className="flex flex-col gap-1">
+              <Input type="search"  placeholder="3x16, vo2, sweet spot…" value={q.search} onChange={(e) => setQ({ ...q, search: e.target.value })} />
+            </Label>
+            <Label className="flex-col items-start gap-1">
               From (min)
-              <input type="number" min={0} className="w-24 rounded-md border px-2 py-1" value={q.minDuration ?? ""} onChange={(e) => setQ({ ...q, minDuration: num(e.target.value) })} />
-            </label>
-            <label className="flex flex-col gap-1">
+              <Input type="number" min={0} className="w-24" value={q.minDuration ?? ""} onChange={(e) => setQ({ ...q, minDuration: num(e.target.value) })} />
+            </Label>
+            <Label className="flex-col items-start gap-1">
               To (min)
-              <input type="number" min={0} className="w-24 rounded-md border px-2 py-1" value={q.maxDuration ?? ""} onChange={(e) => setQ({ ...q, maxDuration: num(e.target.value) })} />
-            </label>
-            <label className="flex flex-col gap-1">
+              <Input type="number" min={0} className="w-24" value={q.maxDuration ?? ""} onChange={(e) => setQ({ ...q, maxDuration: num(e.target.value) })} />
+            </Label>
+            <Label className="flex-col items-start gap-1">
               Sort
-              <select className="rounded-md border px-2 py-1" value={q.sort} onChange={(e) => setQ({ ...q, sort: e.target.value })}>
+              <NativeSelect  value={q.sort} onChange={(e) => setQ({ ...q, sort: e.target.value })}>
                 {SORTS.map(([id, label]) => (
                   <option key={id} value={id}>
                     {label}
                   </option>
                 ))}
-              </select>
-            </label>
+              </NativeSelect>
+            </Label>
           </div>
           {badRange && <p className="text-sm">“From” is longer than “To”.</p>}
         </CardContent>

@@ -51,7 +51,7 @@ describe("Routes", () => {
     await screen.findByText("Route 1")
     await userEvent.selectOptions(screen.getByLabelText("Region"), "alps")
     await userEvent.type(screen.getByLabelText("From (km)"), "30")
-    await userEvent.click(screen.getByLabelText("Loops only"))
+    await userEvent.click(screen.getByRole("checkbox", { name: "Loops only" }))
     await waitFor(() => expect(urls.at(-1)).toContain("loop_only=true"))
     expect(urls.at(-1)).toContain("region=alps")
     expect(urls.at(-1)).toContain("min_km=30")

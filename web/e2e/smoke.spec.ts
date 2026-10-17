@@ -238,7 +238,7 @@ test("Workout shuffle suggests workouts", async ({ page }) => {
 test("Routes lists courses, filters them, and opens one", async ({ page }) => {
   await page.goto("#/courses")
   await expect(page.getByText(/^Showing \d+ of \d+/)).toBeVisible()
-  await page.getByLabel("Loops only").check()
+  await page.getByRole("checkbox", { name: "Loops only" }).click()
   await expect(page.getByText(/^Showing \d+ of \d+/)).toBeVisible()
   await page.getByRole("listitem").first().getByRole("button").click()
   await expect(page.getByRole("img", { name: /^Elevation profile/ })).toBeVisible()

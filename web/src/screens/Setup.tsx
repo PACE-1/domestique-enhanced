@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { NativeSelect } from "@/components/ui/native-select"
 import { IcuComparison, LinkedCard, StepDots } from "@/components/wizard"
 import {
   FIELD_IDS,
@@ -367,14 +368,13 @@ export function Setup() {
               {num("s-age", "Age (years) (optional)", { placeholder: "35" })}
               <div className="grid gap-1.5">
                 <Label htmlFor="s-sex">Sex (optional)</Label>
-                {/* ponytail: native select; swap for the shadcn Select when a second one appears */}
-                <select id="s-sex" className="h-9 rounded-4xl border border-input bg-input/30 px-3 text-sm"
+                <NativeSelect id="s-sex"
                   value={s.values["s-sex"]} onChange={(e) => setField("s-sex", e.target.value)}>
                   <option value="">Prefer not to say</option>
                   <option value="M">Male</option>
                   <option value="F">Female</option>
                   <option value="O">Other</option>
-                </select>
+                </NativeSelect>
               </div>
               <details>
                 <summary className="cursor-pointer text-sm text-muted-foreground">Advanced (optional)</summary>
