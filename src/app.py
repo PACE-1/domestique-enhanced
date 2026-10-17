@@ -8342,7 +8342,7 @@ def api_icu_push(body: "dict | None" = None):
         return {"ok": False, "error": f"internal:{type(e).__name__}"}
 
 
-@app.post("/api/calendar/push-workout")
+@app.post("/api/calendar/push-workout", responses={200: {"model": api_models.WorkoutPushed}})
 def api_calendar_push_workout(body: "dict | None" = None):
     """calendar-push (2026-07-07): push ONE workout to the athlete's ICU calendar
     from a workout-detail modal — the "Send to intervals.icu calendar" button.
@@ -8521,7 +8521,7 @@ def api_calendar_push_workout(body: "dict | None" = None):
 _ICU_RACE_PRIORITY = {"RACE_A": "A", "RACE_B": "B", "RACE_C": "C"}
 
 
-@app.get("/api/icu/races")
+@app.get("/api/icu/races", responses={200: {"model": api_models.IcuRaces}})
 def api_icu_races():
     """Race import (3.13.0): the rider's races planned in intervals.icu
     (RACE_A / RACE_B / RACE_C events, today .. +365 days) for the plan builder
@@ -11266,7 +11266,7 @@ def api_plan():
         return {"plan": f.read(), "plan_json": None, "file": str(plans[0])}
 
 
-@app.get("/api/plan/preview")
+@app.get("/api/plan/preview", responses={200: {"model": api_models.PlanPreview}})
 def api_plan_preview(
     goal: str = Query("general"),
     plan_weeks: int = Query(0),
@@ -11367,7 +11367,7 @@ def api_plan_preview(
     }
 
 
-@app.get("/api/plan/entry-scan")
+@app.get("/api/plan/entry-scan", responses={200: {"model": api_models.EntryScan}})
 def api_plan_entry_scan(
     goal: str | None = Query(None),
     plan_weeks: int = Query(0),
@@ -12067,7 +12067,7 @@ def _maybe_auto_reforecast(profile_id: str, new_rides: int) -> "str | None":
     return written
 
 
-@app.post("/api/plan/reforecast")
+@app.post("/api/plan/reforecast", responses={200: {"model": api_models.PlanReforecasted}})
 async def api_plan_reforecast():
     """Reforecast the plan based on actual training data."""
     json_path = _plan_dir() / "current_plan.json"
@@ -13071,7 +13071,7 @@ async def api_plan_add_race(request: Request):
         return JSONResponse({"error": str(e)}, status_code=500)
 
 
-@app.post("/api/plan/update")
+@app.post("/api/plan/update", responses={200: {"model": api_models.PlanUpdated}})
 async def api_plan_update(debounce: int = Query(0)):
     """v1.8.24 — the ONE primary "Update plan" action.
 
@@ -13755,7 +13755,7 @@ def _collect_week_activities(current_week, today: date, include_today: bool = Fa
     return actual
 
 
-@app.get("/api/plan/daily-adapt")
+@app.get("/api/plan/daily-adapt", responses={200: {"model": api_models.DailyAdapt}})
 def api_plan_daily_adapt():
     """Daily-adapt PROJECTION (fix26 §6.1) — read-only preview.
 
@@ -16053,7 +16053,7 @@ def merge_plan_with_rides(plan: dict, rides: list[dict]) -> dict:
     }
 
 
-@app.get("/api/calendar")
+@app.get("/api/calendar", responses={200: {"model": api_models.CalendarRead}})
 def api_calendar():
     """v4.3.0 B4+B5+B6 + v4.4.0 — unified calendar overlay (intervals.icu-style).
 

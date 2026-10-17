@@ -31,14 +31,41 @@ export const swapSessionType = (date: string, sessionType: string, durationMin: 
     json: { date, session_type: sessionType, duration_min: durationMin },
   })
 
+export type GoalType = "general" | "ftp" | "event" | "vo2max" | "ftp_vo2max" | "ctl" | "continuous"
+
+export interface RaceEvent {
+  date: string
+  priority: "A" | "B" | "C"
+  name: string
+  event_km?: number
+  event_climb_m?: number
+  event_type?: string
+}
+
 export interface GenerateRequest {
-  goal: "general" | "ftp" | "event"
+  goal: GoalType
   hours_per_week: number
   plan_weeks: number
   rest_days: number[] // 0 = Monday
   start_date?: string
+  entry_mode?: "recognized" | "declared"
   event_name?: string
   event_date?: string
+  event_km?: number
+  event_climb?: number
+  event_type?: string
+  events?: RaceEvent[] // B and C races (and the A race when there are any)
+  focus?: "both" | "ftp" | "vo2"
+  distribution?: "polarized" | "pyramidal" | "threshold"
+  plan_mode?: "auto" | "fixed_core" | "template"
+  template_id?: string
+  custom_bands?: { tempo_ss: number; threshold: number; vo2: number; sprint: number }
+  block_periodization?: boolean
+  vo2_microintervals_only?: boolean
+  daily_availability?: Record<number, number> // hours by day, 0 = Monday
+  max_weekday?: number
+  max_weekend?: number
+  phase_weeks?: Record<string, number>
 }
 
 /** Build a new plan from the form. The server replaces the stored plan. */

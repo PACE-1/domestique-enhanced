@@ -925,3 +925,117 @@ class BackfillHistoryStatus(_Model):
     done: Optional[int] = None
     total: Optional[int] = None
 
+
+# ── Plan: calendar, preview, ride scan, update, races, workout push ─────────
+
+class CalendarPlanned(_Model):
+    session_type: str = "rest"
+    name: str = ""
+    display_name: str = ""
+    duration_min: float = 0
+    tss: float = 0
+    zwo_file: str = ""
+    status: str = "pending"
+    user_moved: bool = False
+    is_race: bool = False
+
+
+class CalendarDay(_Model):
+    date: str
+    dow: int = 0
+    is_today: bool = False
+    planned: Optional[CalendarPlanned] = None
+    actual: Optional[dict] = None
+    card_state: str = ""
+    race: Optional[dict] = None
+    availability_hours: Optional[float] = None
+
+
+class CalendarWeek(_Model):
+    iso_year: int
+    iso_week: int
+    start_date: str
+    end_date: str
+    phase: Optional[str] = None
+    is_stepback: bool = False
+    is_current: bool = False
+    planned_tss: Optional[float] = None
+    actual_tss: Optional[float] = None
+    completion_pct: Optional[float] = None
+    days: list[CalendarDay] = []
+
+
+class CalendarRead(_Model):
+    today: str
+    current_iso_week: Optional[dict] = None
+    weeks: list[CalendarWeek] = []
+    summary: dict = {}
+    goal: Optional[dict] = None
+    error: Optional[str] = None
+
+
+class PreviewPhase(_Model):
+    name: str
+    weeks: int
+    start: str = ""
+    end: str = ""
+    weekly_tss: Optional[float] = None
+    focus: str = ""
+
+
+class PlanPreview(_Model):
+    ok: bool = True
+    plan_weeks: int = 0
+    goal: str = ""
+    event_date: Optional[str] = None
+    start_date: Optional[str] = None
+    phase_weeks_status: Optional[str] = None
+    phase_weeks_rec: Optional[dict] = None
+    phase_weeks_disabled_reason: Optional[str] = None
+    phases: list[PreviewPhase] = []
+
+
+class EntryScan(_Model):
+    proposal_weeks: int = 0
+    equivalent_start_date: Optional[str] = None
+    entry_week: Optional[int] = None
+    weeks_remaining: Optional[int] = None
+    plan_weeks: int = 0
+    plan_end_date: Optional[str] = None
+    capped: Optional[bool] = None
+    weeks: list[dict] = []
+
+
+class IcuRaces(_Model):
+    races: list[dict] = []
+    error: Optional[str] = None
+    needs_reconnect: Optional[bool] = None
+
+
+class WorkoutPushed(_Model):
+    ok: Optional[bool] = None
+    error: Optional[str] = None
+    needs_reconnect: Optional[bool] = None
+    needs_lthr: Optional[bool] = None
+
+
+class PlanUpdated(_Model):
+    ok: bool = True
+    action: Optional[str] = None
+    status_message: str = ""
+    plan_json: Optional[PlanJson] = None
+
+
+class PlanReforecasted(_Model):
+    ok: bool = True
+    plan_json: Optional[PlanJson] = None
+    gaps: Optional[dict] = None
+    sessions_changed: Optional[int] = None
+    reforecast: Optional[dict] = None
+
+
+class DailyAdapt(_Model):
+    action: Optional[str] = None
+    projection_only: bool = True
+    projected_adaptations: list[dict] = []
+

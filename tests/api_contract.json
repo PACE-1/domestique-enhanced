@@ -322,6 +322,286 @@
         "title": "BackfillStatus",
         "type": "object"
       },
+      "CalendarDay": {
+        "additionalProperties": true,
+        "properties": {
+          "actual": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual"
+          },
+          "availability_hours": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Availability Hours"
+          },
+          "card_state": {
+            "default": "",
+            "title": "Card State",
+            "type": "string"
+          },
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "dow": {
+            "default": 0,
+            "title": "Dow",
+            "type": "integer"
+          },
+          "is_today": {
+            "default": false,
+            "title": "Is Today",
+            "type": "boolean"
+          },
+          "planned": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CalendarPlanned"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "race": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Race"
+          }
+        },
+        "required": [
+          "date"
+        ],
+        "title": "CalendarDay",
+        "type": "object"
+      },
+      "CalendarPlanned": {
+        "additionalProperties": true,
+        "properties": {
+          "display_name": {
+            "default": "",
+            "title": "Display Name",
+            "type": "string"
+          },
+          "duration_min": {
+            "default": 0,
+            "title": "Duration Min",
+            "type": "number"
+          },
+          "is_race": {
+            "default": false,
+            "title": "Is Race",
+            "type": "boolean"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          },
+          "session_type": {
+            "default": "rest",
+            "title": "Session Type",
+            "type": "string"
+          },
+          "status": {
+            "default": "pending",
+            "title": "Status",
+            "type": "string"
+          },
+          "tss": {
+            "default": 0,
+            "title": "Tss",
+            "type": "number"
+          },
+          "user_moved": {
+            "default": false,
+            "title": "User Moved",
+            "type": "boolean"
+          },
+          "zwo_file": {
+            "default": "",
+            "title": "Zwo File",
+            "type": "string"
+          }
+        },
+        "title": "CalendarPlanned",
+        "type": "object"
+      },
+      "CalendarRead": {
+        "additionalProperties": true,
+        "properties": {
+          "current_iso_week": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Iso Week"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "goal": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Goal"
+          },
+          "summary": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Summary",
+            "type": "object"
+          },
+          "today": {
+            "title": "Today",
+            "type": "string"
+          },
+          "weeks": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/CalendarWeek"
+            },
+            "title": "Weeks",
+            "type": "array"
+          }
+        },
+        "required": [
+          "today"
+        ],
+        "title": "CalendarRead",
+        "type": "object"
+      },
+      "CalendarWeek": {
+        "additionalProperties": true,
+        "properties": {
+          "actual_tss": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual Tss"
+          },
+          "completion_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completion Pct"
+          },
+          "days": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/CalendarDay"
+            },
+            "title": "Days",
+            "type": "array"
+          },
+          "end_date": {
+            "title": "End Date",
+            "type": "string"
+          },
+          "is_current": {
+            "default": false,
+            "title": "Is Current",
+            "type": "boolean"
+          },
+          "is_stepback": {
+            "default": false,
+            "title": "Is Stepback",
+            "type": "boolean"
+          },
+          "iso_week": {
+            "title": "Iso Week",
+            "type": "integer"
+          },
+          "iso_year": {
+            "title": "Iso Year",
+            "type": "integer"
+          },
+          "phase": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phase"
+          },
+          "planned_tss": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned Tss"
+          },
+          "start_date": {
+            "title": "Start Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "iso_year",
+          "iso_week",
+          "start_date",
+          "end_date"
+        ],
+        "title": "CalendarWeek",
+        "type": "object"
+      },
       "CapReverted": {
         "additionalProperties": true,
         "properties": {
@@ -349,6 +629,38 @@
           }
         },
         "title": "CapReverted",
+        "type": "object"
+      },
+      "DailyAdapt": {
+        "additionalProperties": true,
+        "properties": {
+          "action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action"
+          },
+          "projected_adaptations": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Projected Adaptations",
+            "type": "array"
+          },
+          "projection_only": {
+            "default": true,
+            "title": "Projection Only",
+            "type": "boolean"
+          }
+        },
+        "title": "DailyAdapt",
         "type": "object"
       },
       "DailyLogEntry": {
@@ -978,6 +1290,87 @@
           "id"
         ],
         "title": "EnsureProfile",
+        "type": "object"
+      },
+      "EntryScan": {
+        "additionalProperties": true,
+        "properties": {
+          "capped": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capped"
+          },
+          "entry_week": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entry Week"
+          },
+          "equivalent_start_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Equivalent Start Date"
+          },
+          "plan_end_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan End Date"
+          },
+          "plan_weeks": {
+            "default": 0,
+            "title": "Plan Weeks",
+            "type": "integer"
+          },
+          "proposal_weeks": {
+            "default": 0,
+            "title": "Proposal Weeks",
+            "type": "integer"
+          },
+          "weeks": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Weeks",
+            "type": "array"
+          },
+          "weeks_remaining": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weeks Remaining"
+          }
+        },
+        "title": "EntryScan",
         "type": "object"
       },
       "EventProjection": {
@@ -1775,6 +2168,44 @@
         "title": "IcuPushStatus",
         "type": "object"
       },
+      "IcuRaces": {
+        "additionalProperties": true,
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "needs_reconnect": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Needs Reconnect"
+          },
+          "races": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Races",
+            "type": "array"
+          }
+        },
+        "title": "IcuRaces",
+        "type": "object"
+      },
       "LogTail": {
         "additionalProperties": true,
         "properties": {
@@ -2154,6 +2585,92 @@
         "title": "PlanPhase",
         "type": "object"
       },
+      "PlanPreview": {
+        "additionalProperties": true,
+        "properties": {
+          "event_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Date"
+          },
+          "goal": {
+            "default": "",
+            "title": "Goal",
+            "type": "string"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "phase_weeks_disabled_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phase Weeks Disabled Reason"
+          },
+          "phase_weeks_rec": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phase Weeks Rec"
+          },
+          "phase_weeks_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phase Weeks Status"
+          },
+          "phases": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PreviewPhase"
+            },
+            "title": "Phases",
+            "type": "array"
+          },
+          "plan_weeks": {
+            "default": 0,
+            "title": "Plan Weeks",
+            "type": "integer"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          }
+        },
+        "title": "PlanPreview",
+        "type": "object"
+      },
       "PlanRead": {
         "additionalProperties": true,
         "properties": {
@@ -2175,6 +2692,63 @@
           "plan_json"
         ],
         "title": "PlanRead",
+        "type": "object"
+      },
+      "PlanReforecasted": {
+        "additionalProperties": true,
+        "properties": {
+          "gaps": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gaps"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "plan_json": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlanJson"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reforecast": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reforecast"
+          },
+          "sessions_changed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sessions Changed"
+          }
+        },
+        "title": "PlanReforecasted",
         "type": "object"
       },
       "PlanRegenerated": {
@@ -2404,6 +2978,44 @@
           "session_type"
         ],
         "title": "PlanSession",
+        "type": "object"
+      },
+      "PlanUpdated": {
+        "additionalProperties": true,
+        "properties": {
+          "action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "plan_json": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlanJson"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status_message": {
+            "default": "",
+            "title": "Status Message",
+            "type": "string"
+          }
+        },
+        "title": "PlanUpdated",
         "type": "object"
       },
       "PlanWeek": {
@@ -2660,6 +3272,51 @@
           }
         },
         "title": "PrToastQueue",
+        "type": "object"
+      },
+      "PreviewPhase": {
+        "additionalProperties": true,
+        "properties": {
+          "end": {
+            "default": "",
+            "title": "End",
+            "type": "string"
+          },
+          "focus": {
+            "default": "",
+            "title": "Focus",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "start": {
+            "default": "",
+            "title": "Start",
+            "type": "string"
+          },
+          "weekly_tss": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekly Tss"
+          },
+          "weeks": {
+            "title": "Weeks",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "weeks"
+        ],
+        "title": "PreviewPhase",
         "type": "object"
       },
       "ProfileCreated": {
@@ -5355,6 +6012,57 @@
         "title": "WorkoutFolders",
         "type": "object"
       },
+      "WorkoutPushed": {
+        "additionalProperties": true,
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "needs_lthr": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Needs Lthr"
+          },
+          "needs_reconnect": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Needs Reconnect"
+          },
+          "ok": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ok"
+          }
+        },
+        "title": "WorkoutPushed",
+        "type": "object"
+      },
       "WorkoutRow": {
         "additionalProperties": true,
         "properties": {
@@ -5563,6 +6271,40 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/calendar": {
+      "get": {
+        "operationId": "api_calendar_api_calendar_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarRead"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/calendar/push-workout": {
+      "post": {
+        "operationId": "api_calendar_push_workout_api_calendar_push_workout_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutPushed"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/daily-log": {
       "get": {
         "operationId": "api_daily_log_api_daily_log_get",
@@ -5704,6 +6446,23 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/IcuPushResult"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/icu/races": {
+      "get": {
+        "operationId": "api_icu_races_api_icu_races_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IcuRaces"
                 }
               }
             },
@@ -5869,6 +6628,23 @@
         }
       }
     },
+    "/api/plan/daily-adapt": {
+      "get": {
+        "operationId": "api_plan_daily_adapt_api_plan_daily_adapt_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DailyAdapt"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/plan/dismiss-session": {
       "post": {
         "operationId": "api_plan_dismiss_session_api_plan_dismiss_session_post",
@@ -5878,6 +6654,23 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SessionDismissed"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/plan/entry-scan": {
+      "get": {
+        "operationId": "api_plan_entry_scan_api_plan_entry_scan_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntryScan"
                 }
               }
             },
@@ -5954,6 +6747,23 @@
         }
       }
     },
+    "/api/plan/preview": {
+      "get": {
+        "operationId": "api_plan_preview_api_plan_preview_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanPreview"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/plan/preview-redraw": {
       "post": {
         "operationId": "api_plan_preview_redraw_api_plan_preview_redraw_post",
@@ -5963,6 +6773,23 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/RedrawCandidate"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/plan/reforecast": {
+      "post": {
+        "operationId": "api_plan_reforecast_api_plan_reforecast_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanReforecasted"
                 }
               }
             },
@@ -6031,6 +6858,23 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SessionSwapped"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/plan/update": {
+      "post": {
+        "operationId": "api_plan_update_api_plan_update_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanUpdated"
                 }
               }
             },

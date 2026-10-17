@@ -4,6 +4,38 @@
  */
 
 export interface paths {
+    "/api/calendar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_calendar_api_calendar_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/calendar/push-workout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_calendar_push_workout_api_calendar_push_workout_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/daily-log": {
         parameters: {
             query?: never;
@@ -110,6 +142,22 @@ export interface paths {
         get: operations["api_icu_push_status_api_icu_push_get"];
         put?: never;
         post: operations["api_icu_push_api_icu_push_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/icu/races": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_icu_races_api_icu_races_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -260,6 +308,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/plan/daily-adapt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_plan_daily_adapt_api_plan_daily_adapt_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/plan/dismiss-session": {
         parameters: {
             query?: never;
@@ -270,6 +334,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["api_plan_dismiss_session_api_plan_dismiss_session_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/plan/entry-scan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_plan_entry_scan_api_plan_entry_scan_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -340,6 +420,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/plan/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_plan_preview_api_plan_preview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/plan/preview-redraw": {
         parameters: {
             query?: never;
@@ -350,6 +446,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["api_plan_preview_redraw_api_plan_preview_redraw_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/plan/reforecast": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_plan_reforecast_api_plan_reforecast_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -414,6 +526,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["api_plan_swap_type_api_plan_swap_type_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/plan/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_plan_update_api_plan_update_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1366,6 +1494,154 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** CalendarDay */
+        CalendarDay: {
+            /** Actual */
+            actual?: {
+                [key: string]: unknown;
+            } | null;
+            /** Availability Hours */
+            availability_hours?: number | null;
+            /**
+             * Card State
+             * @default
+             */
+            card_state: string;
+            /** Date */
+            date: string;
+            /**
+             * Dow
+             * @default 0
+             */
+            dow: number;
+            /**
+             * Is Today
+             * @default false
+             */
+            is_today: boolean;
+            planned?: components["schemas"]["CalendarPlanned"] | null;
+            /** Race */
+            race?: {
+                [key: string]: unknown;
+            } | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** CalendarPlanned */
+        CalendarPlanned: {
+            /**
+             * Display Name
+             * @default
+             */
+            display_name: string;
+            /**
+             * Duration Min
+             * @default 0
+             */
+            duration_min: number;
+            /**
+             * Is Race
+             * @default false
+             */
+            is_race: boolean;
+            /**
+             * Name
+             * @default
+             */
+            name: string;
+            /**
+             * Session Type
+             * @default rest
+             */
+            session_type: string;
+            /**
+             * Status
+             * @default pending
+             */
+            status: string;
+            /**
+             * Tss
+             * @default 0
+             */
+            tss: number;
+            /**
+             * User Moved
+             * @default false
+             */
+            user_moved: boolean;
+            /**
+             * Zwo File
+             * @default
+             */
+            zwo_file: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** CalendarRead */
+        CalendarRead: {
+            /** Current Iso Week */
+            current_iso_week?: {
+                [key: string]: unknown;
+            } | null;
+            /** Error */
+            error?: string | null;
+            /** Goal */
+            goal?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Summary
+             * @default {}
+             */
+            summary: {
+                [key: string]: unknown;
+            };
+            /** Today */
+            today: string;
+            /**
+             * Weeks
+             * @default []
+             */
+            weeks: components["schemas"]["CalendarWeek"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** CalendarWeek */
+        CalendarWeek: {
+            /** Actual Tss */
+            actual_tss?: number | null;
+            /** Completion Pct */
+            completion_pct?: number | null;
+            /**
+             * Days
+             * @default []
+             */
+            days: components["schemas"]["CalendarDay"][];
+            /** End Date */
+            end_date: string;
+            /**
+             * Is Current
+             * @default false
+             */
+            is_current: boolean;
+            /**
+             * Is Stepback
+             * @default false
+             */
+            is_stepback: boolean;
+            /** Iso Week */
+            iso_week: number;
+            /** Iso Year */
+            iso_year: number;
+            /** Phase */
+            phase?: string | null;
+            /** Planned Tss */
+            planned_tss?: number | null;
+            /** Start Date */
+            start_date: string;
+        } & {
+            [key: string]: unknown;
+        };
         /** CapReverted */
         CapReverted: {
             /**
@@ -1382,6 +1658,25 @@ export interface components {
              * @default true
              */
             reverted: boolean;
+        } & {
+            [key: string]: unknown;
+        };
+        /** DailyAdapt */
+        DailyAdapt: {
+            /** Action */
+            action?: string | null;
+            /**
+             * Projected Adaptations
+             * @default []
+             */
+            projected_adaptations: {
+                [key: string]: unknown;
+            }[];
+            /**
+             * Projection Only
+             * @default true
+             */
+            projection_only: boolean;
         } & {
             [key: string]: unknown;
         };
@@ -1599,6 +1894,38 @@ export interface components {
              * @default true
              */
             ok: boolean;
+        } & {
+            [key: string]: unknown;
+        };
+        /** EntryScan */
+        EntryScan: {
+            /** Capped */
+            capped?: boolean | null;
+            /** Entry Week */
+            entry_week?: number | null;
+            /** Equivalent Start Date */
+            equivalent_start_date?: string | null;
+            /** Plan End Date */
+            plan_end_date?: string | null;
+            /**
+             * Plan Weeks
+             * @default 0
+             */
+            plan_weeks: number;
+            /**
+             * Proposal Weeks
+             * @default 0
+             */
+            proposal_weeks: number;
+            /**
+             * Weeks
+             * @default []
+             */
+            weeks: {
+                [key: string]: unknown;
+            }[];
+            /** Weeks Remaining */
+            weeks_remaining?: number | null;
         } & {
             [key: string]: unknown;
         };
@@ -2006,6 +2333,22 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** IcuRaces */
+        IcuRaces: {
+            /** Error */
+            error?: string | null;
+            /** Needs Reconnect */
+            needs_reconnect?: boolean | null;
+            /**
+             * Races
+             * @default []
+             */
+            races: {
+                [key: string]: unknown;
+            }[];
+        } & {
+            [key: string]: unknown;
+        };
         /** LogTail */
         LogTail: {
             /**
@@ -2193,6 +2536,43 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** PlanPreview */
+        PlanPreview: {
+            /** Event Date */
+            event_date?: string | null;
+            /**
+             * Goal
+             * @default
+             */
+            goal: string;
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
+            /** Phase Weeks Disabled Reason */
+            phase_weeks_disabled_reason?: string | null;
+            /** Phase Weeks Rec */
+            phase_weeks_rec?: {
+                [key: string]: unknown;
+            } | null;
+            /** Phase Weeks Status */
+            phase_weeks_status?: string | null;
+            /**
+             * Phases
+             * @default []
+             */
+            phases: components["schemas"]["PreviewPhase"][];
+            /**
+             * Plan Weeks
+             * @default 0
+             */
+            plan_weeks: number;
+            /** Start Date */
+            start_date?: string | null;
+        } & {
+            [key: string]: unknown;
+        };
         /** PlanRead */
         PlanRead: {
             /**
@@ -2206,6 +2586,27 @@ export interface components {
              */
             plan: string;
             plan_json: components["schemas"]["PlanJson"];
+        } & {
+            [key: string]: unknown;
+        };
+        /** PlanReforecasted */
+        PlanReforecasted: {
+            /** Gaps */
+            gaps?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
+            plan_json?: components["schemas"]["PlanJson"] | null;
+            /** Reforecast */
+            reforecast?: {
+                [key: string]: unknown;
+            } | null;
+            /** Sessions Changed */
+            sessions_changed?: number | null;
         } & {
             [key: string]: unknown;
         };
@@ -2338,6 +2739,24 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** PlanUpdated */
+        PlanUpdated: {
+            /** Action */
+            action?: string | null;
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
+            plan_json?: components["schemas"]["PlanJson"] | null;
+            /**
+             * Status Message
+             * @default
+             */
+            status_message: string;
+        } & {
+            [key: string]: unknown;
+        };
         /** PlanWeek */
         PlanWeek: {
             /** End */
@@ -2451,6 +2870,32 @@ export interface components {
             queue: {
                 [key: string]: unknown;
             }[];
+        } & {
+            [key: string]: unknown;
+        };
+        /** PreviewPhase */
+        PreviewPhase: {
+            /**
+             * End
+             * @default
+             */
+            end: string;
+            /**
+             * Focus
+             * @default
+             */
+            focus: string;
+            /** Name */
+            name: string;
+            /**
+             * Start
+             * @default
+             */
+            start: string;
+            /** Weekly Tss */
+            weekly_tss?: number | null;
+            /** Weeks */
+            weeks: number;
         } & {
             [key: string]: unknown;
         };
@@ -3564,6 +4009,19 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** WorkoutPushed */
+        WorkoutPushed: {
+            /** Error */
+            error?: string | null;
+            /** Needs Lthr */
+            needs_lthr?: boolean | null;
+            /** Needs Reconnect */
+            needs_reconnect?: boolean | null;
+            /** Ok */
+            ok?: boolean | null;
+        } & {
+            [key: string]: unknown;
+        };
         /** WorkoutRow */
         WorkoutRow: {
             /**
@@ -3675,6 +4133,46 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    api_calendar_api_calendar_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CalendarRead"];
+                };
+            };
+        };
+    };
+    api_calendar_push_workout_api_calendar_push_workout_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkoutPushed"];
+                };
+            };
+        };
+    };
     api_daily_log_api_daily_log_get: {
         parameters: {
             query?: never;
@@ -3851,6 +4349,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["IcuPushResult"];
+                };
+            };
+        };
+    };
+    api_icu_races_api_icu_races_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IcuRaces"];
                 };
             };
         };
@@ -4035,6 +4553,26 @@ export interface operations {
             };
         };
     };
+    api_plan_daily_adapt_api_plan_daily_adapt_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DailyAdapt"];
+                };
+            };
+        };
+    };
     api_plan_dismiss_session_api_plan_dismiss_session_post: {
         parameters: {
             query?: never;
@@ -4051,6 +4589,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SessionDismissed"];
+                };
+            };
+        };
+    };
+    api_plan_entry_scan_api_plan_entry_scan_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EntryScan"];
                 };
             };
         };
@@ -4135,6 +4693,26 @@ export interface operations {
             };
         };
     };
+    api_plan_preview_api_plan_preview_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanPreview"];
+                };
+            };
+        };
+    };
     api_plan_preview_redraw_api_plan_preview_redraw_post: {
         parameters: {
             query?: never;
@@ -4151,6 +4729,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RedrawCandidate"];
+                };
+            };
+        };
+    };
+    api_plan_reforecast_api_plan_reforecast_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanReforecasted"];
                 };
             };
         };
@@ -4231,6 +4829,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SessionSwapped"];
+                };
+            };
+        };
+    };
+    api_plan_update_api_plan_update_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanUpdated"];
                 };
             };
         };
