@@ -135,6 +135,7 @@ def test_the_sync_loop_applies_the_eftp_only_when_opted_in():
     for opted, expect in ((True, 1), (False, 0)):
         applied, fetched = [], []
         with patch.object(app_module, "_icu_push_daily_from_sync"), \
+             patch.object(app_module, "_auto_recalc_from_sync"), \
              patch.dict(pm.prefs, {"eftp_auto_apply": opted}), \
              patch.object(app_module, "fetch_wellness", side_effect=lambda n: fetched.append(n) or []), \
              patch.object(app_module, "_guarded_check_and_auto_apply_eftp",
