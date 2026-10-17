@@ -3,10 +3,13 @@ import { useSyncExternalStore } from "react"
 import { AppShell, NotMigrated, TABS, isTab } from "@/components/AppShell"
 import { Dfa } from "@/screens/Dfa"
 import { Home } from "@/screens/Home"
+import { Library } from "@/screens/Library"
 import { Plan } from "@/screens/Plan"
 import { ProfilePicker } from "@/screens/ProfilePicker"
 import { ProfileSetup } from "@/screens/ProfileSetup"
+import { Routes } from "@/screens/Routes"
 import { Setup } from "@/screens/Setup"
+import { Shuffle } from "@/screens/Shuffle"
 
 // ponytail: hash routing, no router dependency. Swap for react-router when nested routes or loaders are needed.
 const subscribe = (cb: () => void) => {
@@ -26,7 +29,7 @@ export function App() {
   const tab = isTab(route) ? route : "home"
   return (
     <AppShell tab={tab}>
-      {tab === "dfa" ? <Dfa /> : tab === "home" ? <Home /> : tab === "plan" ? <Plan /> : <NotMigrated label={TABS.find((t) => t.id === tab)!.label} />}
+      {tab === "dfa" ? <Dfa /> : tab === "home" ? <Home /> : tab === "plan" ? <Plan /> : tab === "library" ? <Library /> : tab === "picker" ? <Shuffle /> : tab === "courses" ? <Routes /> : <NotMigrated label={TABS.find((t) => t.id === tab)!.label} />}
     </AppShell>
   )
 }

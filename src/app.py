@@ -5950,7 +5950,7 @@ def _get_library_rows_cached() -> list[dict]:
 
 
 
-@app.get("/api/workouts")
+@app.get("/api/workouts", responses={200: {"model": list[api_models.WorkoutRow]}})
 def api_workouts(
     # R2 (2026-07-07): injected by FastAPI on HTTP requests; None when the
     # picker (see ~L6000) calls this function directly from python. The
@@ -6171,7 +6171,7 @@ def download_workout_by_id(filename: str, cap: int = Query(0)):
     )
 
 
-@app.get("/api/workout/{category}/{filename}")
+@app.get("/api/workout/{category}/{filename}", responses={200: {"model": api_models.WorkoutDetail}})
 def api_workout_detail(category: str, filename: str, view: str | None = Query(None)):
     """Parse a ZWO file and return segment data for visualization.
 
@@ -6430,7 +6430,7 @@ async def api_bulk_segments(request: Request):
     return {"results": results, "ftp": ftp}
 
 
-@app.get("/api/picker")
+@app.get("/api/picker", responses={200: {"model": api_models.PickerResult}})
 def api_picker(subjective: float = Query(7), duration: int = Query(75)):
     """Workout-of-the-day picker.
 
@@ -6906,7 +6906,7 @@ WORLD_CHARACTER = {
 
 
 
-@app.get("/api/routes")
+@app.get("/api/routes", responses={200: {"model": api_models.RoutesList}})
 def api_routes(
     source: str = Query("any"),
     region: str | None = Query(None),
@@ -7179,7 +7179,7 @@ async def api_routes_suggest(request: Request):
 
 
 
-@app.get("/api/routes/regions")
+@app.get("/api/routes/regions", responses={200: {"model": api_models.RegionsList}})
 def api_routes_regions():
     """Region cards (virtual worlds) + real_world_meta with per-region counts."""
     routes, index = _load_routes_v2()
