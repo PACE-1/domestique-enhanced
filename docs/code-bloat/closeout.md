@@ -121,7 +121,7 @@ DFA/calendar suites passes after the shared harness drains cooperative jobs
 and resets the jobs singleton following shutdown. No production cancellation
 check or existing assertion was removed.
 
-Local logs: `/tmp/domestique-gate/merged-head-baseline.*`,
+Local logs: `/tmp/shepherd-gate/merged-head-baseline.*`,
 `migration-consolidation.*`, and `cleanup-closeout-final.*`. Repeat the gate with
 an installed locked headless environment:
 

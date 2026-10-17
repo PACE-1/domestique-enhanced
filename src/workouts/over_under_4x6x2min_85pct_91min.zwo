@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Over-Under 24x2min (91min)</name>
     <description>Warmup: 10min from 25% to 75% FTP | Intervals: 24 x (2min @ 85% / 30s @ 105%) | Cooldown: 5min ramp from 60% to 40% FTP</description>
     <sportType>bike</sportType>

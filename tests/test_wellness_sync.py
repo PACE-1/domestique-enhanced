@@ -2,7 +2,7 @@
 
 Verifies:
   1. fetch_recent_wellness returns normalized records (mock ICU response).
-  2. persist_wellness writes idempotently to ~/.domestique/wellness/<date>.json.
+  2. persist_wellness writes idempotently to ~/.shepherd/wellness/<date>.json.
   3. load_recent_wellness returns records sorted newest-first.
   4. /api/readiness uses local wellness fallback when ICU live returns {}.
   5. compute_local_atl returns numeric over a sample rides list.

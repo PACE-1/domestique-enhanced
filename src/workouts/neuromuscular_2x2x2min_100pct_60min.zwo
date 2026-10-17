@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Neuromuscular 15s/1min 7x (60min)</name>
     <description>Microintervals: 7 x (15s @ 135% / 1min 5s @ 58%)</description>
     <sportType>bike</sportType>

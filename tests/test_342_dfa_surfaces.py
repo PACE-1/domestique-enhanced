@@ -4,7 +4,7 @@ ROOT CAUSE (owner report: "DFA α1 doesn't work — neither the DFA tab nor
 the homepage; both need a loading progress bar"): the v3.0.0 AC2a profile
 migration moved the ICU envelope archive to ``<profile>/rides/icu/`` but
 left the two DFA READ sites scanning the legacy GLOBAL
-``~/.domestique/rides/icu/`` — empty forever post-migration:
+``~/.shepherd/rides/icu/`` — empty forever post-migration:
 
   * ``app._iter_icu_dfa_rides``   — feeds /api/profile/dfa-alpha1 (home
     Recovery card), /api/profile/dfa-rides (DFA tab) and the readiness DFA

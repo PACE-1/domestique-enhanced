@@ -226,7 +226,7 @@ def test_banister_reaches_63pct_of_equilibrium_at_one_tau():
 # ═════════════════════════════════════════════════════════════════════════════
 # 12) Real-world plausibility — synthesize trace from cached ICU metadata.
 #
-#     The May 1 Zwolle Fietsen ride at ~/.domestique/rides/icu/i144492547.json
+#     The May 1 Zwolle Fietsen ride at ~/.shepherd/rides/icu/i144492547.json
 #     reports tss=193, np_w=219, if_pct=88.3, ftp_at_ride=248. A constant-power
 #     trace at NP for the moving-time duration is a coarse proxy that should
 #     come out within ±25% of the cached TSS — the spec calls for sanity not
@@ -234,8 +234,8 @@ def test_banister_reaches_63pct_of_equilibrium_at_one_tau():
 # ═════════════════════════════════════════════════════════════════════════════
 
 def test_real_world_zwolle_ride_within_25_percent():
-    icu_path = (Path(os.environ.get("DOMESTIQUE_REAL_HOME") or str(Path.home()))
-                / ".domestique/rides/icu/i144492547.json")
+    icu_path = (Path(os.environ.get("SHEPHERD_REAL_HOME") or str(Path.home()))
+                / ".shepherd/rides/icu/i144492547.json")
     if not icu_path.exists():
         pytest.skip(f"cached ICU ride not found at {icu_path}")
     meta = json.loads(icu_path.read_text())

@@ -108,7 +108,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from training import get_today_metrics, fetch_wellness, fetch_activities
 import config
-from user_home import domestique_home
+from user_home import shepherd_home
 
 # Workout library — flat directory of .zwo files (metadata extracted by parsing XML)
 # Linux-IP D2 scoping: snapshot the BUNDLED default BEFORE any override can
@@ -138,7 +138,7 @@ def is_builtin_library(path) -> bool:
 
 
 def _library_copy_names(path) -> set:
-    """The workout file names a copy of Domestique's library listed when it
+    """The workout file names a copy of Shepherd's library listed when it
     shipped (its overhaul manifest), so an old install's folder, or a rider's
     copy of it, adds only the rider's own workouts -- never the old copies of
     workouts the built-in library has renamed or retired. Empty for a folder
@@ -193,7 +193,7 @@ def workout_dir_is_usable(path) -> bool:
 # Allow user override via user_paths.json (matches app.py behavior).
 # Linux-IP D3 (v3.11.1) checked existence; v3.11.2 checks USABILITY — see
 # workout_dir_is_usable.
-for _upf in [domestique_home() / "user_paths.json",
+for _upf in [shepherd_home() / "user_paths.json",
              Path(__file__).parent / "user_paths.json"]:
     if _upf.exists():
         try:
@@ -211,7 +211,7 @@ for _upf in [domestique_home() / "user_paths.json",
             pass
         break
 # Plans must be written to user data dir (not the read-only app bundle)
-PLAN_DIR = domestique_home() / "plans"
+PLAN_DIR = shepherd_home() / "plans"
 # NOTE: PLAN_DIR creation deferred to first write so the v3 data-dir
 # migration in profile_manager._maybe_migrate_data_dir can race-free
 # detect a fresh install vs. a pre-existing legacy dir. Callers that
@@ -16303,7 +16303,7 @@ def export_plan_md(
     # First-write mkdir per the deferred-PLAN_DIR contract (see the PLAN_DIR
     # note ~tp:119): every other writer creates the dir; this bare open()
     # 500'd the whole /api/plan/generate on a FRESH install (no plans/ yet).
-    # Masked for years because the real ~/.domestique/plans always existed —
+    # Masked for years because the real ~/.shepherd/plans always existed —
     # the hermetic test sandbox (9e9aff3d) finally exposed it.
     path.parent.mkdir(parents=True, exist_ok=True)
 

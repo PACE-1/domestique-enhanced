@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Tempo 6 cycles (40min)</name>
     <description>Warmup: 8min ramp from 50% to 75% FTP | Over-Under: 6 cycles (alternating above/below threshold) | Cooldown: 5min from 60% to 45% FTP</description>
     <sportType>bike</sportType>

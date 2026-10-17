@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Sprints 8x12s (49min)</name>
     <description>Warmup 10 min | 8 x 12s @ 265% / 4 min @ 50% | Cooldown 5 min | Total 49 min</description>
     <sportType>bike</sportType>

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Anaerobic 1min/2min 16x (77min)</name>
     <description>Warmup: 10min ramp from 50% to 75% FTP | Microintervals: 16 x (1min @ 138% / 2min 30s @ 50%) | Cooldown: 5min from 40% to 25% FTP</description>
     <sportType>bike</sportType>

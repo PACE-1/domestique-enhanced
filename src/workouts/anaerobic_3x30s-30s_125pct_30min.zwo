@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Pre-Race Day Spin (31min)</name>
     <description>Warmup: 5min ramp from 35% to 75% FTP + 3 x (30s @ 100% / 30s @ 50%) + 1min @ 40% | Main: zone step-up 2min @ 60%, 3min @ 68%, 3min @ 78%, 3min @ 88%, then 2min @ 40% and 3 x (30s opener @ 125% / 30s @ 50%) — day-before-race activation spin | Cooldown: 1min @ 40% + 5min ramp from 40% to 25% FTP</description>
     <sportType>bike</sportType>

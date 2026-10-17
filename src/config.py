@@ -4,6 +4,7 @@ Global constants stay here. Per-profile values (athlete data, ICU creds,
 paths) are resolved dynamically via __getattr__ which proxies to
 ProfileManager.
 """
+import envcompat  # noqa: F401  (old DOMESTIQUE_* names -> SHEPHERD_*, before anything reads them)
 import os
 from pathlib import Path
 
@@ -21,7 +22,7 @@ ICU_BASE = "https://intervals.icu/api/v1"
 def _load_oauth_env() -> None:
     """Populate ICU_OAUTH_* from a gitignored ``.oauth.env`` (KEY=VALUE) if present
     so the client_secret never enters this PUBLIC repo. Dev drops the file in the
-    repo root; the build bundles it into the frozen app (see domestique.spec) so
+    repo root; the build bundles it into the frozen app (see shepherd.spec) so
     the shipped binary has it. A real environment variable still wins (setdefault)."""
     import sys
     candidates = [Path(__file__).resolve().parent / ".oauth.env",
@@ -53,7 +54,7 @@ ICU_OAUTH_CLIENT_SECRET = os.environ.get("ICU_OAUTH_CLIENT_SECRET", "")
 ICU_OAUTH_AUTHORIZE_URL = "https://intervals.icu/oauth/authorize"
 ICU_OAUTH_TOKEN_URL = "https://intervals.icu/api/oauth/token"
 # The callback has to land on whatever port we actually bound, so this follows
-# DOMESTIQUE_PORT (set by launcher.py once the port is resolved) rather than
+# SHEPHERD_PORT (set by launcher.py once the port is resolved) rather than
 # naming one. Safe to vary: intervals.icu ignores the port on loopback
 # redirects entirely — their own app-management page says "http://localhost/*
 # is always allowed, no need to add it", and probing their validator confirms
@@ -66,7 +67,7 @@ ICU_OAUTH_TOKEN_URL = "https://intervals.icu/api/oauth/token"
 # guarantee is scoped to the IP literal. Do NOT switch to [::1] — intervals.icu
 # rejects it — and keep the host lowercase, as their matching is case-sensitive.
 ICU_OAUTH_REDIRECT_URI = (
-    f"http://127.0.0.1:{os.environ.get('DOMESTIQUE_PORT') or '22400'}"
+    f"http://127.0.0.1:{os.environ.get('SHEPHERD_PORT') or '22400'}"
     f"/oauth/icu/callback")
 # CALENDAR:WRITE (v3.0.1, IP_ICU_PUSH): lets the push engine upsert planned
 # workouts onto the athlete's ICU calendar. Pre-existing connections granted

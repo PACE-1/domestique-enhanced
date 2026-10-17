@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>VO2 Short 30s/30s 15x (122min)</name>
     <description>Microintervals: 15 x (30s @ 150% / 30s @ 65%) | Cooldown: 7min from 50% to 30% FTP</description>
     <sportType>bike</sportType>

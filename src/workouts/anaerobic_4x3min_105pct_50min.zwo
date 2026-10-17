@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Anaerobic attack-hold-kick 4x (50min)</name>
     <description>Warmup: 8min ramp from 45% to 75% FTP, 3 x 30s fast-pedal drill @ 82%, primer 1min @ 88% | Race simulation: 4 x (40s @ 135% attack, 3min @ 105% hold, 25s @ 135% kick), 4min 30s between | Cooldown: 5min from 60% to 45% FTP</description>
     <sportType>bike</sportType>

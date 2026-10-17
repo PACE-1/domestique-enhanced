@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Anaerobic 4x20s (59min)</name>
     <description>Warmup: 10min ramp from 50% to 75% FTP | Intervals: 4 x (20s @ 125% / 5min @ 84%) | Cooldown: 5min from 60% to 45% FTP</description>
     <sportType>bike</sportType>

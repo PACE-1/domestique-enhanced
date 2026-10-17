@@ -1,9 +1,9 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════════════════════
-# Domestique Linux AppImage Builder
+# Shepherd Linux AppImage Builder
 # ═══════════════════════════════════════════════════════════════
 # Usage:  ./build_linux.sh
-# Output: dist/Domestique-v<VERSION>-x86_64.AppImage
+# Output: dist/Shepherd-v<VERSION>-x86_64.AppImage
 #
 # The artifact carries pywebview's Qt/PySide6 backend, not GTK: QtWebEngine
 # ships its own Chromium, so there is no host WebKitGTK to bundle, patch or
@@ -38,12 +38,12 @@ if [ "$(uname -s)" != "Linux" ]; then
     exit 1
 fi
 
-# The bundle serves the web interface from web/dist (see domestique.spec).
+# The bundle serves the web interface from web/dist (see shepherd.spec).
 [ -f web/dist/index.html ] || {
     echo "✗ web/dist is missing. Build the web interface first: (cd web && pnpm install && pnpm build)" >&2; exit 1; }
 
 VERSION="$(tr -d '[:space:]' < VERSION)"
-APP_NAME="Domestique"
+APP_NAME="Shepherd"
 DIST="dist/${APP_NAME}"
 APPDIR="build/${APP_NAME}.AppDir"
 # Frozen literal — the picker tests and the update-checker pin this exact
@@ -58,7 +58,7 @@ GLIBC_FLOOR="${GLIBC_FLOOR:-2.35}"
 GLIBCXX_FLOOR="${GLIBCXX_FLOOR:-3.4.30}"
 CXXABI_FLOOR="${CXXABI_FLOOR:-1.3.13}"
 
-echo "=== Domestique Linux AppImage Build (v${VERSION}) ==="
+echo "=== Shepherd Linux AppImage Build (v${VERSION}) ==="
 
 # appimagetool ships as an AppImage and mounts itself via FUSE. Containers and
 # most CI have no FUSE, and the failure ("fuse: device not found") reads like a
@@ -92,7 +92,7 @@ pip3 install -r requirements.txt pyinstaller
 # A dist/ left by a previous macOS or Windows build would otherwise survive a
 # failed run and be measured by the version gate below — which is exactly how a
 # 3.7.0 bundle got checked against a 3.8.0 repo.
-rm -rf dist build/Domestique
+rm -rf dist build/Shepherd
 echo "[2/9] Building with PyInstaller..."
 # NOT piped into tail: the pipeline's exit status would be tail's, which is
 # always 0, so `set -e` never saw a failed build — the script carried on and
@@ -104,7 +104,7 @@ set -o pipefail
 python3 tools/build-library-caches.py || {
     echo "FATAL: could not build the library caches" >&2; exit 1; }
 
-pyinstaller packaging/domestique.spec --clean --noconfirm 2>&1 | tail -3
+pyinstaller packaging/shepherd.spec --clean --noconfirm 2>&1 | tail -3
 set +o pipefail
 [ -x "${DIST}/${APP_NAME}" ] || { echo "✗ FATAL: ${DIST}/${APP_NAME} not produced"; exit 1; }
 
@@ -131,7 +131,7 @@ for lib in 'libstdc++.so.6*' 'libgcc_s.so.1*' 'libgbm.so.1*' 'libxshmfence.so.1*
 done
 
 # 5. Symbol-version gate. Walk the WHOLE tree: under PyInstaller 6 the payload
-# lives in _internal/, so the obvious `objdump -T dist/Domestique/*.so*` matches
+# lives in _internal/, so the obvious `objdump -T dist/Shepherd/*.so*` matches
 # nothing and passes unconditionally. Each family is maxed and compared
 # SEPARATELY — GLIBCXX_3.4.30 is not comparable to GLIBC_2.35.
 echo "[5/9] Symbol-version gate (glibc >= floors of the oldest supported host)..."
@@ -193,20 +193,20 @@ rm -rf "$APPDIR"
 mkdir -p "$APPDIR/usr/bin" "$APPDIR/usr/share/applications" "$APPDIR/usr/share/icons"
 cp -a "$DIST/." "$APPDIR/usr/bin/"
 cp -a assets/linux/hicolor "$APPDIR/usr/share/icons/"
-cp assets/linux/domestique.png "$APPDIR/domestique.png"
+cp assets/linux/shepherd.png "$APPDIR/shepherd.png"
 
-cat > "$APPDIR/domestique.desktop" <<'DESKTOP'
+cat > "$APPDIR/shepherd.desktop" <<'DESKTOP'
 [Desktop Entry]
 Type=Application
-Name=Domestique
+Name=Shepherd
 Comment=Cycling training planner, workout library and ride viewer
-Exec=Domestique
-Icon=domestique
+Exec=Shepherd
+Icon=shepherd
 Categories=Education;Sports;
 Terminal=false
-StartupWMClass=Domestique
+StartupWMClass=Shepherd
 DESKTOP
-cp "$APPDIR/domestique.desktop" "$APPDIR/usr/share/applications/"
+cp "$APPDIR/shepherd.desktop" "$APPDIR/usr/share/applications/"
 
 # A missing Chromium helper is a white window, not an error — find it now and
 # bake the path in, rather than letting Qt's compiled-in guess miss inside a

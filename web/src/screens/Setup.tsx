@@ -271,7 +271,7 @@ export function Setup() {
 
   return (
     <div className="mx-auto flex min-h-svh max-w-xl flex-col justify-center px-6 py-10">
-      <h1 className="text-center text-2xl font-bold">Domestique</h1>
+      <h1 className="text-center text-2xl font-bold">Shepherd</h1>
       <p className="mb-4 text-center text-muted-foreground">Let's get you set up in 4 quick steps.</p>
       <StepDots step={step} total={4} />
       <Card>
@@ -280,7 +280,7 @@ export function Setup() {
             <>
               <h2 className="text-lg font-semibold">Your training data</h2>
               <p className="text-sm text-muted-foreground">
-                Domestique plans from what you actually ride. It can read that from{" "}
+                Shepherd plans from what you actually ride. It can read that from{" "}
                 <a className="underline" href="https://intervals.icu/" target="_blank" rel="noopener noreferrer">intervals.icu</a>
                 , a free training-analysis service, or from ride files you import yourself.
               </p>
@@ -406,7 +406,7 @@ export function Setup() {
             <>
               <h2 className="text-lg font-semibold">Workout &amp; Route Folders</h2>
               <p className="text-sm text-muted-foreground">
-                Domestique comes with a full <b>workout library built in</b>, which is always used, so you can leave
+                Shepherd comes with a full <b>workout library built in</b>, which is always used, so you can leave
                 the folder empty. If you keep your own workout files on this computer, add that folder: its workouts
                 join the built-in library. Click <b>Browse</b> to pick one. You can change this anytime in <b>Settings</b>.
               </p>
@@ -423,7 +423,7 @@ export function Setup() {
                 </div>
               ))}
               <p className="text-sm text-muted-foreground">
-                <b>Almost done.</b> One more step — your weekly hours and training days. When you finish, Domestique
+                <b>Almost done.</b> One more step — your weekly hours and training days. When you finish, Shepherd
                 opens your dashboard, pulls in your recent training from intervals.icu (if you connected it), and you
                 can generate your first training plan with one click.
               </p>

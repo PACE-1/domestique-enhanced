@@ -32,10 +32,10 @@ def _fake_release(tag: str = "9.9.9", assets: list | None = None,
         "tag_name": f"v{tag}",
         "html_url": f"https://github.com/platypus45/domestique/releases/tag/v{tag}",
         "assets": assets if assets is not None else [
-            {"name": "Domestique.dmg",
-             "browser_download_url": f"https://example.com/Domestique-{tag}.dmg"},
-            {"name": "Domestique.exe",
-             "browser_download_url": f"https://example.com/Domestique-{tag}.exe"},
+            {"name": "Shepherd.dmg",
+             "browser_download_url": f"https://example.com/Shepherd-{tag}.dmg"},
+            {"name": "Shepherd.exe",
+             "browser_download_url": f"https://example.com/Shepherd-{tag}.exe"},
         ],
     }
     if body is not None:
@@ -86,8 +86,8 @@ class TestCacheHit(UpdateCheckBase):
             "latest": "999.0.5",
             "update_available": True,
             "release_url": "https://example.com/release",
-            "download_url": "https://example.com/Domestique.dmg",
-            "asset_name": "Domestique.dmg",
+            "download_url": "https://example.com/Shepherd.dmg",
+            "asset_name": "Shepherd.dmg",
             "platform": "darwin",
             "checked_at": "2026-05-01T00:00:00Z",
             "error": None,
@@ -157,7 +157,7 @@ class TestCacheMissApiSuccess(UpdateCheckBase):
         self.assertFalse(data["cached"])
         self.assertEqual(data["latest"], "9.9.9")
         self.assertTrue(data["update_available"])  # current=1.0.0 < 9.9.9
-        self.assertEqual(data["asset_name"], "Domestique.dmg")
+        self.assertEqual(data["asset_name"], "Shepherd.dmg")
         self.assertTrue(data["download_url"].endswith(".dmg"))
         self.assertEqual(data["platform"], "darwin")
         self.assertIsNone(data["error"])
@@ -221,29 +221,29 @@ class TestCacheMissApiFailure(UpdateCheckBase):
 class TestPlatformAssetFiltering(UpdateCheckBase):
     def test_darwin_picks_dmg(self):
         rel = _fake_release(tag="2.3.4", assets=[
-            {"name": "Domestique.dmg",
-             "browser_download_url": "https://example.com/Domestique.dmg"},
-            {"name": "Domestique.exe",
-             "browser_download_url": "https://example.com/Domestique.exe"},
-            {"name": "Domestique.zip",
-             "browser_download_url": "https://example.com/Domestique.zip"},
+            {"name": "Shepherd.dmg",
+             "browser_download_url": "https://example.com/Shepherd.dmg"},
+            {"name": "Shepherd.exe",
+             "browser_download_url": "https://example.com/Shepherd.exe"},
+            {"name": "Shepherd.zip",
+             "browser_download_url": "https://example.com/Shepherd.zip"},
         ])
         with patch("httpx.get", return_value=_FakeResp(200, rel)), \
              patch.object(app_module, "sys") as _sys:
             _sys.platform = "darwin"
             r = self.client.get("/api/update/check")
         data = r.json()
-        self.assertEqual(data["asset_name"], "Domestique.dmg")
-        self.assertEqual(data["download_url"], "https://example.com/Domestique.dmg")
+        self.assertEqual(data["asset_name"], "Shepherd.dmg")
+        self.assertEqual(data["download_url"], "https://example.com/Shepherd.dmg")
         self.assertEqual(data["platform"], "darwin")
 
     def test_darwin_prefers_canonical_dmg_over_decorated(self):
-        # Multiple .dmg assets — the unadorned "Domestique.dmg" must win.
+        # Multiple .dmg assets — the unadorned "Shepherd.dmg" must win.
         rel = _fake_release(tag="2.3.4", assets=[
-            {"name": "Domestique-2.3.4.dmg",
-             "browser_download_url": "https://example.com/Domestique-2.3.4.dmg"},
-            {"name": "Domestique.dmg",
-             "browser_download_url": "https://example.com/Domestique.dmg"},
+            {"name": "Shepherd-2.3.4.dmg",
+             "browser_download_url": "https://example.com/Shepherd-2.3.4.dmg"},
+            {"name": "Shepherd.dmg",
+             "browser_download_url": "https://example.com/Shepherd.dmg"},
         ])
         # Cache must be empty so we hit the API path.
         if self._cache_path.exists():
@@ -253,16 +253,16 @@ class TestPlatformAssetFiltering(UpdateCheckBase):
             _sys.platform = "darwin"
             r = self.client.get("/api/update/check")
         data = r.json()
-        self.assertEqual(data["asset_name"], "Domestique.dmg")
+        self.assertEqual(data["asset_name"], "Shepherd.dmg")
 
     def test_win32_prefers_exe_over_zip(self):
         rel = _fake_release(tag="2.3.4", assets=[
-            {"name": "Domestique.zip",
-             "browser_download_url": "https://example.com/Domestique.zip"},
-            {"name": "Domestique.exe",
-             "browser_download_url": "https://example.com/Domestique.exe"},
-            {"name": "Domestique.dmg",
-             "browser_download_url": "https://example.com/Domestique.dmg"},
+            {"name": "Shepherd.zip",
+             "browser_download_url": "https://example.com/Shepherd.zip"},
+            {"name": "Shepherd.exe",
+             "browser_download_url": "https://example.com/Shepherd.exe"},
+            {"name": "Shepherd.dmg",
+             "browser_download_url": "https://example.com/Shepherd.dmg"},
         ])
         if self._cache_path.exists():
             self._cache_path.unlink()
@@ -271,16 +271,16 @@ class TestPlatformAssetFiltering(UpdateCheckBase):
             _sys.platform = "win32"
             r = self.client.get("/api/update/check")
         data = r.json()
-        self.assertEqual(data["asset_name"], "Domestique.exe")
-        self.assertEqual(data["download_url"], "https://example.com/Domestique.exe")
+        self.assertEqual(data["asset_name"], "Shepherd.exe")
+        self.assertEqual(data["download_url"], "https://example.com/Shepherd.exe")
         self.assertEqual(data["platform"], "win32")
 
     def test_win32_falls_back_to_zip_when_no_exe(self):
         rel = _fake_release(tag="2.3.4", assets=[
-            {"name": "Domestique.zip",
-             "browser_download_url": "https://example.com/Domestique.zip"},
-            {"name": "Domestique.dmg",
-             "browser_download_url": "https://example.com/Domestique.dmg"},
+            {"name": "Shepherd.zip",
+             "browser_download_url": "https://example.com/Shepherd.zip"},
+            {"name": "Shepherd.dmg",
+             "browser_download_url": "https://example.com/Shepherd.dmg"},
         ])
         if self._cache_path.exists():
             self._cache_path.unlink()
@@ -289,7 +289,7 @@ class TestPlatformAssetFiltering(UpdateCheckBase):
             _sys.platform = "win32"
             r = self.client.get("/api/update/check")
         data = r.json()
-        self.assertEqual(data["asset_name"], "Domestique.zip")
+        self.assertEqual(data["asset_name"], "Shepherd.zip")
 
     def test_linux_returns_release_url_only(self):
         rel = _fake_release(tag="2.3.4")

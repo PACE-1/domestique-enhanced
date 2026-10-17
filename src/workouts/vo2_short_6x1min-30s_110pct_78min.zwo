@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>VO2 Short 2x4min (78min)</name>
     <description>Warmup: 12min from 50% to 75% FTP | Intervals: 2 x (4min @ 90% / 1min @ 50%)</description>
     <sportType>bike</sportType>

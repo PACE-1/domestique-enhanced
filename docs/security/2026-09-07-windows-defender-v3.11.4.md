@@ -1,4 +1,4 @@
-# Windows Defender flags Domestique 3.11.4 — provenance audit
+# Windows Defender flags Shepherd 3.11.4 — provenance audit
 
 **Date:** 2026-09-07  ·  **Trigger:** [issue #12](https://github.com/platypus45/domestique/issues/12) — Windows Defender reports `Trojan:Win32/Sabsik.TE.A!ml` on the 3.11.4 Windows build; VirusTotal shows 7 of 68 engines flagging.  ·  **Scope:** the file the report names, and the two previous Windows builds.
 
@@ -35,31 +35,31 @@ Nothing in the bundle came from anywhere other than: this repository at tag `v3.
 
 ## What to do
 
-1. **Submit a false-positive report to Microsoft** — [Microsoft Security Intelligence file submission](https://www.microsoft.com/wdsi/filesubmission), as "Software developer", with `Domestique-Windows.zip` from the release and the hash below. Wacatac/Sabsik `!ml` disputes are typically cleared within days. (Owner action: needs a Microsoft account.)
+1. **Submit a false-positive report to Microsoft** — [Microsoft Security Intelligence file submission](https://www.microsoft.com/wdsi/filesubmission), as "Software developer", with `Shepherd-Windows.zip` from the release and the hash below. Wacatac/Sabsik `!ml` disputes are typically cleared within days. (Owner action: needs a Microsoft account.)
 2. **Code-sign the Windows build.** The durable fix; an unsigned executable is the dominant feature these models key on, and SmartScreen reputation is built on the signing identity. Options: Azure Trusted Signing (what the PSF itself uses for python.org binaries), SignPath Foundation (free for open source), or an OV certificate. The CI workflow already has the `signtool` step drafted.
-3. **Publish the hash and this audit** on the release page so users can verify what they downloaded: `Domestique.exe` SHA-256 `48068373987a6f844aa5169de948f72820332b5c58eeeb1c21bb79e20e4c6b93`; `Domestique-Windows.zip` SHA-256 `3f9fb405ba21b8d60b8ed061ac3f0533a40d2d648c09458fe63f45c3dd9cfbfc`.
+3. **Publish the hash and this audit** on the release page so users can verify what they downloaded: `Shepherd.exe` SHA-256 `48068373987a6f844aa5169de948f72820332b5c58eeeb1c21bb79e20e4c6b93`; `Shepherd-Windows.zip` SHA-256 `3f9fb405ba21b8d60b8ed061ac3f0533a40d2d648c09458fe63f45c3dd9cfbfc`.
 4. Optional hardening that reduces heuristic hits: build the PyInstaller bootloader from source in CI (removes the shared stock-bootloader fingerprint); keep UPX off (it is off — no UPX markers in the EXE).
 
 ## Evidence, reproducibly
 
-Everything below was run on 2026-09-07 on macOS against the public release assets. Paths are relative to a scratch directory; `unz/` is the unzipped `Domestique-Windows.zip`.
+Everything below was run on 2026-09-07 on macOS against the public release assets. Paths are relative to a scratch directory; `unz/` is the unzipped `Shepherd-Windows.zip`.
 
 ### E1 — the reported hash is our file, built by CI
 
 ```bash
-gh release download v3.11.4 --repo platypus45/domestique --pattern 'Domestique-Windows.zip'
-shasum -a 256 Domestique-Windows.zip      # 3f9fb405ba21b8d60b8ed061ac3f0533a40d2d648c09458fe63f45c3dd9cfbfc  (83,296,634 B)
-unzip -q Domestique-Windows.zip -d unz
-shasum -a 256 unz/Domestique.exe          # 48068373987a6f844aa5169de948f72820332b5c58eeeb1c21bb79e20e4c6b93  (16,146,283 B)  == the hash in the report
+gh release download v3.11.4 --repo platypus45/domestique --pattern 'Shepherd-Windows.zip'
+shasum -a 256 Shepherd-Windows.zip      # 3f9fb405ba21b8d60b8ed061ac3f0533a40d2d648c09458fe63f45c3dd9cfbfc  (83,296,634 B)
+unzip -q Shepherd-Windows.zip -d unz
+shasum -a 256 unz/Shepherd.exe          # 48068373987a6f844aa5169de948f72820332b5c58eeeb1c21bb79e20e4c6b93  (16,146,283 B)  == the hash in the report
 gh api repos/platypus45/domestique/releases/tags/v3.11.4 --jq '.assets[] | "\(.name) \(.uploader.login) \(.created_at)"'
-#   Domestique-Windows.zip  github-actions[bot]  2026-09-05T08:06:21Z     (run 33954169244, tag v3.11.4 -> commit ba440379)
-#   Domestique-v3.11.4-x86_64.AppImage  github-actions[bot]
-#   Domestique-v3.11.4.dmg  platypus45   (built locally, notarized by Apple — Apple's notarization includes a malware scan)
+#   Shepherd-Windows.zip  github-actions[bot]  2026-09-05T08:06:21Z     (run 33954169244, tag v3.11.4 -> commit ba440379)
+#   Shepherd-v3.11.4-x86_64.AppImage  github-actions[bot]
+#   Shepherd-v3.11.4.dmg  platypus45   (built locally, notarized by Apple — Apple's notarization includes a malware scan)
 ```
 
 Earlier builds, for comparison (never uploaded to VirusTotal by anyone):
 
-| build | `Domestique.exe` SHA-256 | size |
+| build | `Shepherd.exe` SHA-256 | size |
 |---|---|---|
 | 3.11.2 | `8767843c1c25b6edf88d754e8db1644ca5b57f1f059a54eb5b1f4db9d8b5a999` | 16,105,273 |
 | 3.11.3 | `0b30a538f580d187f776007bf4adace33195866752120078a2a41cbe8b8788c4` | 16,110,455 |
@@ -68,7 +68,7 @@ Earlier builds, for comparison (never uploaded to VirusTotal by anyone):
 ### E2 — what changed between builds (whole bundle, 7,291 files)
 
 Per-file SHA-256 of the unzipped 3.11.3 and 3.11.4 bundles: **5 files differ**, none of them a compiled binary:
-`Domestique.exe` (carries the Python code, see E3), `_internal/VERSION`, `_internal/base_library.zip` (stdlib, see E3), `_internal/numpy-2.5.2.dist-info/RECORD`, `_internal/workouts/.library_index.json` (build-time index).
+`Shepherd.exe` (carries the Python code, see E3), `_internal/VERSION`, `_internal/base_library.zip` (stdlib, see E3), `_internal/numpy-2.5.2.dist-info/RECORD`, `_internal/workouts/.library_index.json` (build-time index).
 3.11.2 → 3.11.3: 11 files differ — the same three build artefacts plus our own `templates/dashboard.html`, three workout files and two workout indexes. **Every `.dll` and `.pyd` is byte-identical across all three releases.**
 
 ### E3 — every embedded module against its public source
@@ -109,7 +109,7 @@ Result over all 75 top-level binaries: 74 × `Signature verification: ok` (diges
 
 ### E5 — the EXE itself is PyInstaller's stock bootloader plus our archive
 
-PE sections of `unz/Domestique.exe` vs `PyInstaller/bootloader/Windows-64bit-intel/runw.exe` from the `pyinstaller-6.22.2-py3-none-win_amd64.whl` (hash-verified against PyPI):
+PE sections of `unz/Shepherd.exe` vs `PyInstaller/bootloader/Windows-64bit-intel/runw.exe` from the `pyinstaller-6.22.2-py3-none-win_amd64.whl` (hash-verified against PyPI):
 
 ```
 .text    MATCH      .rdata  differs (3 bytes)      .data   MATCH      .pdata  MATCH
@@ -124,7 +124,7 @@ Git blob hashes of every non-binary file under `_internal/` that the repository 
 
 ### E7 — indicator sweep
 
-Every `http(s)://` string in every file of the bundle, by domain: `microsoft.com` (certificate CRL/OCSP URLs inside the Microsoft-signed DLLs), `numpy.org`, `dlmf.nist.gov`, `wikipedia.org`, `boost.org`, `github.com` (update check + scipy references), `netlib.org`, `arxiv.org`, `support.garmin.com`, `intervals.icu` (4), `python.org`, `digicert.com` (signing chains), assorted maths references from scipy. Zero occurrences of `WriteProcessMemory`, `CreateRemoteThread`, `VirtualAllocEx`, `SetWindowsHookEx`, `GetAsyncKeyState`, `stratum+tcp`, `xmrig`, `.onion` in `Domestique.exe` + `python312.dll`. No `certutil`, `hosts`, `powershell` or `cmd.exe /c` strings — the CI test helper that uses those (`packaging/tls_intercept_probe_win.py`) is not in the bundle (`unzip -l | grep -i probe` → nothing).
+Every `http(s)://` string in every file of the bundle, by domain: `microsoft.com` (certificate CRL/OCSP URLs inside the Microsoft-signed DLLs), `numpy.org`, `dlmf.nist.gov`, `wikipedia.org`, `boost.org`, `github.com` (update check + scipy references), `netlib.org`, `arxiv.org`, `support.garmin.com`, `intervals.icu` (4), `python.org`, `digicert.com` (signing chains), assorted maths references from scipy. Zero occurrences of `WriteProcessMemory`, `CreateRemoteThread`, `VirtualAllocEx`, `SetWindowsHookEx`, `GetAsyncKeyState`, `stratum+tcp`, `xmrig`, `.onion` in `Shepherd.exe` + `python312.dll`. No `certutil`, `hosts`, `powershell` or `cmd.exe /c` strings — the CI test helper that uses those (`packaging/tls_intercept_probe_win.py`) is not in the bundle (`unzip -l | grep -i probe` → nothing).
 
 ### What this audit does not cover
 
@@ -137,7 +137,7 @@ Every `http(s)://` string in every file of the bundle, by domain: `microsoft.com
 
 ```bash
 # 1. the reported file
-gh release download v3.11.4 --repo platypus45/domestique --pattern 'Domestique-Windows.zip' && unzip -q Domestique-Windows.zip -d unz && shasum -a 256 unz/Domestique.exe
+gh release download v3.11.4 --repo platypus45/domestique --pattern 'Shepherd-Windows.zip' && unzip -q Shepherd-Windows.zip -d unz && shasum -a 256 unz/Shepherd.exe
 # 2. exact dependency versions the runner installed (Windows job log, "Successfully installed" line)
 gh run view 33954169244 --repo platypus45/domestique --log | grep -a "Successfully installed" | tr ' ' '\n' | grep -v "Successfully\|installed" | sort -u > installed.txt
 # 3. full audit (needs the build venv: PyInstaller's archive reader)

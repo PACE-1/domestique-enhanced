@@ -27,7 +27,7 @@ jobs:
       - name: Show verification diagnostics
         if: always()
         run: |
-          if test -f /tmp/domestique-gate/linux-baseline.status.txt; then
-            cat /tmp/domestique-gate/linux-baseline.status.txt
-            tail -n 150 /tmp/domestique-gate/linux-baseline.full.txt
+          if test -f /tmp/shepherd-gate/linux-baseline.status.txt; then
+            cat /tmp/shepherd-gate/linux-baseline.status.txt
+            tail -n 150 /tmp/shepherd-gate/linux-baseline.full.txt
           fi

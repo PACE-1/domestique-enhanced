@@ -22,8 +22,8 @@ log = log_config.get_logger(__name__)
 # v4.0.0-alpha: named category loggers for the observability layer that
 # survived the trainer rip. .ride_import + .library are new; the old
 # .ble / .ws / .session named loggers are gone with their runtimes.
-log_library = log_config.get_logger("domestique.library")
-log_ride_import = log_config.get_logger("domestique.ride_import")
+log_library = log_config.get_logger("shepherd.library")
+log_ride_import = log_config.get_logger("shepherd.ride_import")
 
 # v1.6.0 — error-code observability layer.
 # ``_log_error`` is the single funnel for "something failed inside an

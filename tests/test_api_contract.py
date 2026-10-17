@@ -25,7 +25,7 @@ def test_contract_matches_the_checked_in_snapshot():
 def test_every_documented_route_still_exists_with_its_method():
     snap = json.loads(SNAPSHOT.read_text())
     import os, tempfile
-    os.environ.setdefault("DOMESTIQUE_HOME", tempfile.mkdtemp(prefix="domestique-contract-"))
+    os.environ.setdefault("SHEPHERD_HOME", tempfile.mkdtemp(prefix="domestique-contract-"))
     import app as app_module
     live = {(r.path, m.lower()) for r in app_module.app.routes
             for m in getattr(r, "methods", set()) or ()}

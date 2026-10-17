@@ -1,4 +1,4 @@
-# Test-suite audit — Domestique @ a95447e8 (2026-09-14), measured
+# Test-suite audit — Shepherd @ a95447e8 (2026-09-14), measured
 
 Lens: whether the tests can judge, and what they cost. Independent agent; one full
 run `-n 5 --durations=40`: 3697 collected, 3640 passed, 15 failed, 9 skipped,

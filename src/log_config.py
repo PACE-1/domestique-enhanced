@@ -1,11 +1,11 @@
-"""Persistent logging configuration for Domestique (v4.0.0-alpha).
+"""Persistent logging configuration for Shepherd (v4.0.0-alpha).
 
 Logs to both console and a rotating file. The file-handler path is
-``~/.domestique/logs/domestique_<iso_timestamp>.log`` per boot; the 20
+``~/.shepherd/logs/shepherd_<iso_timestamp>.log`` per boot; the 20
 newest boot logs survive on disk and older ones are pruned on the next
 boot. In addition, per-app-session logs can be spawned via
 ``start_session_log()`` -- these live at
-``~/.domestique/logs/app_<iso_timestamp>_<sid>.log`` and are rotated so
+``~/.shepherd/logs/app_<iso_timestamp>_<sid>.log`` and are rotated so
 only the newest 20 survive. A background flusher wakes every ~1 s so a
 SIGKILL does not lose the last few seconds of data.
 
@@ -13,42 +13,43 @@ Usage::
 
     import log_config
     log = log_config.get_logger(__name__)
-    log_lib = log_config.get_logger("domestique.library")
+    log_lib = log_config.get_logger("shepherd.library")
 
     sid = log_config.start_session_log()   # optional, for long-running flows
     log_config.stop_session_log(sid)
 
 Named categories (shortcuts available as ``log_app``, ``log_plan`` etc):
 
-    domestique.app         -- app-level lifecycle + HTTP surface events
-    domestique.plan        -- planner / weekly-plan writes + reforecasts
-    domestique.profile     -- profile switch / migration events
-    domestique.workout     -- ZWO parsing + library validation
-    domestique.ride_import -- FIT upload + parse events
-    domestique.library     -- workout-library browsing events
-    domestique.power       -- post-ride power-math sanity warnings
-    domestique.rides       -- saved-ride archive CRUD
+    shepherd.app         -- app-level lifecycle + HTTP surface events
+    shepherd.plan        -- planner / weekly-plan writes + reforecasts
+    shepherd.profile     -- profile switch / migration events
+    shepherd.workout     -- ZWO parsing + library validation
+    shepherd.ride_import -- FIT upload + parse events
+    shepherd.library     -- workout-library browsing events
+    shepherd.power       -- post-ride power-math sanity warnings
+    shepherd.rides       -- saved-ride archive CRUD
 
 The trainer/BLE/gate/phase/hr/ws/session category loggers that existed
 in v3 were removed when the live-ride runtime was ripped out.
 
 Env overrides (honoured at ``setup_logging()`` time):
-    DOMESTIQUE_VERBOSE           -- "1" / "true" bumps root logger to DEBUG
-    DOMESTIQUE_LOG_CATEGORIES    -- comma-list (e.g. "plan,profile") bumps
+    SHEPHERD_VERBOSE           -- "1" / "true" bumps root logger to DEBUG
+    SHEPHERD_LOG_CATEGORIES    -- comma-list (e.g. "plan,profile") bumps
                                      those category loggers to DEBUG.
-    DOMESTIQUE_LOG_MAX_BYTES     -- rotating file size before rollover (default 5 MB)
-    DOMESTIQUE_LOG_BACKUP_COUNT  -- number of rotated files to keep (default 20)
-    DOMESTIQUE_RIDE_LOG_KEEP     -- number of per-session app logs to retain (default 20)
+    SHEPHERD_LOG_MAX_BYTES     -- rotating file size before rollover (default 5 MB)
+    SHEPHERD_LOG_BACKUP_COUNT  -- number of rotated files to keep (default 20)
+    SHEPHERD_RIDE_LOG_KEEP     -- number of per-session app logs to retain (default 20)
 
 Runtime::
 
     set_level("DEBUG")                        # root
-    set_level("DEBUG", category="library")    # just domestique.library
+    set_level("DEBUG", category="library")    # just shepherd.library
 
 Legacy ``CC_LOG_MAX_BYTES`` / ``CC_LOG_BACKUP_COUNT`` are still honoured
 as a fallback; setting either emits a one-shot DeprecationWarning.
 """
 
+import envcompat  # noqa: F401  (old DOMESTIQUE_* names -> SHEPHERD_*, before anything reads them)
 import logging
 import logging.handlers
 import os
@@ -58,26 +59,26 @@ import warnings
 from datetime import datetime, timezone
 from pathlib import Path
 
-from user_home import domestique_home
-LOG_DIR = domestique_home() / "logs"
+from user_home import shepherd_home
+LOG_DIR = shepherd_home() / "logs"
 
 # v4.0.0-alpha (FIX-SERVER): primary log file is boot-stamped
-# ``domestique_<iso>.log`` (was a single ``domestique.log``). Each uvicorn
+# ``shepherd_<iso>.log`` (was a single ``shepherd.log``). Each uvicorn
 # boot writes its own file; the 20 newest survive on disk, older ones get
 # pruned before the new handler opens. Per-boot isolation makes
 # post-incident triage trivial ("the log for THIS crash is
-# domestique_<ts>.log") and sidesteps the stale-rotation handshake that
-# kept pre-pivot ``domestique.log.1..14`` files alive in older deploys.
-# Keeping the ``domestique_`` prefix distinguishes the boot log from
+# shepherd_<ts>.log") and sidesteps the stale-rotation handshake that
+# kept pre-pivot ``shepherd.log.1..14`` files alive in older deploys.
+# Keeping the ``shepherd_`` prefix distinguishes the boot log from
 # per-session logs (``app_<ts>_<sid>.log``) which share ``LOG_DIR``.
 LOG_FILE: "Path | None" = None
 
 # v2.2.0 — MINIMAL logging. The old per-boot timestamped logs + per-session
 # app/ride logs accumulated unbounded (multi-GB) because the prune missed the
 # rotation backups and a new file family spawned every launch. Now: ONE small
-# capped ``domestique.log`` (≈3 MB total, forever), no per-boot/per-session files.
+# capped ``shepherd.log`` (≈3 MB total, forever), no per-boot/per-session files.
 _DEFAULT_MAX_BYTES = 1 * 1024 * 1024   # 1 MB per file
-_DEFAULT_BACKUP_COUNT = 2              # domestique.log + .1 + .2  → ~3 MB ceiling
+_DEFAULT_BACKUP_COUNT = 2              # shepherd.log + .1 + .2  → ~3 MB ceiling
 _DEFAULT_RIDE_LOG_KEEP = 0            # per-session app logs disabled (see start_session_log)
 
 _configured = False
@@ -91,7 +92,7 @@ _session_lock = threading.Lock()
 
 # Canonical list of every category logger that the post-pivot app emits on.
 # Used by ``get_levels()`` (log-level endpoint payload) and by the
-# ``DOMESTIQUE_LOG_CATEGORIES`` env-var parser. Keep in sync with the
+# ``SHEPHERD_LOG_CATEGORIES`` env-var parser. Keep in sync with the
 # ``log_*`` shortcuts at the bottom of this file.
 CATEGORY_NAMES = (
     "app", "plan", "profile", "workout", "ride_import",
@@ -145,7 +146,7 @@ def setup_logging(level: int | None = None) -> None:
     """Configure the root logger with console + rotating file handler.
 
     Idempotent -- safe to call many times. ``level`` may be explicitly
-    passed (tests do this) or will be read from DOMESTIQUE_VERBOSE at
+    passed (tests do this) or will be read from SHEPHERD_VERBOSE at
     first call.
     """
     global _configured
@@ -161,7 +162,7 @@ def setup_logging(level: int | None = None) -> None:
     _configured = True
 
     if level is None:
-        level = logging.DEBUG if _env_bool("DOMESTIQUE_VERBOSE") else logging.INFO
+        level = logging.DEBUG if _env_bool("SHEPHERD_VERBOSE") else logging.INFO
 
     root = logging.getLogger()
     root.setLevel(level)
@@ -186,18 +187,18 @@ def setup_logging(level: int | None = None) -> None:
     else:
         try:
             max_bytes = _resolve_log_env_int(
-                "DOMESTIQUE_LOG_MAX_BYTES", "CC_LOG_MAX_BYTES", _DEFAULT_MAX_BYTES,
+                "SHEPHERD_LOG_MAX_BYTES", "CC_LOG_MAX_BYTES", _DEFAULT_MAX_BYTES,
             )
             backup_count = _resolve_log_env_int(
-                "DOMESTIQUE_LOG_BACKUP_COUNT", "CC_LOG_BACKUP_COUNT", _DEFAULT_BACKUP_COUNT,
+                "SHEPHERD_LOG_BACKUP_COUNT", "CC_LOG_BACKUP_COUNT", _DEFAULT_BACKUP_COUNT,
             )
-            # v2.2.0 — single small capped ``domestique.log``. First sweep away
-            # the legacy bloat (old per-boot ``domestique_<ts>.log`` families +
+            # v2.2.0 — single small capped ``shepherd.log``. First sweep away
+            # the legacy bloat (old per-boot ``shepherd_<ts>.log`` families +
             # their rotation backups, per-session ``app_*``/``ride_*`` logs,
             # legacy ``chickencycling*``) so existing installs shrink to a few
             # MB, THEN open the one rotating log we keep from now on.
             _cleanup_legacy_logs(backup_count)
-            log_path = LOG_DIR / "domestique.log"
+            log_path = LOG_DIR / "shepherd.log"
             global LOG_FILE
             LOG_FILE = log_path
             fh = logging.handlers.RotatingFileHandler(
@@ -226,17 +227,17 @@ def setup_logging(level: int | None = None) -> None:
     # FIT parse failure already raises an exception that's caught upstream.
     logging.getLogger("fit_tool").setLevel(logging.ERROR)
 
-    # DOMESTIQUE_LOG_CATEGORIES: opt-in per-category DEBUG, e.g.
-    # DOMESTIQUE_LOG_CATEGORIES=plan,library. Unknown tokens are ignored
+    # SHEPHERD_LOG_CATEGORIES: opt-in per-category DEBUG, e.g.
+    # SHEPHERD_LOG_CATEGORIES=plan,library. Unknown tokens are ignored
     # silently so a typo never crashes boot.
-    cats_env = os.environ.get("DOMESTIQUE_LOG_CATEGORIES", "").strip()
+    cats_env = os.environ.get("SHEPHERD_LOG_CATEGORIES", "").strip()
     if cats_env:
         for raw in cats_env.split(","):
             token = raw.strip().lower()
             if not token:
                 continue
             if token in CATEGORY_NAMES:
-                logging.getLogger(f"domestique.{token}").setLevel(logging.DEBUG)
+                logging.getLogger(f"shepherd.{token}").setLevel(logging.DEBUG)
 
     _start_flusher()
 
@@ -255,8 +256,8 @@ def set_level(level: str | int, category: str | None = None) -> str:
 
     ``category`` may be:
       - None / "" / "root": set the root logger level.
-      - any entry from CATEGORY_NAMES: set ``domestique.<category>``.
-      - "domestique.<x>" / full logger name: set that specific logger.
+      - any entry from CATEGORY_NAMES: set ``shepherd.<category>``.
+      - "shepherd.<x>" / full logger name: set that specific logger.
 
     ``level`` is an int (logging.DEBUG etc.) or a case-insensitive string.
     Returns the resolved level name. Raises ValueError on a bad level or
@@ -282,9 +283,9 @@ def set_level(level: str | int, category: str | None = None) -> str:
     else:
         cat = category.strip().lower()
         if cat in CATEGORY_NAMES:
-            target_name = f"domestique.{cat}"
-        elif cat.startswith("domestique."):
-            target_name = cat
+            target_name = f"shepherd.{cat}"
+        elif cat.startswith(("shepherd.", "domestique.")):  # "domestique.": the name before the rename
+            target_name = "shepherd." + cat.split(".", 1)[1]
         else:
             raise ValueError(f"unknown category: {category!r}")
         logger = logging.getLogger(target_name)
@@ -303,9 +304,9 @@ def get_levels() -> "dict[str, str]":
     root = logging.getLogger()
     out["root"] = logging.getLevelName(root.getEffectiveLevel())
     for cat in CATEGORY_NAMES:
-        lg = logging.getLogger(f"domestique.{cat}")
+        lg = logging.getLogger(f"shepherd.{cat}")
         explicit = logging.getLevelName(lg.level) if lg.level != logging.NOTSET else None
-        out[f"domestique.{cat}"] = explicit or logging.getLevelName(lg.getEffectiveLevel())
+        out[f"shepherd.{cat}"] = explicit or logging.getLevelName(lg.getEffectiveLevel())
     return out
 
 
@@ -314,23 +315,23 @@ def get_levels() -> "dict[str, str]":
 
 def _cleanup_legacy_logs(backup_count: int) -> None:
     """v2.2.0 — delete every legacy/bloat log file, keeping only the single
-    capped ``domestique.log`` (+ its ``.1..`` rotation backups).
+    capped ``shepherd.log`` (+ its ``.1..`` rotation backups).
 
-    The pre-v2.2.0 setup wrote a NEW ``domestique_<ts>.log`` family every launch
+    The pre-v2.2.0 setup wrote a NEW ``shepherd_<ts>.log`` family every launch
     (each up to ~100 MB across its rotation backups) plus per-session ``app_*`` /
     ``ride_*`` logs, and the prune missed the ``.N`` rotation suffixes — so the
     logs dir grew to multiple GB. This runs once at startup so existing installs
     shrink to a few MB. Best-effort: any unlink failure is ignored.
     """
     try:
-        keep = {"domestique.log"} | {
-            f"domestique.log.{i}" for i in range(1, max(backup_count, 0) + 1)
+        keep = {"shepherd.log"} | {
+            f"shepherd.log.{i}" for i in range(1, max(backup_count, 0) + 1)
         }
         for p in LOG_DIR.iterdir():
             if not p.is_file() or p.name in keep:
                 continue
             n = p.name
-            if (n.startswith("domestique_") or n.startswith("app_")
+            if (n.startswith(("shepherd_", "domestique_")) or n.startswith("app_")
                     or n.startswith("ride_") or n.startswith("chickencycling")
                     or ".log" in n):
                 try:
@@ -358,7 +359,7 @@ class _SessionContextFilter(logging.Filter):
 def start_session_log(session_id: str | None = None) -> str:
     """v2.2.0 — NO-OP. Per-session ``app_*.log`` files were removed (they were
     part of the unbounded log bloat); everything now goes to the single capped
-    ``domestique.log``. Kept as a no-op returning an id so legacy callers stay
+    ``shepherd.log``. Kept as a no-op returning an id so legacy callers stay
     safe."""
     setup_logging()
     return session_id or uuid.uuid4().hex[:8]
@@ -428,7 +429,7 @@ def stop_flusher(join_timeout: float = 2.0) -> None:
 
 
 def _cat(name: str) -> logging.Logger:
-    return get_logger(f"domestique.{name}")
+    return get_logger(f"shepherd.{name}")
 
 
 log_app = _cat("app")

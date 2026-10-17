@@ -1,13 +1,13 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════════════════════
-# Domestique DMG Builder — Standard Operating Procedure
+# Shepherd DMG Builder — Standard Operating Procedure
 # ═══════════════════════════════════════════════════════════════
 # Usage: ./build_dmg.sh
-# Output: ~/Desktop/Domestique.dmg
+# Output: ~/Desktop/Shepherd.dmg
 #
 # Notarization flow (when .notarize.env is present and complete):
 #
-#   1. PyInstaller builds dist/Domestique.app.
+#   1. PyInstaller builds dist/Shepherd.app.
 #   2. Resolve signing identity (existing keychain entry, else .p12).
 #   3. Strip PyInstaller's ad-hoc signatures from every nested binary.
 #   4. Sign nested .dylib / .so depth-first with Developer ID identity.
@@ -44,7 +44,7 @@ if [ -x ".venv-build/bin/pyinstaller" ]; then
     echo "  Using isolated build venv (.venv-build) for OpenBLAS numpy/scipy"
 fi
 
-DMG_NAME="Domestique"
+DMG_NAME="Shepherd"
 DMG_PATH="$HOME/Desktop/${DMG_NAME}.dmg"
 STAGING="/tmp/dmg_staging"
 RW_DMG="/tmp/${DMG_NAME}_rw.dmg"
@@ -63,13 +63,13 @@ if [ -f .notarize.env ]; then
     fi
 fi
 
-echo "=== Domestique DMG Build (mode: $NOTARIZE_MODE) ==="
+echo "=== Shepherd DMG Build (mode: $NOTARIZE_MODE) ==="
 
-# Pre-flight: detach any stale Domestique volumes left behind by prior
+# Pre-flight: detach any stale Shepherd volumes left behind by prior
 # failed builds. hdiutil's Finder-layout step at [7/9] silently exits with
-# "Write Permissions Error (-61)" if /Volumes/Domestique* is already
+# "Write Permissions Error (-61)" if /Volumes/Shepherd* is already
 # mounted — usually because a previous run crashed before detaching.
-# Repeated failures leave /Volumes/Domestique 1, /Volumes/Domestique 2, ...
+# Repeated failures leave /Volumes/Shepherd 1, /Volumes/Shepherd 2, ...
 # until the build can never finish without manual recovery.
 for mp in $(ls -d "/Volumes/${DMG_NAME}"* 2>/dev/null); do
     echo "  Detaching stale volume: $mp"
@@ -82,7 +82,7 @@ done
 # always rejected and rewritten. PyInstaller copies workouts/ as it finds it,
 # and the gate at [1b2/9] refuses a bundle without them, so build them first,
 # from the app's own code path rather than a second implementation.
-# The bundle serves the web interface from web/dist (see domestique.spec).
+# The bundle serves the web interface from web/dist (see shepherd.spec).
 [ -f web/dist/index.html ] || {
     echo "✗ web/dist is missing. Build the web interface first: (cd web && pnpm install && pnpm build)" >&2; exit 1; }
 
@@ -91,14 +91,14 @@ python3 tools/build-library-caches.py || {
     echo "FATAL: could not build the library caches" >&2; exit 1; }
 
 echo "[1/9] Building app with PyInstaller..."
-"$PYINSTALLER" packaging/domestique.spec --clean --noconfirm 2>&1 | tail -3
+"$PYINSTALLER" packaging/shepherd.spec --clean --noconfirm 2>&1 | tail -3
 
 # 1b. Version smoke-test — the bundled app MUST ship its own VERSION file with the
 # right contents, else the running app reports "0.0.0" and the in-app updater shows
 # a perpetual "upgrade" prompt. Fail the build before notarize/upload if it regresses.
 REPO_VER="$(tr -d '[:space:]' < VERSION)"
-BUNDLED_VER_FILE="$(find dist/Domestique.app -name VERSION -path '*Resources*' 2>/dev/null | head -1)"
-[ -z "$BUNDLED_VER_FILE" ] && BUNDLED_VER_FILE="$(find dist/Domestique.app -name VERSION 2>/dev/null | head -1)"
+BUNDLED_VER_FILE="$(find dist/Shepherd.app -name VERSION -path '*Resources*' 2>/dev/null | head -1)"
+[ -z "$BUNDLED_VER_FILE" ] && BUNDLED_VER_FILE="$(find dist/Shepherd.app -name VERSION 2>/dev/null | head -1)"
 BUNDLED_VER="$(tr -d '[:space:]' < "$BUNDLED_VER_FILE" 2>/dev/null)"
 if [ -z "$BUNDLED_VER_FILE" ] || [ "$BUNDLED_VER" != "$REPO_VER" ]; then
     echo "FATAL: bundled VERSION ('$BUNDLED_VER') != repo VERSION ('$REPO_VER') — app would misreport its version. Aborting build." >&2
@@ -111,8 +111,8 @@ echo "[1b/9] Version smoke-test OK — bundle reports $BUNDLED_VER"
 # still builds, boots and serves /api/version, then silently degrades every
 # plan to endurance-only ("Z2 Steady" everywhere — the v3.11.0 Linux report
 # class, same family as the v3.3.0 frozen-install storm).
-BUNDLED_WK_DIR="$(find dist/Domestique.app -type d -name workouts -path '*Resources*' 2>/dev/null | head -1)"
-[ -z "$BUNDLED_WK_DIR" ] && BUNDLED_WK_DIR="$(find dist/Domestique.app -type d -name workouts 2>/dev/null | head -1)"
+BUNDLED_WK_DIR="$(find dist/Shepherd.app -type d -name workouts -path '*Resources*' 2>/dev/null | head -1)"
+[ -z "$BUNDLED_WK_DIR" ] && BUNDLED_WK_DIR="$(find dist/Shepherd.app -type d -name workouts 2>/dev/null | head -1)"
 if [ -z "$BUNDLED_WK_DIR" ]; then
     echo "FATAL: no workouts/ directory inside the bundle — plans would degrade to endurance-only. Aborting build." >&2
     exit 1
@@ -134,7 +134,7 @@ echo "[1b2/9] Library smoke-test OK — $ZWO_N workouts + sidecars bundled"
 # the gitignored .oauth.env only when it exists at build time — a checkout
 # without it (fresh clone, WORKTREE) silently ships a DMG whose intervals.icu
 # OAuth sign-in fails with an "exchange" error. Refuse instead.
-BUNDLED_OAUTH="$(find dist/Domestique.app -name '.oauth.env' 2>/dev/null | head -1)"
+BUNDLED_OAUTH="$(find dist/Shepherd.app -name '.oauth.env' 2>/dev/null | head -1)"
 if [ -z "$BUNDLED_OAUTH" ] || ! grep -q 'ICU_OAUTH_CLIENT_SECRET=..*' "$BUNDLED_OAUTH"; then
     echo "FATAL: .oauth.env missing or empty in the bundle — OAuth sign-in would ship broken. Put .oauth.env at the repo root and rebuild." >&2
     exit 1
@@ -149,7 +149,7 @@ echo "[1b3/9] OAuth-secret gate OK — client secret bundled"
 # PyInstaller 6 embeds the PYZ inside the executable — list it recursively
 # through the binary. Anchor on a module we KNOW is bundled so a viewer that
 # silently prints nothing cannot pass the gate.
-FROZEN_EXE="dist/Domestique.app/Contents/MacOS/Domestique"
+FROZEN_EXE="dist/Shepherd.app/Contents/MacOS/Shepherd"
 ARCHIVE_LIST="$(.venv-build/bin/pyi-archive_viewer -r -l "$FROZEN_EXE" 2>/dev/null)"
 if ! printf '%s' "$ARCHIVE_LIST" | grep -q "training_planner"; then
     echo "FATAL: could not list the frozen archive (pyi-archive_viewer -r -l $FROZEN_EXE) — gate cannot run." >&2
@@ -166,9 +166,9 @@ echo "[1b4/9] FIT-message gate OK — fit_tool message modules bundled"
 # bundled workout library, (c) LOADED the OAuth client secret — 1b3 only proves
 # the file is in the bundle; a rider reported "token exchange failed" on 3.11.2
 # and nothing could say whether the frozen loader had read it. Never touches
-# ~/.domestique and never uses port 22400 (the developer's live instance).
+# ~/.shepherd and never uses port 22400 (the developer's live instance).
 PROBE_HOME="$(mktemp -d)"; PROBE_PORT=25999
-DOMESTIQUE_HOME="$PROBE_HOME" DOMESTIQUE_PORT="$PROBE_PORT" DOMESTIQUE_SERVER_ONLY=1 \
+SHEPHERD_HOME="$PROBE_HOME" SHEPHERD_PORT="$PROBE_PORT" SHEPHERD_SERVER_ONLY=1 \
     "$FROZEN_EXE" > /tmp/dmg_runtime_probe.log 2>&1 &
 PROBE_PID=$!
 for _i in $(seq 45); do
@@ -177,7 +177,7 @@ for _i in $(seq 45); do
 done
 PROBE_VER="$(curl -fsS --max-time 5 "http://127.0.0.1:${PROBE_PORT}/api/version" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("version",""))' 2>/dev/null)"
 PROBE_HB="$(curl -fsS --max-time 180 "http://127.0.0.1:${PROBE_PORT}/api/diag/health" 2>/dev/null)"
-PROBE_FIT="$(mktemp -t domestique_probe_fit)"
+PROBE_FIT="$(mktemp -t shepherd_probe_fit)"
 curl -fsS --max-time 60 -o "$PROBE_FIT" "http://127.0.0.1:${PROBE_PORT}/api/export/fit-workout?session_type=z2&duration_min=60&name=probe&zwo_file=endurance_steady_55pct_60min.zwo" 2>/dev/null || true
 kill "$PROBE_PID" >/dev/null 2>&1 || true; sleep 1; rm -rf "$PROBE_HOME"
 PROBE_LIB="$(printf '%s' "$PROBE_HB" | python3 -c 'import json,sys; print(json.load(sys.stdin)["checks"]["workout_library"]["count"])' 2>/dev/null || echo 0)"
@@ -214,7 +214,7 @@ echo "[1b6/9] FIT-duration gate OK -- a 60-minute workout exports as 60 minutes"
 # fixture rather than a real defect in the thing under test. Any threshold file
 # exercises the same code path.
 # The smoke needs a profile with an LTHR on record (lthr_is_set) and HR
-# targets on; it used to read the builder's live ~/.domestique and passed or
+# targets on; it used to read the builder's live ~/.shepherd and passed or
 # failed with whichever profile happened to be active there. A fixture home
 # makes it a property of the code, not of the build machine.
 SMOKE_HOME="$(mktemp -d)"
@@ -222,7 +222,7 @@ mkdir -p "$SMOKE_HOME/profiles/fixture"
 printf '%s' '{"version":1,"active_profile":"fixture","skip_picker":true,"profiles":[{"id":"fixture","name":"Fixture"}]}' > "$SMOKE_HOME/profiles.json"
 printf '%s' '{"lthr":170,"lthr_source":"manual","max_hr":190,"ftp":250,"target_mode":"hr"}' > "$SMOKE_HOME/profiles/fixture/athlete.json"
 touch "$SMOKE_HOME/.setup_complete"
-FIT_SMOKE="$(DOMESTIQUE_HOME="$SMOKE_HOME" python3.12 - <<'PYEOF'
+FIT_SMOKE="$(SHEPHERD_HOME="$SMOKE_HOME" python3.12 - <<'PYEOF'
 import sys
 sys.path.insert(0, "src")
 try:
@@ -261,7 +261,7 @@ if [ "$NOTARIZE_MODE" = "notarize" ]; then
         echo "✓ Identity found in existing keychain — skipping .p12 import"
     elif [ -n "$NOTARIZE_P12_PATH" ] && [ -f "$NOTARIZE_P12_PATH" ]; then
         echo "  Identity missing → importing $NOTARIZE_P12_PATH"
-        BUILD_KEYCHAIN="/tmp/domestique_build.keychain"
+        BUILD_KEYCHAIN="/tmp/shepherd_build.keychain"
         KEYCHAIN_PASS="$(openssl rand -base64 24)"
         security delete-keychain "$BUILD_KEYCHAIN" 2>/dev/null || true
         security create-keychain -p "$KEYCHAIN_PASS" "$BUILD_KEYCHAIN"

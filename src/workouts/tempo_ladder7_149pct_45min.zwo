@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Endurance (45min)</name>
     <description>Warmup: 7min 30s from 40% to 70% FTP | Steady: 1min 30s @ 81% FTP | Steady: 1min @ 57% FTP | Steady: 3min 15s @ 65% FTP | Steady: 1min 15s @ 94% FTP | Steady: 1min @ 55% FTP | Steady: 3min 30s @ 65% FTP | Steady: 1min @ 100% FTP | Steady: 1min @ 55% FTP | Steady: 3min 30s @ 65% FTP | Steady: 30s @ 106% FTP | Steady: 1min @ 55% FTP | Steady: 3min 40s @ 65% FTP | Steady: 20s @ 125% FTP | Steady: 1min @ 53% FTP | Steady: 3min 45s @ 65% FTP | Steady: 15s @ 137% FTP | Steady: 1min @ 50% FTP | Steady: 3min 50s @ 70% FTP | Steady: 10s @ 149% FTP | Steady: 5min @ 65% FTP</description>
     <sportType>bike</sportType>

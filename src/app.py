@@ -1,12 +1,13 @@
 """
-Domestique Dashboard v2 — local web interface.
+Shepherd Dashboard v2 — local web interface.
 
 Run: python3 app.py
-Open: http://127.0.0.1:22400  (or $DOMESTIQUE_PORT, if set)
+Open: http://127.0.0.1:22400  (or $SHEPHERD_PORT, if set)
 
 Pure HTML + CSS + vanilla JS. No npm, no frameworks.
 """
 
+import envcompat  # noqa: F401  (old DOMESTIQUE_* names -> SHEPHERD_*, before anything reads them)
 import clock  # the one clock every module reads (see src/clock.py)
 import collections
 import functools
@@ -27,7 +28,7 @@ from pathlib import Path
 _env_candidates = [
     Path(__file__).parent / ".env",                                    # dev mode
     Path(__file__).parent.parent / ".env",                             # dev mode, repo root (Part-B src/ layout)
-    Path.home() / ".domestique" / ".env",                              # packaged mode (user home)
+    Path.home() / ".shepherd" / ".env",                              # packaged mode (user home)
     Path.home() / "Documents" / "health_tracker" / ".env",             # legacy location
 ]
 for _env_path in _env_candidates:
@@ -90,7 +91,7 @@ except Exception:
 # `app._plan_dir`, `app._safe_path` and friends keep resolving for the ~200
 # call sites and the test files that reach them through `app.X`.
 from paths import (  # noqa: F401
-    domestique_home, _user_data_dir, DATA_DIR,
+    shepherd_home, _user_data_dir, DATA_DIR,
     _DEFAULT_PLAN_DIR, _plan_dir, _safe_path, _rides_fit_dir,
 )
 
@@ -166,7 +167,7 @@ def _adopt_legacy_root_plan(root_dir: Path, prof_dir: Path,
     """v3.1.0 (IP_PLAN_CONTINUITY PART A) — one-time root→profile plan adoption.
 
     Since v2.1.0, single-profile users who never opened the profile picker
-    kept writing plans to the legacy ROOT ``~/.domestique/plans/`` while
+    kept writing plans to the legacy ROOT ``~/.shepherd/plans/`` while
     ``profiles/<id>/plans/`` held a frozen migration-day snapshot; the v3.0.0
     boot repoint then served the stale snapshot. This adopts the legacy root
     ``current_plan.json`` into the ACTIVE profile's plan dir, once.
@@ -555,7 +556,7 @@ except OSError:
 # v4.0.0-alpha pivot: the app is a planner + workout library + post-ride
 # viewer. No live trainer connection, no BLE, no WebSocket. All data flows
 # through plain HTTP; the heavy lifting happens in the user's preferred
-# indoor app (Tacx / MyWhoosh / Golden Cheetah), and Domestique imports
+# indoor app (Tacx / MyWhoosh / Golden Cheetah), and Shepherd imports
 # the resulting FIT afterward via POST /api/ride/import.
 
 # v1.0.2 IMPL-MIGRATION: cached migration-check result for the dashboard.
@@ -572,11 +573,11 @@ async def lifespan(app):
     _jobs_boot.begin()        # a previous run's shutdown must not leave jobs "stopping" (#17)
     # #19: never run against data written by a newer layout; stamp it on first use.
     import backup as _backup
-    from user_home import domestique_home as _home
+    from user_home import shepherd_home as _home
     _backup.check_data_format(_home())
     # ── Profile system: migrate + init ──────────────────────────────────
     # Order matters: ProfileManager.get() runs the v3 data-dir rename
-    # (~/.chickencycling → ~/.domestique). After that runs, the legacy
+    # (~/.chickencycling → ~/.shepherd). After that runs, the legacy
     # single-user migration operates against the new dir name.
     from migrate_profiles import migrate_to_profiles, migrate_to_v4, run_v102_migration_check
     from profile_manager import ProfileManager
@@ -592,7 +593,7 @@ async def lifespan(app):
     pm = ProfileManager.get()
 
     # v1.0.2 IMPL-MIGRATION: startup version-aware self-check. Detects an
-    # upgrade by comparing ~/.domestique/last_run_version.txt to _VERSION;
+    # upgrade by comparing ~/.shepherd/last_run_version.txt to _VERSION;
     # on first boot after a bump, the result dict carries `show_toast=True`
     # and the dashboard surfaces a toast naming from→to versions and
     # confirming rider data is preserved. v1.0.2 has NO schema changes —
@@ -642,7 +643,7 @@ async def lifespan(app):
         _log.warning(f"v4 profile migration loop failed: {e}")
 
     pm.on_switch(clear_cache)
-    # AC2b: one-time adoption of the legacy ROOT ~/.domestique/user_paths.json
+    # AC2b: one-time adoption of the legacy ROOT ~/.shepherd/user_paths.json
     # into the active profile (setup_save now writes per-profile only), then
     # resolve app.py's active_workout_dir()/active_gpx_dir() through the same resolver used on
     # every profile switch — one code path.
@@ -674,7 +675,7 @@ async def lifespan(app):
     try:
         if pm.active_id is not None:
             _adopt_legacy_root_plan(
-                _DEFAULT_PLAN_DIR,   # legacy root ~/.domestique/plans
+                _DEFAULT_PLAN_DIR,   # legacy root ~/.shepherd/plans
                 pm.plan_dir,         # active profile's plans dir
                 multi_profile=len(pm.list_profiles()) > 1,
             )
@@ -758,14 +759,14 @@ async def lifespan(app):
         # (default 8 s, inside Docker's 10 s stop timeout).
         try:
             import jobs as _jobs
-            _budget = float(os.environ.get("DOMESTIQUE_SHUTDOWN_BUDGET_S", "8") or 8)
+            _budget = float(os.environ.get("SHEPHERD_SHUTDOWN_BUDGET_S", "8") or 8)
             _rep = _jobs.shutdown(_budget)
             if _rep["still_running"]:
                 log.warning("shutdown budget exhausted; still running: %s", _rep["still_running"])
         except Exception as e:
             log.debug(f"jobs.shutdown failed: {e}")
 
-app = FastAPI(title="Domestique", version=_VERSION, lifespan=lifespan)
+app = FastAPI(title="Shepherd", version=_VERSION, lifespan=lifespan)
 
 
 # Global exception handler — catches unhandled errors and logs them
@@ -909,7 +910,7 @@ async def _switch_gate(request, call_next):
 
 
 # ── Access gate (server deployments, #13) ────────────────────────────────────
-# No-op unless DOMESTIQUE_ACCESS_TOKEN is set. Registered after origin_check,
+# No-op unless SHEPHERD_ACCESS_TOKEN is set. Registered after origin_check,
 # so it runs first: an unauthenticated request never reaches any handler.
 @app.middleware("http")
 async def _access_gate(request, call_next):
@@ -926,12 +927,12 @@ async def _access_gate(request, call_next):
     return _Redirect("/login", status_code=303)
 
 
-_LOGIN_PAGE = """<!doctype html><meta charset="utf-8"><title>Domestique - sign in</title>
+_LOGIN_PAGE = """<!doctype html><meta charset="utf-8"><title>Shepherd - sign in</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>body{font:16px system-ui;background:#0a0a0a;color:#eee;display:grid;place-items:center;min-height:100vh;margin:0}
 form{display:grid;gap:12px;width:min(320px,90vw)}input,button{font:inherit;padding:10px;border-radius:8px;border:1px solid #444;background:#1a1a1a;color:#eee}
 button{background:#15803d;border-color:#15803d;cursor:pointer}p{color:#f87171;margin:0}</style>
-<form method="post" action="/login"><h1>Domestique</h1>%s
+<form method="post" action="/login"><h1>Shepherd</h1>%s
 <input type="password" name="token" placeholder="Access token" autofocus autocomplete="current-password">
 <button type="submit">Sign in</button></form>"""
 
@@ -1263,7 +1264,7 @@ def setup_pick_folder():
 
     Prefers the pywebview dialog (native, correctly parented); tkinter is the
     fallback for runs without a webview window — the bundle keeps tkinter for
-    exactly this (see domestique.spec excludes comment).
+    exactly this (see shepherd.spec excludes comment).
     """
     native = _pick_folder_webview()
     if native is not None:
@@ -1334,7 +1335,7 @@ def api_set_extra_workout_folder(body: dict):
             return JSONResponse({"error": "That folder has no .zwo workout files"
                                  + ("; they are in a folder inside it, so choose that one." if sub else ".")}, 400)
         if tp.is_builtin_library(p):
-            return JSONResponse({"error": "That is Domestique's built-in library, which is always included. Choose a folder with your own workouts."}, 400)
+            return JSONResponse({"error": "That is Shepherd's built-in library, which is always included. Choose a folder with your own workouts."}, 400)
     paths_file = pm.active_dir / "user_paths.json"
     with _setup_lock:                   # the wizard writes the same file
         try:
@@ -1382,7 +1383,7 @@ def _setup_path_allowed_bases() -> "list[Path]":
     is not below $HOME, so "Complete Setup" failed with a message about
     directories the rider had never chosen and could not act on.
     """
-    bases = [Path.home(), domestique_home()]
+    bases = [Path.home(), shepherd_home()]
     # The app's own directories. Trusted by definition — this is where the
     # library ships, and on a frozen build it is inside the install location.
     for own in (_BUNDLED_WORKOUT_DIR, _BUNDLED_GPX_DIR):
@@ -1405,7 +1406,7 @@ def _setup_path_allowed_bases() -> "list[Path]":
 
 
 def _setup_path_allowed(p: Path) -> bool:
-    """SEC4: restrict user-supplied setup paths to home / .domestique / /tmp.
+    """SEC4: restrict user-supplied setup paths to home / .shepherd / /tmp.
 
     Resolves symlinks before comparison so `/private/var/../Users/...`-style
     escapes still fall under ``Path.home()``. Allows exact matches and any
@@ -1608,14 +1609,14 @@ def setup_save(body: dict):
             prefs["rest_days"] = rest_days
 
         # Path overrides. SEC4: reject paths outside the allow-list
-        # (home / ~/.domestique / /tmp) so a malicious setup-save cannot make
+        # (home / ~/.shepherd / /tmp) so a malicious setup-save cannot make
         # the server read/write arbitrary filesystem locations later.
         for _field in ("workout_dir", "gpx_dir"):
             _val = body.get(_field)
             if _val and not _setup_path_allowed(Path(_val)):
                 raise HTTPException(
                     status_code=400,
-                    detail=f"{_field} must be under $HOME, ~/.domestique, or /tmp",
+                    detail=f"{_field} must be under $HOME, ~/.shepherd, or /tmp",
                 )
         # v3.11.2: never persist a workout folder that cannot serve as a
         # library. An existing-but-empty folder used to be accepted, emptied
@@ -1862,7 +1863,7 @@ def api_profiles():
                 athlete_path = pm._profiles_dir / pid / "athlete.json" if hasattr(pm, '_profiles_dir') else None
                 if not athlete_path or not athlete_path.exists():
                     # Fallback to best-known home path if internal attribute missing
-                    athlete_path = domestique_home() / "profiles" / pid / "athlete.json"
+                    athlete_path = shepherd_home() / "profiles" / pid / "athlete.json"
                 if athlete_path.exists():
                     data = json.loads(athlete_path.read_text(encoding="utf-8"))
                     if "ftp" in data:
@@ -2877,7 +2878,7 @@ def api_profile_dfa_alpha1():
 
     v1.8.10 Bug B — also scans the profile's ``rides/icu/*.json`` so ICU
     rides with computed DFA aren't ignored (the previous version read
-    only ``~/.domestique/profiles/<id>/rides/`` via ride_storage.list_rides,
+    only ``~/.shepherd/profiles/<id>/rides/`` via ride_storage.list_rides,
     which misses every ICU-synced ride and therefore the entire DFA
     history for any user with intervals.icu sync enabled).
 
@@ -3568,7 +3569,7 @@ def _iter_icu_dfa_rides() -> list[dict]:
     try:
         # 3.4.2 — the v3.0.0 AC2a migration moved the ICU envelope archive to
         # <profile>/rides/icu/, but this reader kept scanning the legacy
-        # global ~/.domestique/rides/icu/ (empty post-migration), so every
+        # global ~/.shepherd/rides/icu/ (empty post-migration), so every
         # DFA surface (home card, DFA tab, readiness DFA cap) went silently
         # blank. Resolve through ride_storage._icu_rides_dir — the single
         # source of truth the sync WRITER already uses. A no-active-profile
@@ -3911,7 +3912,7 @@ def api_readiness(subjective: float = Query(None)):
     sleep = cached("sleep", get_sleep_metrics)
     # v4.5.0: when ICU live wellness returns {}, fall back to local wellness
     # store (populated by lazy sync) so HRV/Sleep/RHR component bars aren't
-    # blanks when ~/.domestique/wellness/ has data.
+    # blanks when ~/.shepherd/wellness/ has data.
     data_status_local_wellness = False
     if not sleep:
         sleep = _local_sleep_metrics(days=14)
@@ -6808,7 +6809,7 @@ def api_logs(lines: int = Query(100)):
     Hard-capped at 2000 lines via seek-from-end tailing so that a bloated
     log file (many MB) can't OOM the process when the debug viewer opens.
     """
-    log_path = domestique_home() / "logs" / "domestique.log"
+    log_path = shepherd_home() / "logs" / "shepherd.log"
     if not log_path.exists():
         return {"lines": [], "path": str(log_path), "exists": False}
     try:
@@ -6836,13 +6837,13 @@ def api_version():
     import platform
     return {
         # Identity marker, not decoration: the launcher's single-instance probe
-        # uses it to tell a running Domestique from any other server that
+        # uses it to tell a running Shepherd from any other server that
         # happens to hold :8080. Do not rename or remove.
-        "app": "domestique",
+        "app": "shepherd",
         "version": _VERSION,
         "python": platform.python_version(),
         "frozen": getattr(sys, "frozen", False),
-        "data_dir": str(domestique_home()),
+        "data_dir": str(shepherd_home()),
     }
 
 
@@ -6872,8 +6873,8 @@ def api_migrations_last_run_result():
 #     asset_name, platform, checked_at, cached, error, release_body }
 _UPDATE_CHECK_CACHE_TTL_S = 6 * 60 * 60  # 6 hours
 # Release channel: this fork's own repository, never upstream (#16). Override with
-# DOMESTIQUE_RELEASE_REPO=<owner>/<repo>; upstream binaries are not offered as upgrades.
-_RELEASE_REPO = (os.environ.get("DOMESTIQUE_RELEASE_REPO") or "PACE-1/domestique-enhanced").strip().strip("/")
+# SHEPHERD_RELEASE_REPO=<owner>/<repo>; upstream binaries are not offered as upgrades.
+_RELEASE_REPO = (os.environ.get("SHEPHERD_RELEASE_REPO") or "PACE-1/domestique-enhanced").strip().strip("/")
 _GITHUB_RELEASES_LATEST_URL = f"https://api.github.com/repos/{_RELEASE_REPO}/releases/latest"
 _RELEASE_BODY_MAX_CHARS = 8192
 _RELEASE_BODY_TRUNCATION_SUFFIX = "\n\n… (full release notes on GitHub)"
@@ -6888,10 +6889,10 @@ def _select_platform_asset(assets, plat):
     """Pick (download_url, asset_name) from a GitHub release `assets` list
     based on `plat` (sys.platform string).
 
-    macOS (`darwin`) → `.dmg`, prefer plain `Domestique.dmg` over decorated
-    variants like `Domestique-1.0.3.dmg` so the canonical asset wins.
+    macOS (`darwin`) → `.dmg`, prefer plain `Shepherd.dmg` over decorated
+    variants like `Shepherd-1.0.3.dmg` so the canonical asset wins.
     Windows (`win32`) → prefer `.exe`, fall back to `.zip`.
-    Linux → `.AppImage` (released as `Domestique-v<VERSION>-x86_64.AppImage`).
+    Linux → `.AppImage` (released as `Shepherd-v<VERSION>-x86_64.AppImage`).
     Anything else (BSD) → no asset; banner falls back to release_url.
     """
     if not isinstance(assets, list):
@@ -6907,7 +6908,7 @@ def _select_platform_asset(assets, plat):
         dmgs = [a for a in assets if _name(a).lower().endswith(".dmg")]
         if not dmgs:
             return None, None
-        canonical = [a for a in dmgs if _name(a) == "Domestique.dmg"]
+        canonical = [a for a in dmgs if _name(a) == "Shepherd.dmg"]
         chosen = canonical[0] if canonical else dmgs[0]
         return _url(chosen) or None, _name(chosen) or None
 
@@ -9035,7 +9036,7 @@ def api_week_summary(week_offset: int = Query(0)):
     activities_by_day: dict[str, list[dict]] = {}
     sports_counter: dict[str, int] = {}
 
-    # Measured time-in-zone beats a whole-ride average, and Domestique already
+    # Measured time-in-zone beats a whole-ride average, and Shepherd already
     # records it per ride (the calendar renders it as Z1Z2/Z3Z4/Z5+). Filing a
     # three-hour endurance ride wholly under the band of its average HR put
     # every minute of a Z2 week into mid/high and reported low_aerobic as zero.
@@ -12641,7 +12642,7 @@ def _build_fit_workout(name: str, blocks: list[dict], ftp: int,
     file_id = FileIdMessage()
     file_id.type = FileType.WORKOUT
     # DEVELOPMENT (255) is the honest, spec-correct manufacturer id for an
-    # unregistered third-party app like Domestique. Using a real brand's id
+    # unregistered third-party app like Shepherd. Using a real brand's id
     # (garmin/zwift/peaksware) would be spoofing. If it turns out an importer
     # truly rejects development-stamped workouts, the correct fix is to register
     # a manufacturer id with Garmin FIT — not to impersonate another product.
@@ -12855,7 +12856,7 @@ def _build_fit_workout_from_zwo(name: str, zwo_path: Path, ftp: int,
     file_id = FileIdMessage()
     file_id.type = FileType.WORKOUT
     # DEVELOPMENT (255) is the honest, spec-correct manufacturer id for an
-    # unregistered third-party app like Domestique. Using a real brand's id
+    # unregistered third-party app like Shepherd. Using a real brand's id
     # (garmin/zwift/peaksware) would be spoofing. If it turns out an importer
     # truly rejects development-stamped workouts, the correct fix is to register
     # a manufacturer id with Garmin FIT — not to impersonate another product.
@@ -12956,7 +12957,7 @@ def _is_cycling_sport(sport) -> bool:
     Cycling sport_type values (Strava/ICU): Ride, VirtualRide, GravelRide,
     MountainBikeRide, EBikeRide, Handcycle, Velomobile, … — anything with
     ride/bike/cycl. Empty/unknown sport is treated as cycling (local FIT rides
-    often carry no sport tag, and Domestique is a cycling app). A clearly
+    often carry no sport tag, and Shepherd is a cycling app). A clearly
     non-cycling activity (RockClimbing, Run, Swim, …) returns False so it is
     NOT matched to a cycling session — it never pollutes the plan.
     """
@@ -16681,11 +16682,11 @@ def api_plan_auto_recalc():
 # ═══════════════════════════════════════════════════════════════════════════════
 #
 # The live ride runtime was removed in the trainer-rip pivot. Rides are now
-# recorded outside Domestique (Tacx / MyWhoosh / Golden Cheetah / any FIT
+# recorded outside Shepherd (Tacx / MyWhoosh / Golden Cheetah / any FIT
 # producer) and imported afterwards via POST /api/ride/import.
 #
 # Storage layout:
-#   ~/.domestique/rides/<iso>.fit  -- raw imported FIT file
+#   ~/.shepherd/rides/<iso>.fit  -- raw imported FIT file
 # ride_storage.list_rides / get_ride read per-profile JSON rides from the
 # existing archive and are still used by /api/rides* for the post-pivot
 # history list.
@@ -17052,7 +17053,7 @@ async def api_ride_import(
     """Import a FIT file from the user's recording app.
 
     Accepts a multipart/form-data body with one file part keyed ``fit_file``.
-    Persists the raw bytes under ``~/.domestique/rides/<iso>.fit`` using the
+    Persists the raw bytes under ``~/.shepherd/rides/<iso>.fit`` using the
     upload time as the id; that keeps ids stable + sortable and gives the
     caller a cheap name for later GET by id.
 
@@ -17216,7 +17217,7 @@ async def _import_fit_locked(fit_file: UploadFile):
 # Last-sync-at markers. v3.4.2 M7: PER-PROFILE — resolved through the
 # ride_storage AC2a seams so the marker sits next to the archive it throttles
 # (<profile>/rides/icu/ and <profile>/wellness/). These were the last two
-# paths still pointing at the legacy GLOBAL ~/.domestique locations, which
+# paths still pointing at the legacy GLOBAL ~/.shepherd locations, which
 # (a) leaked one athlete's sync timestamp into every other profile — a fresh
 # profile skipped its initial sync for up to 1h, (b) made db.purge_profile_data
 # contract A4 a lie (it wipes <profile>/rides/icu/ incl. .last_sync_at, but
@@ -17751,7 +17752,7 @@ def _sync_icu_activities_locked(force: bool = False) -> dict:
     import ride_storage as _rs
 
     # AC1: snapshot the owning profile at TASK START (this function runs on the
-    # domestique.icu_sync daemon thread and on forced request threads). The
+    # shepherd.icu_sync daemon thread and on forced request threads). The
     # network fetch stays OUTSIDE any lock; each write below is gated.
     _snap = _sync_task_snapshot()
 
@@ -18067,7 +18068,7 @@ def _pr_toast_queue_path() -> Path:
     that landed major PRs since the last dashboard open. Drained by the GET
     /api/ride/.../prs/toast-queue endpoint.
     """
-    return domestique_home() / "last_pr_toast.json"
+    return shepherd_home() / "last_pr_toast.json"
 
 
 def _read_pr_toast_queue() -> list[dict]:
@@ -18309,7 +18310,7 @@ def _kick_lazy_icu_sync(force_if_today_missing: bool = False) -> bool:
                     _log.debug(f"_kick_lazy_icu_sync: slow-warn log swallowed: {e}")
 
     import jobs as _jobs
-    _jobs.start_thread(_runner, name="domestique.icu_sync")
+    _jobs.start_thread(_runner, name="shepherd.icu_sync")
     return True
 
 
@@ -18457,7 +18458,7 @@ def api_rides(limit: int = Query(0)):
     """List all saved rides as a single flat array sorted newest-first.
 
     v4.4.0: now also surfaces ICU-synced activities (from the local
-    ``~/.domestique/rides/icu/`` cache) alongside FIT imports + legacy
+    ``~/.shepherd/rides/icu/`` cache) alongside FIT imports + legacy
     JSON rides. Each entry carries ``source`` ("icu"|"fit"|"json") and a
     stable ``ride_id`` ("icu_<id>"|"fit_<stem>"|legacy id).
 
@@ -18494,7 +18495,7 @@ def api_rides(limit: int = Query(0)):
 
 # v1.8.3 BUG-E — interval label override for misclassified RECOVERY rows.
 # ICU's auto-detection labels long flat segments "RECOVERY" regardless of
-# actual power. Domestique used to display the label verbatim, so the user
+# actual power. Shepherd used to display the label verbatim, so the user
 # saw "RECOVERY" rows in the 23 INTERVALS table for segments averaging
 # 189-297W (Z3-Z5+ on a 248W FTP). We now compute the zone from avg power
 # and override the displayed name when ICU's label disagrees.
@@ -19402,7 +19403,7 @@ def api_ride_fit(ride_id: str):
     if not ride:
         return JSONResponse({"error": "Ride not found"}, 404)
 
-    profile_id = ride.get("profile_id") or "domestique"
+    profile_id = ride.get("profile_id") or "shepherd"
     try:
         from fit_activity import build_activity_fit
         fit_bytes = build_activity_fit(ride, profile_id)
@@ -19413,7 +19414,7 @@ def api_ride_fit(ride_id: str):
         raise HTTPException(status_code=500, detail="failed to build FIT")
 
     slug = (profile_id or "ride").strip() or "ride"
-    filename = f"domestique-{slug}-{safe_id}.fit"
+    filename = f"shepherd-{slug}-{safe_id}.fit"
     return Response(
         content=fit_bytes,
         media_type="application/octet-stream",
@@ -19720,7 +19721,7 @@ def api_diag_health(request: Request):
         checks["enrich"] = {"ok": True, "skipped": "no plan_data"}
     # rides_dir
     try:
-        rides_dir = Path.home() / ".domestique" / "rides"
+        rides_dir = Path.home() / ".shepherd" / "rides"
         if rides_dir.exists():
             _ = list(rides_dir.iterdir())
         checks["rides_dir"] = {"ok": True, "exists": rides_dir.exists()}
@@ -19728,7 +19729,7 @@ def api_diag_health(request: Request):
         checks["rides_dir"] = {"ok": False, "msg": str(e)[:200]}
     # log_dir
     try:
-        log_dir = Path.home() / ".domestique" / "logs"
+        log_dir = Path.home() / ".shepherd" / "logs"
         log_dir.mkdir(parents=True, exist_ok=True)
         checks["log_dir"] = {"ok": True, "writable": os.access(str(log_dir), os.W_OK)}
     except Exception as e:
@@ -19791,13 +19792,13 @@ if __name__ == "__main__":
     # across workers.
     _UVICORN_WORKERS = 1
     assert _UVICORN_WORKERS == 1, (
-        "Domestique requires single-worker uvicorn — see launcher.py / README "
+        "Shepherd requires single-worker uvicorn — see launcher.py / README "
         "for the reason (per-process caches, DB sync thread)."
     )
     # Follows the launcher's choice so a standalone `python app.py` lands on
     # the same URL the desktop app uses. 22400 only applies when nothing set
-    # DOMESTIQUE_PORT — i.e. app.py run directly, without the launcher.
-    _port = int(os.environ.get("DOMESTIQUE_PORT") or 22400)
-    print(f"Domestique Dashboard - http://127.0.0.1:{_port}")
+    # SHEPHERD_PORT — i.e. app.py run directly, without the launcher.
+    _port = int(os.environ.get("SHEPHERD_PORT") or 22400)
+    print(f"Shepherd Dashboard - http://127.0.0.1:{_port}")
     uvicorn.run(app, host="127.0.0.1", port=_port, log_level="warning",
                 workers=_UVICORN_WORKERS)

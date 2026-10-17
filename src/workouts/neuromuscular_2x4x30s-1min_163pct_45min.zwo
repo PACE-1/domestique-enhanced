@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Neuromuscular 30s/1min 8x (45min)</name>
     <description>Warmup: 10min from 50% to 75% FTP | Microintervals: 8 x (30s @ 163% / 1min @ 30%) | Cooldown: 5min @ 30% FTP</description>
     <sportType>bike</sportType>

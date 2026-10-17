@@ -1,4 +1,4 @@
-# Scientific Evidence Review — Domestique
+# Scientific Evidence Review — Shepherd
 
 Comprehensive literature review conducted April 2026. All findings from PubMed searches and peer-reviewed papers used to validate and correct the dashboard's training logic.
 
@@ -194,7 +194,7 @@ DFA α1 (detrended fluctuation analysis, short-term scaling exponent) is compute
 
 ### Algorithm + artifact rejection (the v1.8.14 correctness fix)
 
-DFA α1 is acutely sensitive to ectopic/misdetected beats — RR cleaning before the computation is mandatory in every DFA paper. Prior to v1.8.14 Domestique dropped only 0ms/65535ms sentinels; it now runs a **Malik 1996 20%-relative filter** (`analytics._filter_rr_artifacts`) before all DFA windows.
+DFA α1 is acutely sensitive to ectopic/misdetected beats — RR cleaning before the computation is mandatory in every DFA paper. Prior to v1.8.14 Shepherd dropped only 0ms/65535ms sentinels; it now runs a **Malik 1996 20%-relative filter** (`analytics._filter_rr_artifacts`) before all DFA windows.
 
 - **Why it matters quantitatively** (Gronwald et al. 2022 update, PMC9124938): artifact level <3% = negligible bias on α1; ~6% still keeps the derived HRV threshold within ±1 bpm. Above that, the signal degrades fast.
 - **Observed failure mode**: on one real ride, ~1.3% uncorrected artifact beats dragged α1 from a correct 1.16 down to **0.573** (physiologically near-impossible for the effort) and broke **57 of 72** sliding windows via the R²-fit gate. The filter restores both the value and the window count.
@@ -219,7 +219,7 @@ DFA α1 is acutely sensitive to ectopic/misdetected beats — RR cleaning before
 | HRVT2 vs VT2 (HR-based) | ICC 0.84 — but HR-based HRVT2 is unreliable and routinely omitted | Schaffarczyk et al. 2022 |
 | HRVT2 **power output** vs VT2/OBLA | ICC **0.97**, r **0.92–0.93** | Reliability & validity study (PMC10875128) |
 
-The headline result is **power-specific**: HRVT2-as-power is the more reliable anchor (ICC 0.97). Domestique scopes the HRVT2 claim to power for exactly this reason and de-emphasises the HR-based HRVT2.
+The headline result is **power-specific**: HRVT2-as-power is the more reliable anchor (ICC 0.97). Shepherd scopes the HRVT2 claim to power for exactly this reason and de-emphasises the HR-based HRVT2.
 
 ### Lazy stream acquisition path (new)
 

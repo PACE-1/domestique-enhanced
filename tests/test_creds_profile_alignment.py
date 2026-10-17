@@ -12,7 +12,7 @@ rejects with HTTP 403 (error 1010). Therefore:
   * /api/rides/sync short-circuits with "no_credentials" → UI toast
 
 Fix: every ICU urllib request now sets a custom User-Agent header
-(``Domestique/<ver>``) so Cloudflare passes the call through.
+(``Shepherd/<ver>``) so Cloudflare passes the call through.
 
 Tests:
   (a) discover_athlete_id sends a User-Agent header (regression test for the
@@ -69,7 +69,7 @@ class TestUserAgentOnIcuCalls(unittest.TestCase):
 
         ua = captured["req"].get_header("User-agent")
         self.assertTrue(ua, "discover_athlete_id must send a User-Agent header")
-        self.assertIn("Domestique", ua)
+        self.assertIn("Shepherd", ua)
 
     def test_get_sends_user_agent(self):
         body = json.dumps([]).encode()
@@ -90,7 +90,7 @@ class TestUserAgentOnIcuCalls(unittest.TestCase):
 
         ua = captured["req"].get_header("User-agent")
         self.assertTrue(ua, "_get must send a User-Agent header")
-        self.assertIn("Domestique", ua)
+        self.assertIn("Shepherd", ua)
 
 
 class _CredsProfileBase(unittest.TestCase):
@@ -140,7 +140,7 @@ class TestSaveWritesToActiveProfile(_CredsProfileBase):
     """(c)+(e): save_env writes to pm.active_dir; pm._env updates immediately.
 
     Both tests stub ``_write_env_atomic`` so we never touch the user's real
-    ``~/.domestique/profiles/<id>/.env`` from CI.
+    ``~/.shepherd/profiles/<id>/.env`` from CI.
     """
 
     def test_save_env_targets_active_profile_dir(self):

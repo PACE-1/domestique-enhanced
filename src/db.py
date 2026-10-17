@@ -15,10 +15,10 @@ from pathlib import Path
 # User data directory: writable, survives app updates.
 # NOTE: directory creation is deferred to first DB write (init_db / set_db_path)
 # so that profile_manager._maybe_migrate_data_dir() can detect a stale-but-
-# empty ~/.domestique vs. a fresh install at boot. Otherwise this import
+# empty ~/.shepherd vs. a fresh install at boot. Otherwise this import
 # would race ahead and create the new dir before the v3 migration runs.
-from user_home import domestique_home
-_USER_DATA = domestique_home()  # 3.4.3: DOMESTIQUE_HOME-aware (dev preview sandbox)
+from user_home import shepherd_home
+_USER_DATA = shepherd_home()  # 3.4.3: SHEPHERD_HOME-aware (dev preview sandbox)
 
 # Load .env — check user data dir first, then project dir
 for _env_candidate in [_USER_DATA / ".env", Path(__file__).parent / ".env",
@@ -398,7 +398,7 @@ def sync_wellness(days: int = 90, _snapshot=None) -> int:
                 si = w.get("sportInfo") or []
                 eftp = si[0].get("eftp") if len(si) > 0 else None
                 db.execute(
-                    # An UPSERT that keeps what only Domestique knows, the same
+                    # An UPSERT that keeps what only Shepherd knows, the same
                     # fix `activities` got for `is_race`. INSERT OR REPLACE is
                     # a DELETE plus an INSERT on a primary-key conflict, so a
                     # day intervals.icu has no HRV for wiped the reading the
@@ -791,7 +791,7 @@ def sync_activities(days: int = 90, _snapshot=None) -> int:
                     # conflict SQLite implements OR REPLACE as DELETE then
                     # INSERT, so every column this statement does not name
                     # went back to its schema default -- and `is_race`, which
-                    # only Domestique knows, was reset to 0 on every sync for
+                    # only Shepherd knows, was reset to 0 on every sync for
                     # every ride. Naming the columns intervals.icu owns means
                     # the local ones are preserved by default, so the next
                     # locally-decided column cannot be erased by omission.

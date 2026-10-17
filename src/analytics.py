@@ -8,11 +8,11 @@ References:
   https://www.frontiersin.org/articles/10.3389/fphys.2019.00707/full
 - FastFitness.tips classification heuristic (also used by intervals.icu).
 
-Domestique uses the FastFitness.tips formulation
+Shepherd uses the FastFitness.tips formulation
 ``PI = log10((Z1+Z2 + Z5+) / Z3+Z4)`` — equivalent in spirit to Treff
 (emphasises the easy/hard ratio over the moderate band) and matches the
 single ``polarization_index`` value ICU reports on the activity GET, which
-keeps the Domestique number consistent with what the user already sees in
+keeps the Shepherd number consistent with what the user already sees in
 intervals.icu.
 
 Classification (v1.8.0 PI-BAND CASCADE):
@@ -28,7 +28,7 @@ import math
 import statistics
 from pathlib import Path
 
-_log_dfa = logging.getLogger("domestique.analytics.dfa")
+_log_dfa = logging.getLogger("shepherd.analytics.dfa")
 
 
 # Canonical centroids in (Z1+Z2 %, Z3+Z4 %, Z5+ %) space.
@@ -95,7 +95,7 @@ def treff_polarization_index(z1z2_pct: float, z3z4_pct: float, z5plus_pct: float
     """Treff 2019 Polarization-Index = log10((Z1+Z2 × Z5+) / Z3+Z4) — MULTIPLICATIVE.
 
     This is the exact form intervals.icu reports on the activity GET and the
-    single value Domestique renders in the polarization card, so it is the one
+    single value Shepherd renders in the polarization card, so it is the one
     source of truth for the *displayed* PI. Treff 2019 fixes the polarized
     cutoff at PI > 2.0 on this scale.
 
@@ -160,7 +160,7 @@ def classify_distribution(
     Treff PI (`treff_polarization_index`), but the legacy gate (rule 1a)
     tests the *additive* `pi`. A Rønnestad ride 58.0/10.7/31.3 has additive
     PI 0.92 (never fires 1a) yet Treff PI 2.23 — ICU labels it Polarized,
-    Domestique mislabelled it "unique". Rule 1b reconciles: it fires on the
+    Shepherd mislabelled it "unique". Rule 1b reconciles: it fires on the
     SAME Treff PI the UI shows, gated by a real hard pole (z5+ >= 20) over a
     suppressed middle (z3z4 < z5+) so it captures the genuine two-pole shape
     WITHOUT pulling in easy base rides like 80/5/15 (Treff PI 2.38 but z5+

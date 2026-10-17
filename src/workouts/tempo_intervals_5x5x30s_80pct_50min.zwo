@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Mixed 25 cycles (50min)</name>
     <description>Over-Under: 25 cycles (alternating above/below threshold)</description>
     <sportType>bike</sportType>

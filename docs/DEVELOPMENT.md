@@ -53,7 +53,7 @@ separate release concern.
 
 See [tests/README.md](../tests/README.md) for isolation and gate semantics.
 The full gate preserves failures and writes logs/status under
-`/tmp/domestique-gate`; a passing diagnostic rerun cannot turn it green.
+`/tmp/shepherd-gate`; a passing diagnostic rerun cannot turn it green.
 The historical list is not a failure allow-list.
 
 Pull requests run `.github/workflows/tests.yml` on GitHub-hosted runners: the
@@ -73,7 +73,7 @@ changes and structural cleanup must have separate evidence and commits.
 ## Browser smoke tests
 
 `web/e2e/` drives the new UI in a real Chromium against a real backend on a
-throwaway data root (a temporary `HOME` and `DOMESTIQUE_HOME`; credentials blank,
+throwaway data root (a temporary `HOME` and `SHEPHERD_HOME`; credentials blank,
 no network flag). It covers first-run setup, the new-profile wizard, profile
 switching by keyboard, deleting with the typed confirmation, keyboard navigation,
 and the DFA empty and error states.

@@ -28,7 +28,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Optional
 
-log = logging.getLogger("domestique.jobs")
+log = logging.getLogger("shepherd.jobs")
 
 _stop = threading.Event()
 _owner = threading.local()   # the profile a job thread was started under

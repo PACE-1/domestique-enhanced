@@ -72,5 +72,5 @@ does not claim that the full sampler or wider cleanup is complete.
   20 expected failures, 13 non-strict unexpected passes and 26 passed subtests;
   **3 serial passed**. Status: `bulk=0`, `serial=0`, `exit=0`.
   Bulk took 558.76 seconds; serial took 3.91 seconds. Logs:
-  `/tmp/domestique-gate/planner-slots-final.*`.
+  `/tmp/shepherd-gate/planner-slots-final.*`.
   Hosted PR CI is a separate result. Web source is unchanged by this layer.

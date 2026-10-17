@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Threshold 3x6min (59min)</name>
     <description>Intervals: 3 x (6min @ 98% / 2min @ 55%) | Cooldown: 5min from 60% to 45% FTP</description>
     <sportType>bike</sportType>

@@ -112,7 +112,7 @@ class TestHrvRecordingStatusEndpoints(unittest.TestCase):
 
     def setUp(self):
         # Disposable DATA_DIR so the dismissal-flag JSON doesn't leak between
-        # tests or stomp the user's real ~/.domestique state.
+        # tests or stomp the user's real ~/.shepherd state.
         self._tmp = tempfile.TemporaryDirectory()
         self.tmp_path = Path(self._tmp.name)
         self._orig_data_dir = app_module.DATA_DIR

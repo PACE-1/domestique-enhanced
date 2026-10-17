@@ -1,4 +1,4 @@
-"""Shared pytest fixtures for the Domestique test suite.
+"""Shared pytest fixtures for the Shepherd test suite.
 
 Order-independence guard for the lazy ICU sync singleton.
 
@@ -128,7 +128,7 @@ _db_boot.init_db()
 # generate_plan is DETERMINISTIC under a fixed seed_salt; the historic planner
 # suite flakiness was ENVIRONMENT COUPLING — it self-fetches live CTL
 # (get_today_metrics → ICU wellness), recent_mean_weekly_tss() from the live
-# ~/.domestique archive, and anchors phase layout on date.today(). The planner
+# ~/.shepherd archive, and anchors phase layout on date.today(). The planner
 # suites (test_planner_diversification / _variety_bonus /
 # _full_library_utilization / _interval_variety) pin all three via this block
 # so the same plan is produced on any machine, any day.
@@ -257,7 +257,7 @@ def _reset_icu_sync_singleton():
     # Drain a still-running lazy-sync daemon thread so it can't bleed into
     # the next test's patched paths/mocks, then clear the in-progress guard.
     for t in threading.enumerate():
-        if t.name == "domestique.icu_sync" and t.is_alive():
+        if t.name == "shepherd.icu_sync" and t.is_alive():
             t.join(timeout=5.0)
     app_module._icu_sync_in_progress.clear()
     # 3.4.3 — db._sync_stop is a module-GLOBAL Event: any TestClient
@@ -341,7 +341,7 @@ def _no_live_icu_network():
         # don't inherit the monkeypatches above — training._get honours this
         # env kill switch at the source (real-transport calls only) so they
         # can't reach the live API either.
-        mp.setenv("DOMESTIQUE_NO_NET", "1")
+        mp.setenv("SHEPHERD_NO_NET", "1")
         yield
 
 

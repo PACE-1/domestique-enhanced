@@ -18,7 +18,7 @@ Covers the grill-locked CORE scope of IP_ACCOUNT_FIXES:
         .setup_complete, user_prefs.json] existed; clear_bootstrapped().
 
 Every test pins HOME to a pytest tmp dir (test_profiles.py pattern) — the
-real ~/.domestique is never touched.
+real ~/.shepherd is never touched.
 """
 from __future__ import annotations
 
@@ -100,7 +100,7 @@ def _profile_db_counts(db_file: Path) -> dict:
 
 def _athlete_json(home: Path, pid: str) -> dict:
     return json.loads(
-        (home / ".domestique" / "profiles" / pid / "athlete.json").read_text())
+        (home / ".shepherd" / "profiles" / pid / "athlete.json").read_text())
 
 
 # ─── A1: mid-sync switch — zero crossover ────────────────────────────────────
@@ -132,7 +132,7 @@ def test_a1_mid_sync_switch_aborts_wellness_write(tmp_path, monkeypatch,
     with pytest.raises(db_mod.SyncAborted):
         db_mod.sync_wellness(days=1)
 
-    profiles = tmp_path / ".domestique" / "profiles"
+    profiles = tmp_path / ".shepherd" / "profiles"
     assert _profile_db_counts(profiles / "alice" / "health_tracker.db")["wellness"] == 0
     assert _profile_db_counts(profiles / "bob" / "health_tracker.db")["wellness"] == 0
     # zero mirror writes in B
@@ -168,7 +168,7 @@ def test_a1_run_sync_mid_switch_no_activity_crossover(tmp_path, monkeypatch):
     with pytest.raises(db_mod.SyncAborted):
         db_mod.run_sync(days=1)
 
-    profiles = tmp_path / ".domestique" / "profiles"
+    profiles = tmp_path / ".shepherd" / "profiles"
     alice = _profile_db_counts(profiles / "alice" / "health_tracker.db")
     bob = _profile_db_counts(profiles / "bob" / "health_tracker.db")
     assert alice["wellness"] == 1      # written while A still owned the pass
@@ -376,7 +376,7 @@ def _seed_global_archives(base: Path):
 
 
 def _mk_migration_base(tmp_path: Path, multi: bool = True) -> Path:
-    base = tmp_path / ".domestique"
+    base = tmp_path / ".shepherd"
     base.mkdir(parents=True)
     _seed_profile(base, "martijn", act_ids=("m1", "m2"),
                   wellness_rows=[("2026-06-01", 20.777937, 17.746977)])
@@ -492,7 +492,7 @@ def test_a11_migration_kill9_resumable_count_preserved(tmp_path, monkeypatch):
 
 
 def test_a11_trigger_absent_is_noop(tmp_path):
-    base = tmp_path / ".domestique"
+    base = tmp_path / ".shepherd"
     (base / "profiles" / "solo").mkdir(parents=True)
     (base / "profiles.json").write_text(json.dumps({
         "version": 1, "active_profile": "solo",
@@ -515,13 +515,13 @@ def test_a12_delete_last_then_create_no_resurrection(tmp_path):
     rs.persist_icu_activity({"id": "s1", "type": "Ride", "name": "s1",
                              "start_date_local": "2026-07-01T10:00:00",
                              "elapsed_time": 3600})
-    profiles_root = tmp_path / ".domestique" / "profiles"
+    profiles_root = tmp_path / ".shepherd" / "profiles"
     assert (profiles_root / "solo" / "health_tracker.db").exists()
 
     assert pm.delete_profile(a) is True
 
     # registry: real pointer cleared, stray "active" key gone
-    reg = json.loads((tmp_path / ".domestique" / "profiles.json").read_text())
+    reg = json.loads((tmp_path / ".shepherd" / "profiles.json").read_text())
     assert reg["active_profile"] is None
     assert "active" not in reg
     assert pm.active_id is None
@@ -570,7 +570,7 @@ def test_a12_delete_last_then_create_no_resurrection(tmp_path):
     pm.switch(b)
     assert pm.active_id == "fresh"
     assert db_mod.DB_PATH == profiles_root / "fresh" / "health_tracker.db"
-    reg2 = json.loads((tmp_path / ".domestique" / "profiles.json").read_text())
+    reg2 = json.loads((tmp_path / ".shepherd" / "profiles.json").read_text())
     assert reg2["active_profile"] == "fresh"
     assert "active" not in reg2
     assert not (profiles_root / "health_tracker.db").exists()
@@ -580,7 +580,7 @@ def test_a12_delete_last_then_create_no_resurrection(tmp_path):
 def test_stray_active_key_cleaned_on_registry_load(tmp_path):
     """The LIVE registry carries "active": null from the old delete code —
     loading must drop it and the next save persists the cleanup."""
-    base = tmp_path / ".domestique"
+    base = tmp_path / ".shepherd"
     prof = base / "profiles" / "solo"
     prof.mkdir(parents=True)
     (prof / "athlete.json").write_text(json.dumps({"ftp": 200}), encoding="utf-8")
@@ -672,24 +672,24 @@ def test_ac4_bootstrapped_fresh_true_legacy_false_and_clear(tmp_path):
     fresh_home.mkdir()
     with patch("pathlib.Path.home", return_value=fresh_home):
         migrate_profiles.migrate_to_profiles()
-    reg = json.loads((fresh_home / ".domestique" / "profiles.json").read_text())
+    reg = json.loads((fresh_home / ".shepherd" / "profiles.json").read_text())
     assert reg["profiles"][0]["bootstrapped"] is True
 
     # legacy upgrade: a root .env existed → NOT bootstrapped
     legacy_home = tmp_path / "legacy"
-    (legacy_home / ".domestique").mkdir(parents=True)
-    (legacy_home / ".domestique" / ".env").write_text(
+    (legacy_home / ".shepherd").mkdir(parents=True)
+    (legacy_home / ".shepherd" / ".env").write_text(
         "ICU_ATHLETE_ID=i1\nICU_API_KEY=k\n", encoding="utf-8")
     with patch("pathlib.Path.home", return_value=legacy_home):
         migrate_profiles.migrate_to_profiles()
-    reg2 = json.loads((legacy_home / ".domestique" / "profiles.json").read_text())
+    reg2 = json.loads((legacy_home / ".shepherd" / "profiles.json").read_text())
     assert reg2["profiles"][0]["bootstrapped"] is False
 
     # wizard save clears it (pm.clear_bootstrapped) — idempotently
     pm = _mk_pm(fresh_home)
     assert pm.active_id == "default"
     pm.clear_bootstrapped()
-    reg3 = json.loads((fresh_home / ".domestique" / "profiles.json").read_text())
+    reg3 = json.loads((fresh_home / ".shepherd" / "profiles.json").read_text())
     assert "bootstrapped" not in reg3["profiles"][0]
     pm.clear_bootstrapped()  # second call: no-op, no crash
 

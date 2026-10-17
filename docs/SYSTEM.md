@@ -1,12 +1,12 @@
-# Domestique — System Documentation
+# Shepherd — System Documentation
 
-*Evidence-based indoor cycling training platform — your training domestique*
+*Evidence-based training planner*
 
 ---
 
 ## Project Overview
 
-Domestique (formerly ChickenCycling) is an indoor cycling training platform with smart trainer control, structured workouts, virtual routes, and evidence-based training planning. It combines a local Python backend with a vanilla JavaScript frontend (no npm, no build step) and a rich library of workouts, route profiles, and nutrition data.
+Shepherd (formerly ChickenCycling) is an indoor cycling training platform with smart trainer control, structured workouts, virtual routes, and evidence-based training planning. It combines a local Python backend with a vanilla JavaScript frontend (no npm, no build step) and a rich library of workouts, route profiles, and nutrition data.
 
 Key capabilities:
 
@@ -68,10 +68,10 @@ The server redirects `/` to the web app. `pnpm build` in `web/` must run before 
 
 ## User Data (never committed)
 
-All per-user state lives under `~/.domestique/`:
+All per-user state lives under `~/.shepherd/`:
 
 ```
-~/.domestique/
+~/.shepherd/
 ├── profiles/        → Athlete profiles (FTP, LTHR, max HR, weight, preferences)
 ├── rides/           → Local ride history (telemetry recordings, summaries)
 ├── plans/           → Active and archived training plans

@@ -56,4 +56,4 @@ def test_settings_save_sync_status_and_version_validate():
         assert c.post("/api/settings", json={"target_mode": "hr", "max_hr": 150, "lthr": 160}).status_code == 400
         api_models.SyncStatus.model_validate(c.get("/api/sync/status").json())
         v = api_models.VersionInfo.model_validate(c.get("/api/version").json())
-        assert v.app == "domestique" and v.version
+        assert v.app == "shepherd" and v.version

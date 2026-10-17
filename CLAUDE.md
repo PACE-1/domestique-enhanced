@@ -72,7 +72,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ---
 
-## Project-Specific Guidelines (Domestique)
+## Project-Specific Guidelines (Shepherd)
 
 These guidelines layer on top of the four principles above:
 
@@ -86,7 +86,7 @@ These guidelines layer on top of the four principles above:
 - **Contract before code (loops):** lock a checklist of *testable* assertions (the IP / `MASTER_DECISIONS`, grilled) BEFORE implementing; the contract is what gets graded, and ≤10 assertions usually means the grill rubber-stamped.
 - **Restart over patch (loops):** when a run goes sideways, revert + redo rather than patch-the-patch; escalate to the user only when the *contract* is wrong, not when a build is.
 - **Debug from traces; prune the harness (loops):** read the transcript / `*.jsonl` to find where judgment diverged before re-running; re-read CLAUDE.md + skills each model release and cut what the model now does for free. The bottleneck always moves (coding → planning → verification → taste). Full discipline: the `/loops` skill.
-- **Trainer subsystem is gone since v4.0.0-alpha.** Don't add `bleak`, `pycycling`, `_on_real_trainer_*`, FTMS, ERG, FE-C, or anything that talks to a hardware trainer. Domestique is planner + library + post-ride viewer.
+- **Trainer subsystem is gone since v4.0.0-alpha.** Don't add `bleak`, `pycycling`, `_on_real_trainer_*`, FTMS, ERG, FE-C, or anything that talks to a hardware trainer. Shepherd is planner + library + post-ride viewer.
 - **Workout classification is content-based, not filename-based** (since v4.1.2). Read `workouts/.content_classification.json` for the canonical type. Filename rules are fallback only.
 
 ---

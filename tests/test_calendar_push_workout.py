@@ -102,7 +102,7 @@ def stub(tmp_path):
             pass
 
     ProfileManager._instance = None
-    app_module.DATA_DIR = home / ".domestique"
+    app_module.DATA_DIR = home / ".shepherd"
 
     pm = ProfileManager.get()
     pid = pm.create_profile("Pusher")

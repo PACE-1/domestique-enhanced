@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Crit Sprints 12x (60min)</name>
     <description>Warmup: 5min ramp from 35% to 75% FTP | Priming: 3 x (30s @ 100% / 30s @ 50%) + 2min @ 40% | Main: 12 x 40s wind-up sprint (13s @ 82%, 13s @ 150%, 14s @ 180% - capped at library max from CP-calibrated source) with 3min @ 81% race-pace tempo between sprints - crit race simulation | Cooldown: 1min @ 40% + 5min ramp from 40% to 25% FTP</description>
     <sportType>bike</sportType>

@@ -10,7 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
-os.environ.setdefault("DOMESTIQUE_HOME", tempfile.mkdtemp(prefix="domestique-openapi-"))
+os.environ.setdefault("SHEPHERD_HOME", tempfile.mkdtemp(prefix="shepherd-openapi-"))
 
 
 def contract() -> dict:
@@ -45,7 +45,7 @@ def contract() -> dict:
                 changed = True
     return {
         "openapi": "3.1.0",
-        "info": {"title": "Domestique typed contracts", "version": "1"},
+        "info": {"title": "Shepherd typed contracts", "version": "1"},
         "paths": dict(sorted(paths.items())),
         "components": {"schemas": dict(sorted(schemas.items()))},
     }

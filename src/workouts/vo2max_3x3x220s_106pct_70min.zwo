@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>VO2max 12min Surge 3x (70min)</name>
     <description>Warmup: 5min ramp from 35% to 75% FTP | Priming: 3 x (30s @ 100% / 30s @ 50%) + 2min @ 40% | Main: 3 x 12min supra-threshold blocks, each 3 x (20s surge @ 125% / 3min 40s @ 106%), 6min @ 50% between blocks — long surged blocks for maximal aerobic power | Cooldown: 1min @ 40% + 5min ramp from 40% to 25% FTP</description>
     <sportType>bike</sportType>

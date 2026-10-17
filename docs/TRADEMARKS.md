@@ -1,6 +1,6 @@
 # Trademark Policy
 
-Domestique (formerly ChickenCycling) is an independent open-source project.
+Shepherd (derived from Domestique, formerly ChickenCycling) is an independent open-source project.
 It is **not affiliated with, endorsed by, or sponsored by** any trainer
 manufacturer, sensor vendor, platform, or fitness service.
 
@@ -33,24 +33,24 @@ use third-party logos except where essential to identify a device category in
 the UI; and where a logo does appear, it is used descriptively, not as a
 badge of affiliation.
 
-## Using the "Domestique" Name
+## Using the "Shepherd" Name
 
-The name **Domestique** (and the legacy name **ChickenCycling**) and any
+The name **Shepherd** (and the legacy name **ChickenCycling**) and any
 associated logos are trademarks of the project authors. You may refer to
 this project by name in articles, reviews, and technical documentation
 (nominative use). You may **not**:
 
 - Use the name or logos in a way that suggests your fork, service, or
-  commercial product is the official Domestique.
+  commercial product is the official Shepherd.
 - Use the name to endorse or promote derivative products without written
   permission.
 
 Forks must clearly distinguish themselves (e.g., "MyFork (based on
-Domestique)").
+Shepherd)").
 
-> Note: Domestique was released as **ChickenCycling** prior to v2.0.0. The
+> Note: Shepherd was released as **ChickenCycling** prior to v2.0.0. The
 > legacy name is preserved here for historical/SEO reference; the project's
-> current name is Domestique.
+> current name is Shepherd.
 
 ## Attribution Practice
 

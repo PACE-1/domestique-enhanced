@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Tempo 4x30s (31min)</name>
     <description>Intervals: 4 x (30s @ 105% / 1min @ 55%)</description>
     <sportType>bike</sportType>

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>FTP Test — Coggan 20min protocol (59min)</name>
     <description>Coggan 20-minute FTP test, full protocol (~59min). 10min easy ramp warmup, then 3x1min fast-spin openers at 95% with 1min easy between, 4min easy. Then a 5min ALL-OUT effort — a free ride with no target: this deliberately empties the anaerobic tank so your 20-min number reflects sustainable power, not a fresh anaerobic surge. 9min easy to recover, then the test: 20min FREE RIDE, no target, no erg — ride the hardest steady pace you can hold, like a time trial. The app never shows you a number to hold here on purpose: we are measuring your FTP, not riding your old one. Easy 5min cooldown. Your new FTP = 95% of the 20-min average power — the app computes this from the ride file automatically.</description>
     <sportType>bike</sportType>

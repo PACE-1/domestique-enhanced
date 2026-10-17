@@ -1,14 +1,14 @@
-# Running Domestique as a server
+# Running Shepherd as a server
 
-Domestique is a single-rider application. A server deployment exposes that one
+Shepherd is a single-rider application. A server deployment exposes that one
 rider's data to the network, so it needs an access boundary. This page is the
 policy; `src/access.py` is the enforcement.
 
 ## Access policy
 
 - **Desktop / loopback use:** no token, no gate. Behaviour is unchanged.
-- **Server use:** set `DOMESTIQUE_SERVER_MODE=1`. The app then refuses to start
-  unless `DOMESTIQUE_ACCESS_TOKEN` is set (fail closed). The Docker image sets
+- **Server use:** set `SHEPHERD_SERVER_MODE=1`. The app then refuses to start
+  unless `SHEPHERD_ACCESS_TOKEN` is set (fail closed). The Docker image sets
   server mode already.
 - **With a token:** every route except `/login`, `/logout` and `/healthz` needs
   `Authorization: Bearer <token>` or the session cookie from `POST /login`.
@@ -26,7 +26,7 @@ Mutating requests (`POST`, `PUT`, `PATCH`, `DELETE`) that carry an `Origin`
 header must come from loopback or from an exact origin you list:
 
 ```sh
-DOMESTIQUE_TRUSTED_ORIGINS=https://train.example.com
+SHEPHERD_TRUSTED_ORIGINS=https://train.example.com
 ```
 
 A prefix or a look-alike host (`https://train.example.com.evil.io`) is rejected.
@@ -52,14 +52,14 @@ train.example.com {
     forward_auth pocket-id:1411 {   # or oauth2-proxy; sign-in happens here
         uri /api/auth/verify
     }
-    reverse_proxy domestique:22400 {
-        header_up Authorization "Bearer {env.DOMESTIQUE_ACCESS_TOKEN}"
+    reverse_proxy shepherd:22400 {
+        header_up Authorization "Bearer {env.SHEPHERD_ACCESS_TOKEN}"
     }
 }
 ```
 
 Keep the app reachable only from the proxy (private network or loopback), and
-list the public origin in `DOMESTIQUE_TRUSTED_ORIGINS`. The Caddy block shows the
+list the public origin in `SHEPHERD_TRUSTED_ORIGINS`. The Caddy block shows the
 shape; the forward-auth endpoint is your provider's, and it has not been run
 against a live Pocket ID here.
 
@@ -119,7 +119,7 @@ The app runs as one worker process. Everything below runs inside it.
 | Work | Started by | Limit | Stops on shutdown |
 |---|---|---|---|
 | Intervals.icu sync loop | `db.start_background_sync` | one thread, guarded by `_sync_lock` | `db.stop_sync` sets the stop event |
-| Lazy sync after boot, `domestique.icu_sync` | `jobs.start_thread` | one at a time | `jobs.shutdown` |
+| Lazy sync after boot, `shepherd.icu_sync` | `jobs.start_thread` | one at a time | `jobs.shutdown` |
 | History backfill, `pc-backfill`, `backfill-history` | `jobs.start_thread` | single flight (`acquire_backfill_lock`, `already_running`) | `stopping()` checked in the loop |
 | DFA backfill, `dfa-backfill` | `jobs.start_thread` | single flight (`_dfa_backfill_lock`) | cancel hook plus `stopping()` |
 | DFA computation | `jobs.Slot` | one at a time; a timed-out run keeps the slot until it ends | bounded, not interrupted |
@@ -134,7 +134,7 @@ ends at its next check instead of writing into the new profile. A job started
 before any profile was active is not bound to one.
 
 Every thread here is a daemon, so a stuck one cannot hold up exit. Shutdown
-asks registered jobs to stop and waits up to `DOMESTIQUE_SHUTDOWN_BUDGET_S`
+asks registered jobs to stop and waits up to `SHEPHERD_SHUTDOWN_BUDGET_S`
 (default 8 s, inside Docker's 10 s stop timeout), then logs what is still
 running.
 
@@ -155,7 +155,7 @@ reverse proxy should still set its own body limit.
 ## Linux AppImage (#12)
 
 The AppImage bundles the same Python core and the Qt/PySide6 webview launcher
-(`packaging/build_linux.sh`, `packaging/domestique.spec`). It is built inside
+(`packaging/build_linux.sh`, `packaging/shepherd.spec`). It is built inside
 `ubuntu:22.04`, so the supported baseline is glibc 2.35 (Ubuntu 22.04 and
 newer); the build fails if any bundled binary needs newer symbols.
 

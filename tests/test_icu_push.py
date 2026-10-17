@@ -113,7 +113,7 @@ def stub(tmp_path):
             pass
 
     ProfileManager._instance = None
-    app_module.DATA_DIR = home / ".domestique"
+    app_module.DATA_DIR = home / ".shepherd"
 
     pm = ProfileManager.get()
     pid = pm.create_profile("Pusher")
@@ -586,7 +586,7 @@ class TestConnectionWriteOk:
                                 follow_redirects=False)
         assert "icu=connected" in r.headers["location"]
         assert "CALENDAR:WRITE" in stub.pm.icu_granted_scopes
-        env = (stub.home / ".domestique" / "profiles" / stub.pid / ".env")
+        env = (stub.home / ".shepherd" / "profiles" / stub.pid / ".env")
         assert "ICU_GRANTED_SCOPES=ACTIVITY:READ,CALENDAR:READ,CALENDAR:WRITE" \
             in env.read_text(encoding="utf-8")
         # Disconnect drops the stamp with the token.

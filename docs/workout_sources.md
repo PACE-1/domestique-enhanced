@@ -1,21 +1,21 @@
 # Workout Library Sources
 
-Domestique ships a library of ZWO workout files. Each `.zwo` is an XML
+Shepherd ships a library of ZWO workout files. Each `.zwo` is an XML
 description of an interval set (warm-up, intervals, recovery, cool-down).
 This document explains where those files come from.
 
 ---
 
-## What we include in Domestique
+## What we include in Shepherd
 
-### 1. Procedurally generated — primary source (author: Domestique Library)
+### 1. Procedurally generated — primary source (author: Shepherd Library)
 
 Almost the entire shipped library is authored in-house by the workout
 generators. They enumerate interval structures (reps × on / off durations ×
 %FTP) per category — recovery, endurance, tempo, sweet-spot, threshold, VO2,
 anaerobic, sprints, over-under, pyramid — and emit ZWO from templates. Every
-file carries `<author>Domestique Library</author>` and a description that is a
-factual summary of the structure. The content is original to Domestique.
+file carries `<author>Shepherd Library</author>` and a description that is a
+factual summary of the structure. The content is original to Shepherd.
 
 ### 2. GitHub imports — MIT / Unlicense only
 
@@ -26,7 +26,7 @@ explicitly permit redistribution and modification:
 - `michaelahlers/michaelahlers-zwift-workouts` — **MIT**.
 
 The importer dedupes against the existing library by structure hash,
-normalizes `<author>` to `Domestique Library`, regenerates `<name>` and
+normalizes `<author>` to `Shepherd Library`, regenerates `<name>` and
 `<description>` from the structure, and strips any coach-cue text events. The
 original license text and upstream URLs are preserved in
 `workouts/.github_imports_manifest.json`.
@@ -35,7 +35,7 @@ original license text and upstream URLs are preserved in
 
 ## Sources to avoid
 
-Domestique does not include — and does not accept contributions of — workout
+Shepherd does not include — and does not accept contributions of — workout
 content from commercial or proprietary catalogues:
 
 - **Zwift built-in workouts** — Zwift EULA OEM content. Off-limits.

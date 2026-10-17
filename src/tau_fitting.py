@@ -48,7 +48,7 @@ from scipy.signal import lfilter  # type: ignore[import-untyped]
 
 import db
 
-_log = logging.getLogger("domestique.tau_fitting")
+_log = logging.getLogger("shepherd.tau_fitting")
 
 
 # ── weighted-marker counting ────────────────────────────────────────────────
@@ -146,7 +146,7 @@ def count_weighted_markers(profile_id: str, horizon_days: int) -> float:
 
     ``profile_id`` is currently informational only — the existing DB layer
     is single-profile-at-a-time (each profile has its own SQLite file under
-    ``~/.domestique/profiles/<id>/``). The argument is locked into the
+    ``~/.shepherd/profiles/<id>/``). The argument is locked into the
     contract for v1.2.0 OOS-validation re-use.
     """
     conn = db.get_db()

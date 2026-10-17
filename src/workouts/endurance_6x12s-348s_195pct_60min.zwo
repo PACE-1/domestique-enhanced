@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Endurance 12s/5min48 6x (60min)</name>
     <description>Warmup: 8min from 58% to 72% FTP | Aerobic primer: 2min30 @ 78% FTP, 5min from 80% to 88% FTP, 2min30 @ 90% FTP | Sprints: 6 x (12s @ 195% / 5min48 @ 70% FTP) | Cooldown: 6min from 60% to 45% FTP</description>
     <sportType>bike</sportType>

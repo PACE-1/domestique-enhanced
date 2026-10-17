@@ -1,4 +1,4 @@
-# Structure audit — Domestique @ a95447e8 (2026-09-14)
+# Structure audit — Shepherd @ a95447e8 (2026-09-14)
 
 Lens: layering, dependency direction, the two monoliths, the domain model, the
 frontend, constants, process state. Independent agent, measured with AST scripts

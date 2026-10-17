@@ -15,7 +15,7 @@ scratchpad only; git history has 03237915 to roll back to.
 - Deploy Wave 1.
 - The morning adapter adapts the plan: `cycling-stack` commit 1d12ba2 applies
   the D8 patch (auto-recalc as POST) and adds step 2b, `POST
-  /api/rides/sync?force=1`, in both modes. Checked against a fake Domestique
+  /api/rides/sync?force=1`, in both modes. Checked against a fake Shepherd
   that records requests and refuses GETs on write endpoints.
 - CTL values from intervals.icu (P7): `src/fitness.py`, commit 070ad407;
   see "After Wave 1" below.
@@ -93,11 +93,11 @@ internals, Wave 3), and `ride_storage.compute_local_ctl` itself.
   (A1, A2, A6, P4), the strip and grid harnesses in `test_344_plan_grid_parity.py`.
 - **The sandboxed dashboard over CDP** (scratchpad scripts, not in the repo;
   recreate from this description): boot the worktree's `src/launcher.py
-  --server-only` with `HOME=<tmp>` and `DOMESTIQUE_PORT=<spare>`; wait until
+  --server-only` with `HOME=<tmp>` and `SHEPHERD_PORT=<spare>`; wait until
   the port is actually bindable first (TIME_WAIT sockets from the previous run
   make the launcher exit, and a page then loads from nowhere); seed
-  `<HOME>/.domestique/profiles/default/plans/current_plan.json`,
-  `.domestique/.setup_complete` and ICU ride JSONs under
+  `<HOME>/.shepherd/profiles/default/plans/current_plan.json`,
+  `.shepherd/.setup_complete` and ICU ride JSONs under
   `profiles/default/rides/icu/`; drive headless Chromium with
   `--remote-debugging-port` from a small `websockets` script that records
   `Network.requestWillBeSent` (Fetch/XHR), console errors, `document.body.innerText`
@@ -164,7 +164,7 @@ internals, Wave 3), and `ride_storage.compute_local_ctl` itself.
   inside it; make scratch worktrees by hand (`git worktree add --detach
   <scratchpad>/<name> <sha>`, symlink `.venv`).
 - Push by URL: `git -c credential.helper='!gh auth git-credential' push
-  https://github.com/taladjidi/domestique.git refactor/backend-architecture`.
+  https://github.com/taladjidi/shepherd.git refactor/backend-architecture`.
 - The known-failures list is 8 lines. A ninth means something.
 - Run tests under pytest only (the conftest sandboxes HOME); restore
   `src/workouts/.library_index.json` and `.workout_facts.json` afterwards.

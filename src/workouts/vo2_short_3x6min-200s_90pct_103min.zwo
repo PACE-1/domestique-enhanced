@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>VO2 Short 3x6min (103min)</name>
     <description>Intervals: 3 x (6min @ 90% / 3min 20s @ 55%)</description>
     <sportType>bike</sportType>

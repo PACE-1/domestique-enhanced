@@ -1,6 +1,6 @@
 """Ride archive: save/load/list/delete completed rides.
 
-Rides are stored as JSON in ~/.domestique/profiles/{id}/rides/
+Rides are stored as JSON in ~/.shepherd/profiles/{id}/rides/
 (v3.0.0: data-dir migrated from ~/.chickencycling/ — see
 profile_manager._maybe_migrate_data_dir).
 The columnar sample format keeps a 2-hour ride under 500KB (50KB gzipped).
@@ -17,7 +17,7 @@ import time
 from pathlib import Path
 from typing import Optional
 
-log = logging.getLogger("domestique.rides")
+log = logging.getLogger("shepherd.rides")
 
 # v2.2.9 — locally-computed DFA augmentation keys (written by app.py's
 # _augment_icu_record_with_dfa from the raw FIT, NOT present in the ICU
@@ -114,7 +114,7 @@ def _icu_rides_dir() -> Path:
     """v4.4.0 — directory for ICU-synced normalized activity records.
 
     v3.0.0 AC2a: per-profile — ``<profile>/rides/icu/`` (was the global
-    ``~/.domestique/rides/icu/``, which leaked every rider's ICU archive to
+    ``~/.shepherd/rides/icu/``, which leaked every rider's ICU archive to
     whoever was active; migrate_profiles.migrate_archives_to_profiles moves
     the legacy global tree on first boot). One JSON file per ICU activity,
     keyed by ICU's external id. power_curve._icu_rides_dir delegates here —
@@ -1054,7 +1054,7 @@ def _fit_iso_started_at(fit_path: Path) -> str:
 def _fit_load_sidecar_path(fit_path: Path) -> Path:
     """Sidecar JSON next to an imported FIT: ``<stem>.load.json``.
 
-    Lives in ``~/.domestique/rides/`` alongside the FIT — nothing globs
+    Lives in ``~/.shepherd/rides/`` alongside the FIT — nothing globs
     ``*.json`` there (ICU records live in the ``icu/`` subdir), so the
     sidecar can't be mistaken for a ride record.
     """
@@ -1454,7 +1454,7 @@ def compute_ride_xss(
 # v4.0.0-alpha (FIX-SERVER): save_ride() removed. The live TrainingSession
 # runtime it depended on (session._recorder, session._metrics, session.mode,
 # session._workout) is gone; rides now arrive via ``POST /api/ride/import``
-# which writes a FIT directly under ``~/.domestique/profiles/<id>/rides/``.
+# which writes a FIT directly under ``~/.shepherd/profiles/<id>/rides/``.
 # No caller remains in app.py or any live module. The removed-but-not-deleted
 # tests in test_route_picker_api.py:1028+ are handled separately by FIX-B.
 
@@ -1784,7 +1784,7 @@ def wellness_value(key: str, value):
 
 
 def persist_wellness(record: dict) -> Path | None:
-    """v4.5.0 — write a single ICU wellness record to ``~/.domestique/wellness/``.
+    """v4.5.0 — write a single ICU wellness record to ``~/.shepherd/wellness/``.
 
     The record's ``id`` field is the ISO date (YYYY-MM-DD) — used as the
     filename. Merges over the day's existing file: a field the new record
@@ -1824,7 +1824,7 @@ def persist_wellness(record: dict) -> Path | None:
 def load_recent_wellness(days: int = 90) -> list[dict]:
     """v4.5.0 — load up to N most recent wellness records (newest first).
 
-    Walks ``~/.domestique/wellness/``, parses each ``YYYY-MM-DD.json`` file,
+    Walks ``~/.shepherd/wellness/``, parses each ``YYYY-MM-DD.json`` file,
     sorts by date descending, returns the first ``days`` records. Bad files
     are skipped silently. Returns [] when the dir is empty or unreadable.
     """

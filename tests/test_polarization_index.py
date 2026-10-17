@@ -7,7 +7,7 @@ References:
   10:707. doi:10.3389/fphys.2019.00707
 - FastFitness.tips classification heuristic (also used by intervals.icu).
 
-Domestique uses the FastFitness.tips formulation
+Shepherd uses the FastFitness.tips formulation
 ``PI = log10((Z1+Z2 + Z5+) / Z3+Z4)`` — equivalent in spirit to Treff
 (emphasises the easy/hard ratio over the moderate band) and matches the
 single ``polarization_index`` value ICU reports on the activity GET.

@@ -47,10 +47,10 @@ PROXIED = ("ATHLETE_FTP_W", "ATHLETE_WEIGHT_KG", "ATHLETE_LBM_KG",
 @pytest.fixture()
 def rider(tmp_path, monkeypatch):
     """A profile with an FTP, and the app pointed at it."""
-    monkeypatch.setenv("DOMESTIQUE_HOME", str(tmp_path))
+    monkeypatch.setenv("SHEPHERD_HOME", str(tmp_path))
     old_instance, old_data = ProfileManager._instance, app_module.DATA_DIR
     ProfileManager._instance = None
-    app_module.DATA_DIR = tmp_path / ".domestique"
+    app_module.DATA_DIR = tmp_path / ".shepherd"
     pm = ProfileManager.get()
     pid = pm.create_profile("Rider")
     pm.switch(pid)

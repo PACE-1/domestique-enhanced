@@ -1,4 +1,4 @@
-# Debugging Domestique — backend observability playbook
+# Debugging Shepherd — backend observability playbook
 
 The v3.6.0-fix30 logging layer is designed so any post-mortem "why did X
 happen during the ride?" question can be answered with `grep` + one call to
@@ -15,16 +15,16 @@ Every ride spawns its own file as soon as `POST /api/training/start`
 returns 200. Path template:
 
 ```
-~/.domestique/logs/ride_<iso_utc_timestamp>_<sessid>.log
+~/.shepherd/logs/ride_<iso_utc_timestamp>_<sessid>.log
 ```
 
 - `iso_utc_timestamp` is `YYYYMMDDTHHMMSSZ` (e.g. `20260420T103012Z`).
 - `sessid` is an 8-char hex tag generated at start and echoed back in the
   debug-snapshot `session_id` field.
 - Rotation keeps the **20 most recent** ride logs. Older files are deleted
-  on the next `start`. Override with `DOMESTIQUE_RIDE_LOG_KEEP=N`.
+  on the next `start`. Override with `SHEPHERD_RIDE_LOG_KEEP=N`.
 
-The global app log is still at `~/.domestique/logs/domestique.log` (size-
+The global app log is still at `~/.shepherd/logs/shepherd.log` (size-
 rotated, 30 backups). Per-ride files are a *tee* of the active session —
 their rotation is independent of the global one.
 
@@ -38,20 +38,20 @@ Every ride-critical code path now emits through one of:
 
 | Logger                | Covers                                            |
 | --------------------- | ------------------------------------------------- |
-| `domestique.ble`      | BLE frames in/out, connect/disconnect, RTL stats  |
-| `domestique.gate`     | First-pedal gate decisions, per-tick eval         |
-| `domestique.phase`    | ARMED → INDEXING → WARMUP → ROUTE → … transitions |
-| `domestique.power`    | Power readings, 4Hz buffer stats, spike filter    |
-| `domestique.trainer`  | FTMS 0x11 / 0x05 dispatches, FE-C writes          |
-| `domestique.hr`       | HR frames, RR intervals, DFA α1 status            |
-| `domestique.session`  | start / stop / pause / resume                     |
-| `domestique.ws`       | WS connect / disconnect / tick errors             |
+| `shepherd.ble`      | BLE frames in/out, connect/disconnect, RTL stats  |
+| `shepherd.gate`     | First-pedal gate decisions, per-tick eval         |
+| `shepherd.phase`    | ARMED → INDEXING → WARMUP → ROUTE → … transitions |
+| `shepherd.power`    | Power readings, 4Hz buffer stats, spike filter    |
+| `shepherd.trainer`  | FTMS 0x11 / 0x05 dispatches, FE-C writes          |
+| `shepherd.hr`       | HR frames, RR intervals, DFA α1 status            |
+| `shepherd.session`  | start / stop / pause / resume                     |
+| `shepherd.ws`       | WS connect / disconnect / tick errors             |
 
 Each log line includes the category name in brackets so `grep` filters
 trivially:
 
 ```
-2026-04-20 10:30:15 INFO  [domestique.gate] [SESSION a1b2c3d4] EVENT=gate_decision ...
+2026-04-20 10:30:15 INFO  [shepherd.gate] [SESSION a1b2c3d4] EVENT=gate_decision ...
 ```
 
 The `[SESSION ...]` prefix only appears in the per-ride file.
@@ -64,13 +64,13 @@ Three ways, pick whichever fits the situation:
 
 ```bash
 # everything at DEBUG
-DOMESTIQUE_VERBOSE=1 python3.12 app.py
+SHEPHERD_VERBOSE=1 python3.12 app.py
 
 # only specific categories
-DOMESTIQUE_LOG_CATEGORIES=gate,ble python3.12 app.py
+SHEPHERD_LOG_CATEGORIES=gate,ble python3.12 app.py
 ```
 
-Category names are the short form (`gate`, not `domestique.gate`).
+Category names are the short form (`gate`, not `shepherd.gate`).
 Unknown tokens are silently ignored.
 
 ### 2. Runtime — hot-swap via HTTP
@@ -140,7 +140,7 @@ grep 'EVENT=ble_connect\|EVENT=ble_disconnect' "$LOG"
 ```
 
 If `ble_frame` returns nothing, confirm the category is at DEBUG
-(`curl … log-level` or `DOMESTIQUE_LOG_CATEGORIES=ble`). The
+(`curl … log-level` or `SHEPHERD_LOG_CATEGORIES=ble`). The
 `ble_connect` / `ble_disconnect` pair tells you whether BLE flapped
 during the ride.
 
@@ -159,7 +159,7 @@ in the snapshot).
 ### "ERG not responding"
 
 ```bash
-grep '\[domestique.trainer\]' "$LOG" | tail -50
+grep '\[shepherd.trainer\]' "$LOG" | tail -50
 ```
 
 Shows every FTMS 0x11 / 0x05 dispatch, ERG engage/disengage, and the

@@ -20,8 +20,8 @@ from unittest.mock import patch, MagicMock
 # ---------------------------------------------------------------------------
 
 def _make_base(tmp: str) -> Path:
-    """Return a .domestique base dir inside the given temp directory."""
-    base = Path(tmp) / ".domestique"
+    """Return a .shepherd base dir inside the given temp directory."""
+    base = Path(tmp) / ".shepherd"
     base.mkdir(parents=True, exist_ok=True)
     return base
 
@@ -108,7 +108,7 @@ class TestCreateProfile(unittest.TestCase):
 
     def test_create_profile(self):
         slug = self.pm.create_profile("Anna")
-        profile_dir = Path(self.tmp) / ".domestique" / "profiles" / slug
+        profile_dir = Path(self.tmp) / ".shepherd" / "profiles" / slug
         self.assertTrue(profile_dir.is_dir())
         self.assertTrue((profile_dir / "athlete.json").exists())
         self.assertTrue((profile_dir / ".env").exists())
@@ -189,7 +189,7 @@ class TestDeleteProfile(unittest.TestCase):
         shutil.rmtree(self.tmp, ignore_errors=True)
 
     def test_delete_profile(self):
-        profile_dir = Path(self.tmp) / ".domestique" / "profiles" / "todelete"
+        profile_dir = Path(self.tmp) / ".shepherd" / "profiles" / "todelete"
         self.assertTrue(profile_dir.exists())
         self.pm.delete_profile("todelete")
         self.assertFalse(profile_dir.exists())
@@ -259,7 +259,7 @@ class TestSwitchProfile(unittest.TestCase):
         self.pm = _fresh_manager(self.tmp)
         slug = self.pm.create_profile("Partner")
         # Write custom athlete data to the partner profile
-        partner_dir = Path(self.tmp) / ".domestique" / "profiles" / slug
+        partner_dir = Path(self.tmp) / ".shepherd" / "profiles" / slug
         athlete = {
             "ftp": 180, "weight_kg": 60.0, "lbm_kg": 48.0,
             "lthr": 165, "max_hr": 185,
@@ -517,7 +517,7 @@ class TestUpdateProfile(unittest.TestCase):
         self.assertEqual(self.pm.profile_color, "#ef4444")
         # Check persisted on disk
         reg = json.loads(
-            (Path(self.tmp) / ".domestique" / "profiles.json").read_text()
+            (Path(self.tmp) / ".shepherd" / "profiles.json").read_text()
         )
         p = [x for x in reg["profiles"] if x["id"] == "default"][0]
         self.assertEqual(p["name"], "Martijn H.")
@@ -579,7 +579,7 @@ class TestRebuildRegistryFromDirs(unittest.TestCase):
 
     def test_rebuild_from_dirs_corrupt(self):
         """Corrupt profiles.json triggers rebuild from directory scan."""
-        reg_path = Path(self.tmp) / ".domestique" / "profiles.json"
+        reg_path = Path(self.tmp) / ".shepherd" / "profiles.json"
         reg_path.write_text("{invalid json", encoding="utf-8")
 
         pm = _fresh_manager(self.tmp)
@@ -591,7 +591,7 @@ class TestRebuildRegistryFromDirs(unittest.TestCase):
 
     def test_rebuild_from_dirs_missing(self):
         """Missing profiles.json triggers rebuild from directory scan."""
-        reg_path = Path(self.tmp) / ".domestique" / "profiles.json"
+        reg_path = Path(self.tmp) / ".shepherd" / "profiles.json"
         reg_path.unlink()
 
         pm = _fresh_manager(self.tmp)
@@ -658,7 +658,7 @@ class TestMigrationFreshInstall(unittest.TestCase):
         # guard skip creating `default` on a fresh install → no active profile →
         # FTP 200 / 70kg defaults + saves evaporating (the Windows "profile resets
         # every launch" bug). Leaving the file absent lets migrate create default.
-        reg_path = Path(self.tmp) / ".domestique" / "profiles.json"
+        reg_path = Path(self.tmp) / ".shepherd" / "profiles.json"
         self.assertFalse(reg_path.exists())
 
         # After explicitly creating a profile, has_any_profile() becomes True
@@ -687,7 +687,7 @@ class TestMigrationExistingData(unittest.TestCase):
 
     def test_migration_existing_data(self):
         """Simulate the migration function from the plan."""
-        base = Path(self.tmp) / ".domestique"
+        base = Path(self.tmp) / ".shepherd"
         registry = base / "profiles.json"
         # Registry does not exist yet (pre-migration)
         self.assertFalse(registry.exists())
@@ -796,7 +796,7 @@ class TestConfigGetattrAfterSwitch(unittest.TestCase):
         _bootstrap_default_profile(_make_base(self.tmp))
         self.pm = _fresh_manager(self.tmp)
         slug = self.pm.create_profile("Partner")
-        partner_dir = Path(self.tmp) / ".domestique" / "profiles" / slug
+        partner_dir = Path(self.tmp) / ".shepherd" / "profiles" / slug
         athlete = {
             "ftp": 180, "weight_kg": 60.0, "lbm_kg": 48.0,
             "lthr": 165, "max_hr": 185,
@@ -879,7 +879,7 @@ class TestCorruptAthleteJson(unittest.TestCase):
     def test_corrupt_athlete_json(self):
         # Corrupt the athlete.json
         athlete_path = (
-            Path(self.tmp) / ".domestique" / "profiles" / "default" / "athlete.json"
+            Path(self.tmp) / ".shepherd" / "profiles" / "default" / "athlete.json"
         )
         athlete_path.write_text("{not valid json!!!", encoding="utf-8")
 
@@ -934,8 +934,8 @@ class TestConcurrentSwitchBlocked(unittest.TestCase):
         # Create two alternate profiles to switch between
         self.pm.create_profile("ProfileA")
         self.pm.create_profile("ProfileB")
-        partner_dir_a = Path(self.tmp) / ".domestique" / "profiles" / "profilea"
-        partner_dir_b = Path(self.tmp) / ".domestique" / "profiles" / "profileb"
+        partner_dir_a = Path(self.tmp) / ".shepherd" / "profiles" / "profilea"
+        partner_dir_b = Path(self.tmp) / ".shepherd" / "profiles" / "profileb"
         for d in [partner_dir_a, partner_dir_b]:
             (d / "athlete.json").write_text(json.dumps({
                 "ftp": 200, "weight_kg": 70.0, "lbm_kg": 56.0,

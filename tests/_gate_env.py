@@ -3,11 +3,11 @@
 Import this BEFORE training_planner. It makes a planner run a function of its
 inputs and nothing else:
 
-  * DOMESTIQUE_HOME points at a fresh empty directory, so no run reads the
+  * SHEPHERD_HOME points at a fresh empty directory, so no run reads the
     athlete's data. The old golden held only on one machine: match_zwo seeds
     from the ICU athlete id, which came from the real profile's .env
     (notes/review/gates.md GATE-2).
-  * DOMESTIQUE_NO_NET=1.
+  * SHEPHERD_NO_NET=1.
   * "today" is frozen inside the planner and moved explicitly with at(). The
     old golden changed on the next calendar day with no code change -- 16
     cases, every one of them an end-to-end generate.
@@ -31,8 +31,8 @@ import sys
 import tempfile
 
 HERE = pathlib.Path(__file__).resolve().parent
-os.environ["DOMESTIQUE_HOME"] = tempfile.mkdtemp(prefix="domestique-gate-")
-os.environ["DOMESTIQUE_NO_NET"] = "1"
+os.environ["SHEPHERD_HOME"] = tempfile.mkdtemp(prefix="shepherd-gate-")
+os.environ["SHEPHERD_NO_NET"] = "1"
 sys.path.insert(0, str(HERE.parent / "src"))
 
 import config  # noqa: E402

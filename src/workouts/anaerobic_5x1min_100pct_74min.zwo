@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>VO2 Ladder 74min — 80→200% × 3</name>
     <description>Warmup: 10min ramp from 50% to 75% FTP | Intervals: 5 x (30s @ 130% / 2min @ 55%) | Cooldown: 5min from 60% to 25% FTP</description>
     <sportType>bike</sportType>

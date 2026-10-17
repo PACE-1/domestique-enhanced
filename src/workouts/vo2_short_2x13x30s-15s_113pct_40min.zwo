@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Rønnestad 30/15 VO2max — 2x13 @ 113% (40 min)</name>
     <description>2 series of 13 x (30s @ 113% FTP / 15s easy), 3 min easy between series. The 15 s recoveries are deliberately too short for oxygen uptake to fall back, so it ratchets up over the first few reps and stays near maximum for the rest of the series — which is the point. Time spent near VO2max is what drives the adaptation, and short on/off reps buy more of it than long intervals at the same average power. The percentage is a STARTING POINT, not the protocol: the source studies prescribed no percentage at all — ride the highest power you can repeat in the LAST series and adjust between series. RPE 16-18. A session you fade through trains fading. Warmup: 10min from 45% to 78% FTP | Microintervals: 2 x 13 x (30s @ 113% / 15s @ 56%) | Cooldown: 8min from 56% to 45% FTP</description>
     <sportType>bike</sportType>

@@ -2,7 +2,7 @@
 ADDS workouts to it (it used to replace it, and then lacked every workout
 shipped later: "no cp_test workout in library", tester report on 3.13.0).
 
-A folder that is itself a Domestique built-in library (the setup wizard
+A folder that is itself a Shepherd built-in library (the setup wizard
 saved the install's own path, so many profiles point at an old install) is
 never an extra folder.
 """
@@ -59,7 +59,7 @@ def test_only_the_running_built_in_library_is_refused_as_extra(tmp_path):
 def _library_copy(root: Path) -> Path:
     """A copy of an older install's library (its manifest lists its files),
     with one workout the rider added and one old name the library retired."""
-    old = root / "Domestique-3.12.2" / "_internal" / "workouts"
+    old = root / "Shepherd-3.12.2" / "_internal" / "workouts"
     old.mkdir(parents=True)
     (old / "endurance_steady_68pct_120min.zwo").write_text(MINE, encoding="utf-8")
     (old / "z2_old_name_60min.zwo").write_text(MINE, encoding="utf-8")

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Threshold Ladder 62min — 2×4min/30s @ 75%</name>
     <description>Warmup: 6min @ 55% FTP | Over-Under: 3 cycles (alternating above/below threshold) | Cooldown: 10min @ 45% FTP</description>
     <sportType>bike</sportType>

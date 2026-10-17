@@ -132,7 +132,7 @@ class CalendarBase(unittest.TestCase):
         self._patch_fit.start()
 
         # v4.4.0 §1 — also redirect ride_storage's ICU + FIT dirs so the
-        # test process doesn't see the developer's cached ~/.domestique
+        # test process doesn't see the developer's cached ~/.shepherd
         # entries via load_all_rides().
         import ride_storage as _rs
         self._icu_dir = Path(self._tmpdir.name) / "icu"

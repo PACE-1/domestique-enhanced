@@ -84,7 +84,7 @@ def test_preset_typical_bands_present():
         assert set(tp.PRESET_TYPICAL_BANDS[k]) == set(tp.BAND_ORDER)
 
 
-# ── end-to-end generate (sandboxed plan dir — never touches real ~/.domestique) ─
+# ── end-to-end generate (sandboxed plan dir — never touches real ~/.shepherd) ─
 
 @pytest.fixture
 def sandbox_plan_dir(monkeypatch):

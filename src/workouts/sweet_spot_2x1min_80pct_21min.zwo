@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Mixed (21min)</name>
     <description>Steady: 3min @ 60% FTP | Steady: 1min @ 70% FTP | Steady: 1min @ 80% FTP | Steady: 1min @ 90% FTP | Steady: 1min @ 60% FTP | Steady: 1min @ 70% FTP | Steady: 1min @ 80% FTP | Steady: 1min @ 90% FTP | Cooldown: 9min from 50% to 55% FTP</description>
     <sportType>bike</sportType>

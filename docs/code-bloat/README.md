@@ -97,11 +97,11 @@ Reasons and source locations for every row are in [baseline.json](baseline.json)
 ## Verification / reproduction
 
 ```sh
-python3 tools/arch/astmap.py src > /tmp/domestique-ast.json
-python3 tools/arch/report.py /tmp/domestique-ast.json src/templates/dashboard.html
-python3 tools/arch/endpoints.py /tmp/domestique-ast.json src/templates src/static
-python3 tools/arch/endpoints_control.py /tmp/domestique-ast.json
-python3 scripts/architecture_report.py --json > /tmp/domestique-architecture.json
+python3 tools/arch/astmap.py src > /tmp/shepherd-ast.json
+python3 tools/arch/report.py /tmp/shepherd-ast.json src/templates/dashboard.html
+python3 tools/arch/endpoints.py /tmp/shepherd-ast.json src/templates src/static
+python3 tools/arch/endpoints_control.py /tmp/shepherd-ast.json
+python3 scripts/architecture_report.py --json > /tmp/shepherd-architecture.json
 ```
 
 These read-only tools do not import the app. Candidate review uses `rg` across source, tests, packaging, scripts, templates and historical notes, followed by AST call/import inspection. Keep before/after scope identical. Raw reports belong in review artifacts rather than new runtime subsystems.

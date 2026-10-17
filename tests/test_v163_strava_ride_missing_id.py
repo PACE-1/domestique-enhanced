@@ -60,7 +60,7 @@ def test_list_rides_skips_ride_without_timestamps(tmp_path, monkeypatch, caplog)
     })
 
     import logging
-    with caplog.at_level(logging.WARNING, logger="domestique.rides"):
+    with caplog.at_level(logging.WARNING, logger="shepherd.rides"):
         rides = ride_storage.list_rides()
 
     ids = [r["id"] for r in rides]
@@ -83,7 +83,7 @@ def test_list_rides_no_keyerror_in_warn_log(tmp_path, monkeypatch, caplog):
     })
 
     import logging
-    with caplog.at_level(logging.WARNING, logger="domestique.rides"):
+    with caplog.at_level(logging.WARNING, logger="shepherd.rides"):
         ride_storage.list_rides()
 
     for rec in caplog.records:

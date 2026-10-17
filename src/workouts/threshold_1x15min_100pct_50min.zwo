@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Endurance Steady (50min)</name>
     <description>Warmup: 6min from 40% to 75% FTP | Steady: 37min @ 75% FTP | Cooldown: 7min from 60% to 25% FTP</description>
     <sportType>bike</sportType>

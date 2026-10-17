@@ -19,7 +19,7 @@ Locked invariants:
   G10  — per-ride `weight_kg` + `ftp_at_ride` drive each point's W/kg + %FTP.
          P&G overlay uses CURRENT profile FTP + weight.
   G2   — atomic writes (tempfile + rename) for backfilled JSONs.
-  G3   — single-flight lock at ~/.domestique/cache/.backfill.lock.
+  G3   — single-flight lock at ~/.shepherd/cache/.backfill.lock.
   G7   — `compute_ride_prs` returns the FULL list; UI does the cap.
   G15  — backfill idempotency uses `set(e.secs) ⊇ STANDARD_DURATIONS`,
          not just file-presence.
@@ -38,10 +38,10 @@ import time
 import uuid
 from datetime import date, timedelta
 from pathlib import Path
-from user_home import domestique_home
+from user_home import shepherd_home
 from typing import Optional
 
-log = logging.getLogger("domestique.power_curve")
+log = logging.getLogger("shepherd.power_curve")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -72,7 +72,7 @@ _PG_2011_W_PER_KG: dict[int, float] = {
 
 
 def _profile_dir() -> Path:
-    return domestique_home() / "cache"
+    return shepherd_home() / "cache"
 
 
 def _backfill_lock_path() -> Path:
@@ -84,7 +84,7 @@ def _backfill_lock_path() -> Path:
 def _icu_rides_dir() -> Path:
     """v3.0.0 AC2a: delegates to ride_storage._icu_rides_dir — the ONE
     resolver for the (now per-profile) ICU archive. This module previously
-    duplicated the global ``~/.domestique/rides/icu`` path; post-migration
+    duplicated the global ``~/.shepherd/rides/icu`` path; post-migration
     that dir is empty and reading it here would blank every power curve.
     Kept as a module-level function so tests can still monkey-patch
     ``power_curve._icu_rides_dir`` independently. Raises RuntimeError when
@@ -800,7 +800,7 @@ def backfill_icu_history(profile_id: "str | None" = None,
                           sync_snapshot=None) -> dict:
     """One-shot detail+streams pull for cached-list rides missing efforts.
 
-    For each ride file in ``~/.domestique/rides/icu/`` that fails the G15
+    For each ride file in ``~/.shepherd/rides/icu/`` that fails the G15
     coverage check, fetches /activity/<id>/streams from ICU, derives
     efforts at every STANDARD_DURATIONS tier, and persists the augmented
     envelope back to disk via atomic write (G2).
@@ -814,7 +814,7 @@ def backfill_icu_history(profile_id: "str | None" = None,
     directory is live by then. None = legacy ungated behaviour (CLI/tests
     outside the profile system).
 
-    Single-flight lock at ``~/.domestique/cache/.backfill.lock`` (G3); a
+    Single-flight lock at ``~/.shepherd/cache/.backfill.lock`` (G3); a
     second concurrent call returns ``{"status": "already_running",
     "task_id": <existing>}``.
 

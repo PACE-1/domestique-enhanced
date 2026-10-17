@@ -3,7 +3,7 @@
 Unit-level coverage of db._refresh_hr_from_activities(): the activities
 table is an in-memory SQLite stub, ProfileManager is stubbed (pattern:
 tests/test_hr_mode_api.py _StubPM) — tests never touch the real
-athlete.json or ~/.domestique DB.
+athlete.json or ~/.shepherd DB.
 """
 import json
 import logging

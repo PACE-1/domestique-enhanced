@@ -10,7 +10,7 @@ WT=${1:?worktree}; LABEL=${2:?label}; BASE=${3:-}
 cd "$WT" || exit 2
 TEST_PYTHON=${GATE_PYTHON:-$PWD/.venv/bin/python}
 [[ -x "$TEST_PYTHON" ]] || { echo "Missing test interpreter: $TEST_PYTHON" >&2; exit 2; }
-S=${GATE_OUT:-/tmp/domestique-gate}
+S=${GATE_OUT:-/tmp/shepherd-gate}
 mkdir -p "$S" || exit 2
 OUT=$S/$LABEL
 if [[ -n "$BASE" && ! -f "$S/$BASE.real.txt" ]]; then

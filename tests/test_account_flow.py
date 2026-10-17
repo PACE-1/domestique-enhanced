@@ -13,7 +13,7 @@ Covers the locked contract items owned by app.py + templates:
       3-tuple db.sync_write_gate checks)
 
 Every filesystem-touching test runs against a stubbed HOME (fresh
-ProfileManager singleton under tmp_path) — the real ~/.domestique is never
+ProfileManager singleton under tmp_path) — the real ~/.shepherd is never
 read or written.
 """
 from __future__ import annotations
@@ -69,7 +69,7 @@ def stub(tmp_path):
     old_tp_workout_dir = _tp.WORKOUT_DIR
 
     ProfileManager._instance = None
-    app_module.DATA_DIR = home / ".domestique"
+    app_module.DATA_DIR = home / ".shepherd"
     app_module._icu_oauth_states.clear()
 
     pm = ProfileManager.get()
@@ -112,12 +112,12 @@ def _active_profile(stub, name="Solo"):
 
 
 def _athlete_on_disk(stub, pid):
-    p = stub.home / ".domestique" / "profiles" / pid / "athlete.json"
+    p = stub.home / ".shepherd" / "profiles" / pid / "athlete.json"
     return json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
 
 
 def _env_on_disk(stub, pid):
-    p = stub.home / ".domestique" / "profiles" / pid / ".env"
+    p = stub.home / ".shepherd" / "profiles" / pid / ".env"
     out = {}
     if p.exists():
         for line in p.read_text(encoding="utf-8").splitlines():
@@ -209,7 +209,7 @@ class TestFirstRun:
         # AC6a adjacency: no active profile → 409, never a profiles-root write.
         r = stub.client.post("/api/setup/save", json={"ftp": 250})
         assert r.status_code == 409
-        assert not (stub.home / ".domestique" / "profiles" / "athlete.json").exists()
+        assert not (stub.home / ".shepherd" / "profiles" / "athlete.json").exists()
 
 
 class TestWizardWithNoProfile:
@@ -302,7 +302,7 @@ class TestSetupSaveAtomicity:
         # AC4b validate-all-then-write: an lthr>=max_hr 400 must leave NO
         # partial state — no creds, no athlete change, no prefs, no marker.
         pid = _active_profile(stub)
-        prof_dir = stub.home / ".domestique" / "profiles" / pid
+        prof_dir = stub.home / ".shepherd" / "profiles" / pid
         before_athlete = (prof_dir / "athlete.json").read_text(encoding="utf-8")
         before_env = (prof_dir / ".env").read_text(encoding="utf-8") \
             if (prof_dir / ".env").exists() else None
@@ -331,7 +331,7 @@ class TestSetupSaveAtomicity:
         # athlete data, no provenance, no FTP-test ledger rows — just the
         # completion marker.
         pid = _active_profile(stub)
-        prof_dir = stub.home / ".domestique" / "profiles" / pid
+        prof_dir = stub.home / ".shepherd" / "profiles" / pid
         before = (prof_dir / "athlete.json").read_text(encoding="utf-8")
         r = stub.client.post("/api/setup/save", json={})
         assert r.status_code == 200, r.text
@@ -496,7 +496,7 @@ class TestOauthBinding:
                                 follow_redirects=False)
         assert "reason=profile_gone" in r.headers["location"]
         assert _env_on_disk(stub, a).get("ICU_ACCESS_TOKEN", "") == ""
-        assert not (stub.home / ".domestique" / "profiles" / "ghost").exists()
+        assert not (stub.home / ".shepherd" / "profiles" / "ghost").exists()
 
 
 # ---------------------------------------------------------------------------
@@ -519,7 +519,7 @@ def _seed_synced_data(stub, pid):
 
 def _counts(stub, pid):
     import sqlite3
-    p = stub.home / ".domestique" / "profiles" / pid / "health_tracker.db"
+    p = stub.home / ".shepherd" / "profiles" / pid / "health_tracker.db"
     c = sqlite3.connect(str(p))
     try:
         return tuple(c.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0]

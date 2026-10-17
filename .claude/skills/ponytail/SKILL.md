@@ -92,7 +92,7 @@ change touches, the actual flow — before picking a rung. Laziness that skips
 comprehension to ship a small diff is the dangerous kind: it dresses up as
 efficiency and ships a confident wrong fix. Read fully, then be lazy.
 
-## Domestique-specific notes
+## Shepherd-specific notes
 
 - The trainer subsystem is gone (v4.0.0-alpha): rung 1 (YAGNI) applies hard to
   anything that smells like hardware/FTMS/ERG — don't build it.

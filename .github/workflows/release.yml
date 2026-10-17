@@ -26,13 +26,13 @@ jobs:
   # CI builds the DMG without the Apple notarization secrets
   # (.notarize.env / Developer ID Application cert in keychain), so
   # build_dmg.sh falls back to ad-hoc signing. That produces a
-  # Domestique.dmg that Gatekeeper rejects with "Domestique is damaged"
-  # the moment a user downloads it. Worse, the bare-name Domestique.dmg
+  # Shepherd.dmg that Gatekeeper rejects with "Shepherd is damaged"
+  # the moment a user downloads it. Worse, the bare-name Shepherd.dmg
   # asset that CI uploaded sorted ahead of the manually-notarized
-  # Domestique-v$VER.dmg in _select_platform_asset, so the update banner
+  # Shepherd-v$VER.dmg in _select_platform_asset, so the update banner
   # served Mac users the broken one.
   #
-  # macOS ships are produced manually via the [[domestique-release]] skill
+  # macOS ships are produced manually via the [[shepherd-release]] skill
   # (build_dmg.sh + .notarize.env + xcrun notarytool + stapler). Re-enable
   # this job only after the Apple secrets are wired into GitHub Actions
   # (APPLE_ID, APPLE_TEAM_ID, APPLE_APP_PASSWORD, APPLE_P12_BASE64) and
@@ -40,7 +40,7 @@ jobs:
   # ───────────────────────────────────────────────────────────────────
   build-macos:
     name: Build macOS DMG
-    if: false  # ← disabled; manual notarized ship via domestique-release skill
+    if: false  # ← disabled; manual notarized ship via shepherd-release skill
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -73,11 +73,11 @@ jobs:
       #   APPLE_ID, APPLE_TEAM_ID, APPLE_APP_PASSWORD
       # Without signing, end users must right-click → Open to bypass Gatekeeper.
       # Sketch for later:
-      #   codesign --deep --options runtime --sign "$APPLE_DEV_ID" dist/Domestique.app
-      #   xcrun notarytool submit dist_dmg/Domestique.dmg \
+      #   codesign --deep --options runtime --sign "$APPLE_DEV_ID" dist/Shepherd.app
+      #   xcrun notarytool submit dist_dmg/Shepherd.dmg \
       #     --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" \
       #     --password "$APPLE_APP_PASSWORD" --wait
-      #   xcrun stapler staple dist_dmg/Domestique.dmg
+      #   xcrun stapler staple dist_dmg/Shepherd.dmg
 
       - name: Build DMG
         run: |
@@ -87,8 +87,8 @@ jobs:
           mkdir -p "$DESTDIR"
           ./packaging/build_dmg.sh || { cat /tmp/dmg_build.log 2>/dev/null || true; exit 1; }
           # Fallback: some build_dmg.sh variants hardcode ~/Desktop
-          if [ ! -f "$DESTDIR/Domestique.dmg" ] && [ -f "$HOME/Desktop/Domestique.dmg" ]; then
-            cp "$HOME/Desktop/Domestique.dmg" "$DESTDIR/Domestique.dmg"
+          if [ ! -f "$DESTDIR/Shepherd.dmg" ] && [ -f "$HOME/Desktop/Shepherd.dmg" ]; then
+            cp "$HOME/Desktop/Shepherd.dmg" "$DESTDIR/Shepherd.dmg"
           fi
           ls -la "$DESTDIR"
 
@@ -96,15 +96,15 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
-          name: Domestique-macOS-DMG
-          path: dist_dmg/Domestique.dmg
+          name: Shepherd-macOS-DMG
+          path: dist_dmg/Shepherd.dmg
           retention-days: 7
 
       - name: Attach DMG to release
         if: startsWith(github.ref, 'refs/tags/v') || inputs.tag != ''
         uses: softprops/action-gh-release@v2
         with:
-          files: dist_dmg/Domestique.dmg
+          files: dist_dmg/Shepherd.dmg
           fail_on_unmatched_files: true
           tag_name: ${{ inputs.tag || github.ref_name }}
 
@@ -270,8 +270,8 @@ jobs:
           set -eu
           VERSION="$(tr -d '[:space:]' < VERSION)"
           # Frozen literal. The version token is deliberate: the bare-name
-          # Domestique.dmg once out-sorted the good asset in the update picker.
-          NAME="Domestique-v${VERSION}-x86_64.AppImage"
+          # Shepherd.dmg once out-sorted the good asset in the update picker.
+          NAME="Shepherd-v${VERSION}-x86_64.AppImage"
           FOUND="$(find . -maxdepth 3 -type f -name "$NAME" -print -quit)"
           if [ -z "$FOUND" ]; then
             echo "::error::build_linux.sh produced no $NAME"
@@ -318,9 +318,9 @@ jobs:
               echo "--- $f ---"; cat "$f" 2>/dev/null || echo "(none)"
             done
             echo "--- startup_crash.txt ---"
-            cat "$HOME/.domestique/startup_crash.txt" 2>/dev/null || echo "(none)"
+            cat "$HOME/.shepherd/startup_crash.txt" 2>/dev/null || echo "(none)"
             echo "--- launcher logs ---"
-            for f in "$HOME"/.domestique/logs/*.log; do
+            for f in "$HOME"/.shepherd/logs/*.log; do
               [ -f "$f" ] || continue
               echo "=== $f ==="; cat "$f"
             done
@@ -363,11 +363,11 @@ jobs:
           #    browser tab would satisfy every HTTP check below it.
           WID=""
           for _ in $(seq 20); do
-            WID="$(xdotool search --onlyvisible --name 'Domestique' 2>/dev/null | head -1)"
+            WID="$(xdotool search --onlyvisible --name 'Shepherd' 2>/dev/null | head -1)"
             [ -n "$WID" ] && break
             sleep 3
           done
-          [ -n "$WID" ] || fail "no mapped window named 'Domestique' — the native window did not open"
+          [ -n "$WID" ] || fail "no mapped window named 'Shepherd' — the native window did not open"
           xwininfo -id "$WID" > wininfo.txt 2>&1 || fail "xwininfo could not read window $WID"
           cat wininfo.txt
           grep -q 'Map State: IsViewable' wininfo.txt || fail "window $WID exists but is not viewable"
@@ -436,10 +436,10 @@ jobs:
           # The grep above is a belt: on Linux the fatal path diverts before
           # either string is emitted, so it can never fire. The braces are
           # the crash file the fatal path DOES write, and the exit code.
-          if [ -f "$HOME/.domestique/startup_crash.txt" ]; then
-            echo "FAIL: startup_crash.txt written — the GUI backend died"; cat "$HOME/.domestique/startup_crash.txt"; exit 1
+          if [ -f "$HOME/.shepherd/startup_crash.txt" ]; then
+            echo "FAIL: startup_crash.txt written — the GUI backend died"; cat "$HOME/.shepherd/startup_crash.txt"; exit 1
           fi
-               gui.log "$HOME/.domestique/logs" 2>/dev/null; then
+               gui.log "$HOME/.shepherd/logs" 2>/dev/null; then
             fail "the AppImage fell back to a browser — a native window is a hard requirement"
           fi
 
@@ -453,7 +453,7 @@ jobs:
 
           echo "Smoke-test passed: version $served, mapped window $WID, screenshot sd=$SD"
           kill "$B_PID" 2>/dev/null || true
-          pkill -9 -f 'Domestique' 2>/dev/null || true
+          pkill -9 -f 'Shepherd' 2>/dev/null || true
           kill "$XVFB_PID" 2>/dev/null || true
 
       # CI cannot prove the window RENDERS correctly — a human still has to
@@ -462,7 +462,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Domestique-Linux-smoke-screenshot
+          name: Shepherd-Linux-smoke-screenshot
           path: screenshot.png
           retention-days: 7
           if-no-files-found: warn
@@ -472,7 +472,7 @@ jobs:
         if: env.APPIMAGE != ''
         uses: actions/upload-artifact@v4
         with:
-          name: Domestique-Linux-AppImage
+          name: Shepherd-Linux-AppImage
           path: dist_linux/
           retention-days: 7
 
@@ -508,7 +508,7 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: Domestique-Linux-AppImage
+          name: Shepherd-Linux-AppImage
           path: appimage
 
       - name: Run the AppImage on a stock debian:12-slim
@@ -521,7 +521,7 @@ jobs:
           fi
           echo "Declared host dependencies (packages):"; cat appimage/host-deps-debian.txt
           echo "Declared host dependencies (sonames):";  cat appimage/host-deps.txt
-          chmod +x "appimage/Domestique-v${VERSION}-x86_64.AppImage"
+          chmod +x "appimage/Shepherd-v${VERSION}-x86_64.AppImage"
           # --shm-size=1g because a real desktop has a real /dev/shm and
           # Chromium needs one. Docker's 64 MB default would only be papered
           # over with --disable-dev-shm-usage, which no user runs.
@@ -548,7 +548,7 @@ jobs:
                   || echo "::warning::debian:12 has no package named $pkg (jammy-derived name)"
               done < /ai/host-deps-debian.txt
 
-              cp /ai/Domestique-*.AppImage /tmp/app.AppImage
+              cp /ai/Shepherd-*.AppImage /tmp/app.AppImage
               chmod +x /tmp/app.AppImage
               cd /tmp && ./app.AppImage --appimage-extract > /dev/null
 
@@ -618,7 +618,7 @@ jobs:
               done
               if [ -z "$served" ]; then
                 echo "::error::AppImage never served /api/version on a stock debian:12-slim"
-                cat /tmp/run.log; cat ~/.domestique/startup_crash.txt 2>/dev/null || true
+                cat /tmp/run.log; cat ~/.shepherd/startup_crash.txt 2>/dev/null || true
                 exit 1
               fi
               kill -0 "$pid" 2>/dev/null || { echo "::error::AppImage exited on a stock debian:12-slim"; cat /tmp/run.log; exit 1; }
@@ -627,12 +627,12 @@ jobs:
                 *"\"version\":\"$EXPECTED\""*) echo "OK: served version $EXPECTED" ;;
                 *) echo "::error::version mismatch on the clean container: $served"; exit 1 ;;
               esac
-              if grep -REn "_fallback_to_browser|opening in browser" /tmp/run.log ~/.domestique/logs 2>/dev/null; then
+              if grep -REn "_fallback_to_browser|opening in browser" /tmp/run.log ~/.shepherd/logs 2>/dev/null; then
               # The grep above is a belt: on Linux the fatal path diverts before
               # either string is emitted, so it can never fire. The braces are
               # the crash file the fatal path DOES write, and the exit code.
-              if [ -f "$HOME/.domestique/startup_crash.txt" ]; then
-                echo "FAIL: startup_crash.txt written — the GUI backend died"; cat "$HOME/.domestique/startup_crash.txt"; exit 1
+              if [ -f "$HOME/.shepherd/startup_crash.txt" ]; then
+                echo "FAIL: startup_crash.txt written — the GUI backend died"; cat "$HOME/.shepherd/startup_crash.txt"; exit 1
               fi
                 echo "::error::the AppImage fell back to a browser on a stock distro"
                 exit 1

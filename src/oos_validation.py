@@ -45,7 +45,7 @@ import numpy as np  # type: ignore[import-untyped]
 import db
 import tau_fitting
 
-_log = logging.getLogger("domestique.oos_validation")
+_log = logging.getLogger("shepherd.oos_validation")
 
 
 # Hellard 2006 / Banister-impulse-response literature: 5-8 % MAE on FTP-equiv
@@ -130,7 +130,7 @@ def _collect_holdout_markers(
 
     For v1.2.0 we anchor against the **eFTP** series in `athlete_metrics`
     because that's the universally-available high-frequency signal in
-    Domestique's data store. A per-component (CP / 5-min / 1-min) anchor
+    Shepherd's data store. A per-component (CP / 5-min / 1-min) anchor
     requires power-curve data which v1.2.0 does not yet pull.
     """
     markers: list[dict[str, Any]] = []

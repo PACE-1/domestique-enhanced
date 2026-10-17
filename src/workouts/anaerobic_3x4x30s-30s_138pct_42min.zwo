@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Anaerobic 30s/30s 3x4 (42min)</name>
     <description>Warmup: 7min ramp from 45% to 75% FTP, 3 x 30s fast-pedal drill @ 82%, primer 1min @ 88% + 1min @ 102% | Supramaximal microintervals: 3 sets x 4 x (30s @ 138% / 30s @ 50%), 4min 30s between sets | Cooldown: 5min from 50% to 45% FTP</description>
     <sportType>bike</sportType>

@@ -128,7 +128,7 @@ export function toggleRest(s: WizardState, day: string): WizardState {
   }
 }
 
-export const LS_KEY = "domestique_setup"
+export const LS_KEY = "shepherd_setup"
 export function serialize(s: WizardState) {
   return { ...s.values, days: s.days, rest: s.rest, touched: s.touched, icuOrigin: s.icuOrigin,
     daysTouched: s.daysTouched, restTouched: s.restTouched, targetMode: s.targetMode,

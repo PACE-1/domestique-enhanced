@@ -8,7 +8,7 @@ Reviewer: owner-lens (1 of 5). Code: `ca6091f9` in the scratch worktree
 ## 0. How this was measured (and why you can trust the instruments)
 
 Every number below comes from running code in a sandbox: HOME points at a
-temp dir, `DOMESTIQUE_NO_NET=1`, the live-metrics and ride-archive fetches are
+temp dir, `SHEPHERD_NO_NET=1`, the live-metrics and ride-archive fetches are
 stubbed (`review/tools/boot.py`), and the run asserts that `tp.PLAN_DIR` is
 inside the sandbox. Production was never touched. The worktree has two
 instrumentation edits: `_USE_TRAINING_WEEK` reads `REVIEW_OWNER`
@@ -295,7 +295,7 @@ both modes.
 - `plan_invariants._ceiling` reads the planner's stamped `net_tss_target`, so OWN-1 grades clean. It checks overshoot only (no under-delivery), and `empty_week` needs a ceiling of at least 50.
 - Hardness is judged by label in the auditor (OWN-3).
 - **The refit column of the parity probe is vacuous.** Rerun in the sandbox, it gave `refit actions: {'no_change': 40}` with the flag off *and* on, because the plans are generated "today" and contain no missed hard session. "No violations in any entry point" includes an entry point that never ran its logic.
-- The probes pass no `recent_weekly_tss`. Run as documented (outside pytest, so without conftest's HOME sandbox), `generate_plan` (`training_planner.py:8306-8311`) and `regenerate_from_today` (`12988-12995`) call `ride_storage.recent_mean_weekly_tss()`. That reads the **active profile's** ride archive (`ride_storage.py:95-106`, `ProfileManager.get().active_dir`, under `domestique_home()`, which defaults to `~/.domestique`), and `_rides_dir()` calls `mkdir(parents=True)` there. If no profile is active, it raises, the error is swallowed, and the plan falls back to CTL×7. So the handover's numbers depend on which machine and profile ran them. In the sandbox, legacy `weekly_volume` came out 2/7/2/2/2 against the documented baseline of 1/7/1/1/1.
+- The probes pass no `recent_weekly_tss`. Run as documented (outside pytest, so without conftest's HOME sandbox), `generate_plan` (`training_planner.py:8306-8311`) and `regenerate_from_today` (`12988-12995`) call `ride_storage.recent_mean_weekly_tss()`. That reads the **active profile's** ride archive (`ride_storage.py:95-106`, `ProfileManager.get().active_dir`, under `shepherd_home()`, which defaults to `~/.shepherd`), and `_rides_dir()` calls `mkdir(parents=True)` there. If no profile is active, it raises, the error is swallowed, and the plan falls back to CTL×7. So the handover's numbers depend on which machine and profile ran them. In the sandbox, legacy `weekly_volume` came out 2/7/2/2/2 against the documented baseline of 1/7/1/1/1.
 
 ### OWN-13 · low (domain, both modes) · Delivered load against each week's own target
 

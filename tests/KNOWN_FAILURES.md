@@ -76,7 +76,7 @@ ln -sfn <the shared venv> ~/Documents/domestique-main/.venv
 
 1. `tests/characterize_planner.py` — 57 planner fingerprints, must be unchanged
 2. the test files covering whatever the commit touched
-3. `import app` under a temp `DOMESTIQUE_HOME`, asserting the re-exports that
+3. `import app` under a temp `SHEPHERD_HOME`, asserting the re-exports that
    the suite reaches through `app.X`
 
 The full suite runs before the branch is handed back, and is diffed against

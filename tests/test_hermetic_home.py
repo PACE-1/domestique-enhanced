@@ -1,15 +1,15 @@
 """3.4.3 — hermetic-fs gate: the suite must NEVER write the user's real home.
 
 Owner incident (2026-07-16): a release-gate run replaced the owner's live
-~/.domestique/profiles/<name>/plans/current_plan.json with a fixture plan
+~/.shepherd/profiles/<name>/plans/current_plan.json with a fixture plan
 (goal.event_name == "v134-test", from test_v134_generate_plan_no_yellow's
 TestClient POST to /api/plan/generate). Every app data path resolves through
-Path.home()/.domestique at import time, and profile_manager rebinds
+Path.home()/.shepherd at import time, and profile_manager rebinds
 training_planner.PLAN_DIR to the ACTIVE PROFILE's plan dir — so any
 unsandboxed test that generates/updates a plan stomped the real store.
 
 conftest.py now swaps HOME to a per-process sandbox BEFORE any project
-import (keeping the real path in DOMESTIQUE_REAL_HOME for read-only
+import (keeping the real path in SHEPHERD_REAL_HOME for read-only
 validations). These tests pin that contract.
 """
 import json
@@ -25,21 +25,21 @@ import training_planner as tp
 
 
 def test_home_is_sandboxed():
-    real = os.environ.get("DOMESTIQUE_REAL_HOME")
-    assert real, "conftest must record the real home in DOMESTIQUE_REAL_HOME"
+    real = os.environ.get("SHEPHERD_REAL_HOME")
+    assert real, "conftest must record the real home in SHEPHERD_REAL_HOME"
     assert str(Path.home()) != real, "HOME must be swapped to a sandbox"
     assert "domestique-test-home-" in str(Path.home()), (
         f"HOME does not look like the conftest sandbox: {Path.home()}")
 
 
 def test_app_data_paths_resolve_inside_sandbox():
-    real = os.environ.get("DOMESTIQUE_REAL_HOME") or ""
+    real = os.environ.get("SHEPHERD_REAL_HOME") or ""
     sandbox = str(Path.home())
     # The two import-time roots every plan write funnels through.
     plan_dir = str(app_module._plan_dir())
     assert plan_dir.startswith(sandbox), (
         f"app._plan_dir() escapes the sandbox: {plan_dir}")
-    assert not plan_dir.startswith(str(Path(real) / ".domestique")), (
+    assert not plan_dir.startswith(str(Path(real) / ".shepherd")), (
         f"app._plan_dir() points at the REAL home: {plan_dir}")
     tp_dir = str(tp.PLAN_DIR)
     assert tp_dir.startswith(sandbox), (
@@ -72,9 +72,9 @@ def test_generate_endpoint_writes_only_the_sandbox():
 
 
 @pytest.mark.skipif(
-    not os.environ.get("DOMESTIQUE_REAL_HOME"), reason="no real home recorded")
+    not os.environ.get("SHEPHERD_REAL_HOME"), reason="no real home recorded")
 def test_real_home_helper_points_outside_sandbox():
-    real = Path(os.environ["DOMESTIQUE_REAL_HOME"])
+    real = Path(os.environ["SHEPHERD_REAL_HOME"])
     assert str(Path.home()) != str(real)
     # Never a sandbox artifact: the recorded real home must not be a tmp dir
     # minted by this gate.
@@ -96,11 +96,11 @@ def test_inherited_data_root_and_credentials_cannot_escape_sandbox(tmp_path, mod
 import json, os
 from pathlib import Path
 import app, db, config, training_planner
-from user_home import domestique_home
+from user_home import shepherd_home
 
-root = domestique_home()
+root = shepherd_home()
 assert root.is_relative_to(Path.home())
-assert os.environ["DOMESTIQUE_NO_NET"] == "1"
+assert os.environ["SHEPHERD_NO_NET"] == "1"
 assert not config.ICU_API_KEY
 assert not config.ICU_ACCESS_TOKEN
 assert not config.ICU_OAUTH_CLIENT_SECRET
@@ -118,10 +118,10 @@ def test_startup_and_write():
     (app._plan_dir() / "probe.json").write_text("{}")
 ''')
     env = os.environ.copy()
-    env.update(DOMESTIQUE_HOME=str(external), ICU_API_KEY="external-key",
+    env.update(SHEPHERD_HOME=str(external), ICU_API_KEY="external-key",
                ICU_ACCESS_TOKEN="external-token", ICU_OAUTH_CLIENT_SECRET="external-secret",
                SANDBOX_REPORT=str(report), PYTEST_ADDOPTS="")
-    env.pop("DOMESTIQUE_NO_NET", None)
+    env.pop("SHEPHERD_NO_NET", None)
     # Block real transports even before pytest's network fixtures run.
     runner = '''
 import socket, sys, pytest

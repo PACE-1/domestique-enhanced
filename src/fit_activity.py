@@ -1,9 +1,9 @@
-"""Build a FIT activity file from a saved Domestique ride.
+"""Build a FIT activity file from a saved Shepherd ride.
 
 Produces a `.fit` blob for download / third-party upload. The shape
 follows the standard ACTIVITY file layout:
 
-    FileIdMessage  (type=ACTIVITY, manufacturer=DEVELOPMENT, product_name="Domestique")
+    FileIdMessage  (type=ACTIVITY, manufacturer=DEVELOPMENT, product_name="Shepherd")
     RecordMessage  × N   (per-second power / hr / cadence / speed / distance)
     SessionMessage       (cycling, sub_sport=virtual_activity, trainer=true)
     ActivityMessage
@@ -13,7 +13,7 @@ Note on attribution
 We use `manufacturer=DEVELOPMENT(255)` and `product=0` — third-party
 uploaders (TrainingPeaks, Intervals.icu, etc.) accept these without
 a registered device ID, so the file is useful for analysis even
-though no platform renders a "via Domestique" source label.
+though no platform renders a "via Shepherd" source label.
 """
 
 from __future__ import annotations
@@ -25,7 +25,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
 
-log = logging.getLogger("domestique.fit_activity")
+log = logging.getLogger("shepherd.fit_activity")
 
 
 # v1.0.7 IMPL-HRV-PROMPT — friendly-name lookup for FIT FileIdMessage.garmin_product
@@ -270,7 +270,7 @@ _FIT_SPORT_NAMES = {0: "generic", 1: "running", 2: "cycling", 5: "swimming",
 def read_session_sport(fit_path: Path) -> "str | None":
     """K1 — read the SOURCE FIT's session sport (lowercase name) so DFA α1 can
     gate by activity type. Reads the original file's ``SessionMessage.sport``, NOT
-    Domestique's own CYCLING export stamp. Returns None when unreadable."""
+    Shepherd's own CYCLING export stamp. Returns None when unreadable."""
     try:
         from fit_tool.fit_file import FitFile
     except Exception:
@@ -475,7 +475,7 @@ def build_activity_fit(ride: dict, profile_id: str) -> bytes:
     # Defensive product_name hint — some viewers surface this string
     # in their activity details even when manufacturer is DEVELOPMENT.
     try:
-        file_id.product_name = "Domestique"
+        file_id.product_name = "Shepherd"
     except Exception as e:
         log.debug("FIT field write failed (file_id.product_name): %s", e)
     builder.add(file_id)

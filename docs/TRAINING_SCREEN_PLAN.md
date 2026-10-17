@@ -1,4 +1,4 @@
-> **Obsolete** (written 2026-05-04). This plans a live trainer screen with Bluetooth trainer control. The trainer subsystem was removed in v4.0.0-alpha: Domestique is a planner, workout library and post-ride viewer. Kept for the research it records; do not implement from it.
+> **Obsolete** (written 2026-05-04). This plans a live trainer screen with Bluetooth trainer control. The trainer subsystem was removed in v4.0.0-alpha: Shepherd is a planner, workout library and post-ride viewer. Kept for the research it records; do not implement from it.
 
 # Live Training Screen + Native App Window
 

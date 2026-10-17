@@ -35,7 +35,7 @@ async def _get_json_body(request) -> dict:
 
 
 def _diag_local_only(request: Request) -> bool:
-    """True iff the request is from localhost. Domestique listens only on
+    """True iff the request is from localhost. Shepherd listens only on
     127.0.0.1, so any non-local client is suspicious. Returns True when
     ``request.client`` is None or the host is the FastAPI TestClient
     sentinel, so tests pass without special-casing.

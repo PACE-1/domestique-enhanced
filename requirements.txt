@@ -1,4 +1,4 @@
-# Domestique desktop profile (all supported platforms).
+# Shepherd desktop profile (all supported platforms).
 # For a headless server use requirements-server.txt instead.
 -r requirements-server.txt
 

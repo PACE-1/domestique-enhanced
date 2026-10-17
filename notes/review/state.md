@@ -1,12 +1,12 @@
 > **Historical document** (last changed 2026-09-10). It records what was found or planned then; the code has moved on. Check the current source before treating anything here as a live defect or instruction. Index: [docs/README.md](../../docs/README.md).
 
-# Domestique — runtime state, concurrency and persistence (lens STA)
+# Shepherd — runtime state, concurrency and persistence (lens STA)
 
 Code: `ca6091f9` (scratch worktree `rev-state`). Every finding below was measured
-in a sandbox. `review/sbx.py` points HOME and DOMESTIQUE_HOME at a fresh temp dir,
+in a sandbox. `review/sbx.py` points HOME and SHEPHERD_HOME at a fresh temp dir,
 blocks the network, runs the first-boot sequence, and then **asserts** that
 `tp.PLAN_DIR`, `paths._plan_dir()`, `paths.DATA_DIR`, `db.DB_PATH`, `pm.plan_dir`
-and `pm.active_dir` resolve inside that dir and outside `~/.domestique`. The
+and `pm.active_dir` resolve inside that dir and outside `~/.shepherd`. The
 repros are `review/r1…r7*.py`, with raw output in `review/r*.out`. To re-run one:
 
 ```
@@ -23,7 +23,7 @@ Nothing in production was touched. The only change to the worktree is
 | one process | the systemd unit runs `launcher.py --server-only`, which reaches `start_server()` (launcher.py:963) and builds `uvicorn.Config(app, host, port, log_level)` with no `workers` (launcher.py:440-444). `uvicorn.Config(...).workers` was printed as **1**. |
 | the single-worker assert is not what enforces that | app.py:20944-20960 sits under `if __name__ == "__main__"` and never runs in production |
 | one process is **not** one thread | 115 `def` handlers run in the AnyIO threadpool (`total_tokens` printed as **40**). 33 `async def` handlers run on the event-loop thread. app.py has **no** `run_in_threadpool` / `to_thread`, and none of the four middlewares (app.py:818-885) serialises requests. |
-| so what overlaps | any async plan handler (generate, reforecast, rematch, dismiss, swap…) with any sync handler (GET auto-recalc, GET today-session, POST rides/sync, GET calendar…) and with the daemon threads: lazy ICU sync `domestique.icu_sync` → `_maybe_auto_reforecast`, db `sync`, the ICU push `Timer`, DFA backfill. Observed thread names in the repros: `asyncio-portal-…` (async) and `AnyIO worker thread` (sync). |
+| so what overlaps | any async plan handler (generate, reforecast, rematch, dismiss, swap…) with any sync handler (GET auto-recalc, GET today-session, POST rides/sync, GET calendar…) and with the daemon threads: lazy ICU sync `shepherd.icu_sync` → `_maybe_auto_reforecast`, db `sync`, the ICU push `Timer`, DFA backfill. Observed thread names in the repros: `asyncio-portal-…` (async) and `AnyIO worker thread` (sync). |
 | automation (read from bin/) | 04:45 `cs-domestique-adapt` sends `POST /api/sync`. In **apply** mode it then sends `GET /api/plan/auto-recalc` (writes), `POST /api/plan/reforecast` and `POST /api/plan/auto-adjust`; in **observe** mode (current `stack.conf`) only `auto-adjust dry_run:true`. It finishes with `POST /api/icu/push`. `cs-repair-strava-husks` (every 30 min, 06:00–23:30, only when a husk is present) sends `POST /api/sync` and `POST /api/rides/sync?force=1`, and the latter writes the plan through `_maybe_auto_reforecast`. `cs-healthcheck` only reads. |
 | the UI races itself | On every Plan-tab open, dashboard.html:15511 fires `POST /api/rides/sync` **without awaiting it**, then awaits `POST /api/plan/rematch?apply=1` at :15522. Both write the plan. |
 

@@ -1,7 +1,7 @@
-"""An intervals.icu sync does not erase what only Domestique knows.
+"""An intervals.icu sync does not erase what only Shepherd knows.
 
 `activities` holds two kinds of column: what intervals.icu sent (name, sport,
-duration, TSS, power) and what Domestique decided locally. `is_race` is the
+duration, TSS, power) and what Shepherd decided locally. `is_race` is the
 second kind -- the rider marks a ride as a race, and the tau fitting and the
 race-week logic read that flag afterwards.
 

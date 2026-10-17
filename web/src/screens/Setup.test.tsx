@@ -85,7 +85,7 @@ describe("Setup wizard", () => {
     const writes = calls.filter((c) => c.method === "POST").map((c) => c.url)
     expect(writes).toEqual(["/api/setup/ensure-profile", "/api/setup/save"])
     expect(calls.find((c) => c.url === "/api/setup/save")?.body).toEqual({ ftp: 265 })
-    expect(localStorage.getItem("domestique_setup")).toBeNull()
+    expect(localStorage.getItem("shepherd_setup")).toBeNull()
   })
 
   it("blocks Next on an out-of-range value", async () => {
@@ -101,7 +101,7 @@ describe("Setup wizard", () => {
 
   it("restores a rider's earlier entries from localStorage", async () => {
     mockApi()
-    localStorage.setItem("domestique_setup", JSON.stringify({ "s-ftp": "301", touched: ["s-ftp"] }))
+    localStorage.setItem("shepherd_setup", JSON.stringify({ "s-ftp": "301", touched: ["s-ftp"] }))
     render(<Setup />)
     await userEvent.click(await screen.findByRole("button", { name: "Continue without intervals.icu" }))
     await waitFor(() =>

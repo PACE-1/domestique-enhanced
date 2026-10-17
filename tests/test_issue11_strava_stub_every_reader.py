@@ -152,7 +152,7 @@ def test_sqlite_mirror_leaves_out_strava_stubs(tmp_path, monkeypatch):
     result = db_mod.run_sync(days=1)
     assert result["status"] == "ok", result
 
-    db_file = tmp_path / ".domestique" / "profiles" / "alice" / "health_tracker.db"
+    db_file = tmp_path / ".shepherd" / "profiles" / "alice" / "health_tracker.db"
     assert _activity_rows(db_file) == [("i2", "Endurance")]
 
 

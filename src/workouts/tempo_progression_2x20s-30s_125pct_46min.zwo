@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Tempo (46min)</name>
     <description>Warmup: 8min ramp from 50% to 75% FTP | Steady: 40s @ 105% FTP | Steady: 30s @ 50% FTP | Steady: 30s @ 115% FTP | Steady: 30s @ 50% FTP | Steady: 20s @ 125% FTP | Steady: 30s @ 50% FTP | Steady: 15s @ 135% FTP | Steady: 30s @ 50% FTP | Steady: 20s @ 125% FTP | Steady: 30s @ 50% FTP | Steady: 30s @ 115% FTP | Steady: 30s @ 50% FTP | Steady: 40s @ 105% FTP | Steady: 30s @ 50% FTP | Steady: 10min @ 77% FTP | Steady: 1min 30s @ 50% FTP | Steady: 10min @ 77% FTP | Steady: 1min 30s @ 50% FTP | Steady: 5min @ 85% FTP | Cooldown: 3min from 60% to 25% FTP</description>
     <sportType>bike</sportType>

@@ -12,8 +12,8 @@ treated as claims (section 3).
 
 **How it was measured**
 
-- *Hermetic env* (all mutation runs): `DOMESTIQUE_HOME=<empty dir>`,
-  `DOMESTIQUE_NO_NET=1`, `PYTHONHASHSEED=0`, `PYTHONDONTWRITEBYTECODE=1`.
+- *Hermetic env* (all mutation runs): `SHEPHERD_HOME=<empty dir>`,
+  `SHEPHERD_NO_NET=1`, `PYTHONHASHSEED=0`, `PYTHONDONTWRITEBYTECODE=1`.
 - Baselines were recorded in that same env, and each mutant was compared
   against them. The comparison is not against `tests/characterization.json`;
   why is in GATE-2.
@@ -25,7 +25,7 @@ treated as claims (section 3).
   conftest's per-process HOME sandbox and network block apply. Each mutant run
   is compared against the **same files, flag mode, environment and worker
   count at clean HEAD** (`gates-work/subset_baselines.py`).
-- *A first pytest phase was discarded.* It passed `DOMESTIQUE_HOME`, which
+- *A first pytest phase was discarded.* It passed `SHEPHERD_HOME`, which
   made every run share one data directory (GATE-8). Its outputs are kept as
   `mut_pytest_*.polluted.jsonl`.
 - *Unaffected by that*: every characterization, parity and prototype result.
@@ -39,7 +39,7 @@ treated as claims (section 3).
   `gates-work/verifier/`. It confirmed those findings and corrected six
   statements, which are now fixed: the R6 date claim, T05's flag-on count,
   GATE-3's scope, R4.4, the athlete-id share (6 of 16), and two line numbers.
-  The one row it could not re-check, by rule, is "copy of `~/.domestique`: 0
+  The one row it could not re-check, by rule, is "copy of `~/.shepherd`: 0
   changed", which needs a copy of the owner's credentials. That result rests on
   this review's `chain1.out` run alone.
 
@@ -88,14 +88,14 @@ the check. That check would pass if all three were deleted. The notes' baseline
 - `training_planner.py:5337-5356`: `match_zwo`'s RNG seed is
   `anchor_date:profile_id:week:day:type:salt`, where `profile_id` falls back to
   `config.ICU_ATHLETE_ID`. That value is loaded from
-  `~/.domestique/profiles/default/.env`. The verifier set two different ids
+  `~/.shepherd/profiles/default/.env`. The verifier set two different ids
   and 6 of the 16 `generate/*` cases moved, so the dependence is partial but
   real.
 
 **Evidence** (`gates-work/../chain1.out`, `chain2.out`, `why_net.py`):
 ```
-empty DOMESTIQUE_HOME                    2 changed (generate/every-day/3h/{fresh,midweek})
-copy of ~/.domestique                    73 cases, all unchanged
+empty SHEPHERD_HOME                    2 changed (generate/every-day/3h/{fresh,midweek})
+copy of ~/.shepherd                    73 cases, all unchanged
 copy minus profiles/default/.env only    DIFF
 copy, network blocked (audit hook)       MATCH, 0 socket attempts
 today = 2026-09-11                       16 changed   (every generate/* case)
@@ -275,9 +275,9 @@ property each one actually protects is listed in section 4. **STRUCTURAL**
     workouts directory is shared by all xdist workers. One worker's teardown can
     delete a file another worker's test just generated. That is latent while
     `_GENERATE_WHEN_LIBRARY_MISSES = False`, and no test enables it.
-- **`DOMESTIQUE_HOME` defeats conftest's sandbox.** Conftest swaps only
-  `HOME` (`tests/conftest.py:59-78`), and `domestique_home()` prefers
-  `DOMESTIQUE_HOME` (`src/user_home.py:23-28`). Run the suite with that
+- **`SHEPHERD_HOME` defeats conftest's sandbox.** Conftest swaps only
+  `HOME` (`tests/conftest.py:59-78`), and `shepherd_home()` prefers
+  `SHEPHERD_HOME` (`src/user_home.py:23-28`). Run the suite with that
   variable set and every pytest process writes into the directory it names.
   - This review did exactly that by accident in its first pytest phase.
   - Each worker shared one directory: 390 files, 53 profiles, and
@@ -286,7 +286,7 @@ property each one actually protects is listed in section 4. **STRUCTURAL**
     athlete's profile registry.
   - `tests/test_hermetic_home.py` caught it: it failed in 12 of 12 runs that
     included it, which is that test doing its job.
-  - Fix: conftest should unset or override `DOMESTIQUE_HOME` as well as `HOME`.
+  - Fix: conftest should unset or override `SHEPHERD_HOME` as well as `HOME`.
 - **Library ordering is deterministic.** `sorted(glob)` is used, and the
   "content_classification cache stale" warning (the worktree checkout changes
   mtimes) warns but still uses the cache.
@@ -473,7 +473,7 @@ The seven that survive everything are informative in themselves:
 | # | claim (where) | verdict | evidence |
 |---|---|---|---|
 | C1 | "every date here is absolute rather than relative to today, so a run in six months compares equal to a run now" (`tests/characterize_planner.py:22-24`) | **DID NOT HOLD** | The same code with `date.today()` frozen, compared against the golden: 09-10 all 73 unchanged; **09-11: 16 changed**; 09-17: 8 changed; 10-12: 16 changed. The 16 are every `generate/*` case. `generate_plan` anchors on `date.today()` (`training_planner.py:8341`, `generate_phases`) and the cases pass no date. (`gates-work/../chain2.out`) |
-| C2 | "73 cases, all passing" (`notes/planner-cleanup-plan.md` table) | **HELD only on the owner's machine, on 2026-09-10** | Empty data home: 2 changed (`generate/every-day/3h/{fresh,midweek}`). Copy of `~/.domestique`: 0 changed. The same copy with only `profiles/default/.env` removed: changed. Why: `match_zwo` seeds from `config.ICU_ATHLETE_ID` (`training_planner.py:5337-5356`); two different ids move 6 of the 16 `generate/*` cases (verifier). With the network blocked by an audit hook, the owner copy still matched, with 0 socket attempts, so this is the credential value, not a live call. |
+| C2 | "73 cases, all passing" (`notes/planner-cleanup-plan.md` table) | **HELD only on the owner's machine, on 2026-09-10** | Empty data home: 2 changed (`generate/every-day/3h/{fresh,midweek}`). Copy of `~/.shepherd`: 0 changed. The same copy with only `profiles/default/.env` removed: changed. Why: `match_zwo` seeds from `config.ICU_ATHLETE_ID` (`training_planner.py:5337-5356`); two different ids move 6 of the 16 `generate/*` cases (verifier). With the network blocked by an audit hook, the owner copy still matched, with 0 socket attempts, so this is the credential value, not a live call. |
 | C3 | "The planner is deterministic for a fixed seed_salt (verified)" (`characterize_planner.py:22`) / "43 of 57 differing -> 0 of 57" (`REFACTOR-PLAN.md`) | **HELD** across processes; **not** across machines | `probe_plan_reproducibility.py --runs 3` (no hash pin): "0 of 73 cases differ". Across profiles it fails, per C2. |
 | C4 | "mutating `TSS_PER_HOUR["z2"]` 45->46 is caught, restoring it goes clean" (`REFACTOR-PLAN.md`) | **HELD** | Mutation T02: characterization 53/73 changed; the revert was verified clean by the harness. |
 | C5 | "Each of generate / regenerate / recalculate / extend / refit ... This probe asks whether that difference is visible in the output" (`tests/probe_entry_point_parity.py:3-8`) | **DID NOT HOLD** | recalculate, extend and refit outputs are byte-identical to generate's for **40/40 riders**, with the flag off and on (GATE-1). |
@@ -508,8 +508,8 @@ In `characterize_planner.py`:
 - Pin the `match_zwo` seed input: set `config.ICU_ATHLETE_ID` to a constant, or
   stamp `session.profile_id`.
 - Pass `recent_weekly_tss` explicitly, so the ride archive is never read.
-- In the re-exec, set `DOMESTIQUE_HOME` to an empty temp dir and
-  `DOMESTIQUE_NO_NET=1`.
+- In the re-exec, set `SHEPHERD_HOME` to an empty temp dir and
+  `SHEPHERD_NO_NET=1`.
 - Date the `midweek` rides inside the plan's opening week. Today they fall in
   week 2, and from next month before the plan starts (GATE-2).
 

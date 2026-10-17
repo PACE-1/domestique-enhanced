@@ -32,7 +32,7 @@ from profile_manager import ProfileManager          # noqa: E402
 
 @pytest.fixture()
 def pm(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOMESTIQUE_HOME", str(tmp_path))
+    monkeypatch.setenv("SHEPHERD_HOME", str(tmp_path))
     old = ProfileManager._instance
     ProfileManager._instance = None
     manager = ProfileManager.get()

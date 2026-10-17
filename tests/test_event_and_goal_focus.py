@@ -1,4 +1,4 @@
-"""Domestique v2.0.0 — event-demand + goal-focus planner acceptance tests.
+"""Shepherd v2.0.0 — event-demand + goal-focus planner acceptance tests.
 
 Covers the v1.11.0/v2.0.0 IMPL-EVENT + IMPL-GOAL-FOCUS surface in
 ``training_planner.py``:

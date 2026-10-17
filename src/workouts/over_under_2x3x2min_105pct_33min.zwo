@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Over-Unders 6x2min (33min)</name>
     <description>Warmup: 5min ramp from 40% to 105% FTP + 2min @ 50% | Main: 2 sets of 3 x (2min over @ 105% / 1min under @ 90-91%), 3min @ 51% between sets — classic over-under lactate shuttling | Cooldown: 5min ramp from 60% to 40% FTP</description>
     <sportType>bike</sportType>
