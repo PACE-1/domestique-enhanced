@@ -36,6 +36,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/plan/dismiss-session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_plan_dismiss_session_api_plan_dismiss_session_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/profile/dfa-backfill": {
         parameters: {
             query?: never;
@@ -859,6 +875,18 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** SessionDismissed */
+        SessionDismissed: {
+            /** Dismissed */
+            dismissed: boolean;
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
+        } & {
+            [key: string]: unknown;
+        };
         /** SetupDefaults */
         SetupDefaults: {
             /** Ftp */
@@ -949,6 +977,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PlanRead"];
+                };
+            };
+        };
+    };
+    api_plan_dismiss_session_api_plan_dismiss_session_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionDismissed"];
                 };
             };
         };

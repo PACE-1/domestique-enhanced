@@ -1,8 +1,12 @@
-import type { PlanJson, PlanRead, PlanSession, PlanWeek, ProgrammeSummary, RiderStats } from "@/api/types"
+import type { PlanJson, PlanRead, PlanSession, PlanWeek, ProgrammeSummary, RiderStats, SessionDismissed } from "@/api/types"
 import { api } from "@/lib/api"
 
 export const getPlan = () => api<PlanRead>("/api/plan")
 export const getSummary = () => api<ProgrammeSummary>("/api/programme/summary")
+/** Dismiss (or restore) the session on a day. The server applies it to every session on that date. */
+export const dismissSession = (date: string, undo = false) =>
+  api<SessionDismissed>("/api/plan/dismiss-session", { method: "POST", json: { date, undo } })
+
 export const getStats = () => api<RiderStats>("/api/rider-stats")
 
 /** Local calendar day as YYYY-MM-DD (the plan stores local dates). */

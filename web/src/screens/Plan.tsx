@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react"
 import type { PlanRead, PlanWeek } from "@/api/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { currentWeek, fmtMinutes, getPlan, isoDay, plannedTss, weekSessions } from "@/lib/home"
+import { currentWeek, dismissSession, fmtMinutes, getPlan, isoDay, plannedTss, weekSessions } from "@/lib/home"
 
 type Load = { state: "loading" } | { state: "ok"; plan: PlanRead } | { state: "error"; message: string }
 
@@ -23,6 +23,8 @@ const dayLabel = (iso: string) =>
 export function Plan() {
   const [load, setLoad] = useState<Load>({ state: "loading" })
   const [index, setIndex] = useState<number | null>(null)
+  const [busy, setBusy] = useState<string | null>(null)
+  const [actionError, setActionError] = useState("")
   const today = isoDay()
 
   const run = useCallback(() => {
@@ -33,6 +35,21 @@ export function Plan() {
     )
   }, [])
   useEffect(run, [run])
+
+  // Dismiss or restore the day's session, then re-read the plan in place (no loading flash).
+  const toggleDismissed = async (day: string, undo: boolean) => {
+    setBusy(day)
+    setActionError("")
+    try {
+      await dismissSession(day, undo)
+      const plan = await getPlan()
+      setLoad({ state: "ok", plan })
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : String(e))
+    } finally {
+      setBusy(null)
+    }
+  }
 
   if (load.state === "loading") return <p className="text-sm text-muted-foreground">Loading…</p>
   if (load.state === "error")
@@ -105,20 +122,38 @@ export function Plan() {
             <ul className="divide-y">
               {sessions.map((s, k) => {
                 const extra = statusLabel(s.status)
+                const dismissed = s.status === "dismissed"
+                const canToggle = !s.is_race && !s.status.startsWith("done")
                 return (
-                  <li key={k} className="flex flex-wrap justify-between gap-2 py-2 text-sm">
+                  <li key={k} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
                     <span className={s.day === today ? "font-medium" : ""} aria-current={s.day === today ? "date" : undefined}>
                       {dayLabel(s.day)} · {s.zwo_name || s.session_type}
                     </span>
                     <span className="text-muted-foreground">
                       {fmtMinutes(s.duration_min)} · {Math.round(s.tss_estimate)} TSS{extra ? ` · ${extra}` : ""}
                     </span>
+                    {canToggle && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        disabled={busy === s.day}
+                        aria-label={`${dismissed ? "Restore" : "Dismiss"} ${dayLabel(s.day)}`}
+                        onClick={() => toggleDismissed(s.day, dismissed)}
+                      >
+                        {dismissed ? "Restore" : "Dismiss"}
+                      </Button>
+                    )}
                   </li>
                 )
               })}
             </ul>
           )}
-          <p className="text-xs text-muted-foreground">Editing sessions still happens in the current dashboard.</p>
+          {actionError && (
+            <p role="alert" className="text-sm">
+              Couldn’t change that session: {actionError}
+            </p>
+          )}
+          <p className="text-xs text-muted-foreground">Moving, swapping and regenerating still happen in the current dashboard.</p>
         </CardContent>
       </Card>
     </div>

@@ -68,4 +68,38 @@ describe("Plan", () => {
     await userEvent.click(screen.getByRole("button", { name: "Retry" }))
     await waitFor(() => expect(screen.getByText(/Week 2/)).toBeTruthy())
   })
+
+  it("dismisses a session, re-reads the plan, and can restore it", async () => {
+    const posts: unknown[] = []
+    let dismissed = false
+    vi.stubGlobal("fetch", vi.fn(async (url: string, init?: RequestInit) => {
+      if (url === "/api/plan/dismiss-session") {
+        const body = JSON.parse(String(init?.body))
+        posts.push(body)
+        dismissed = !body.undo
+        return new Response(JSON.stringify({ ok: true, dismissed }))
+      }
+      const copy = JSON.parse(JSON.stringify(PLAN))
+      if (dismissed) copy.plan_json.weeks[1].sessions[0].status = "dismissed"
+      return new Response(JSON.stringify(copy))
+    }))
+    render(<Plan />)
+    const day = PLAN.plan_json.weeks[1].sessions[0].day
+    await userEvent.click(await screen.findByRole("button", { name: /^Dismiss / }))
+    expect(await screen.findByRole("button", { name: /^Restore / })).toBeTruthy()
+    expect(posts[0]).toEqual({ date: day, undo: false })
+    await userEvent.click(screen.getByRole("button", { name: /^Restore / }))
+    await screen.findByRole("button", { name: /^Dismiss / })
+    expect(posts[1]).toEqual({ date: day, undo: true })
+  })
+
+  it("shows the server's message when a change fails", async () => {
+    vi.stubGlobal("fetch", vi.fn(async (url: string) =>
+      url === "/api/plan/dismiss-session"
+        ? new Response(JSON.stringify({ error: "race day is fixed" }), { status: 400 })
+        : new Response(JSON.stringify(PLAN))))
+    render(<Plan />)
+    await userEvent.click(await screen.findByRole("button", { name: /^Dismiss / }))
+    expect((await screen.findByRole("alert")).textContent).toContain("race day is fixed")
+  })
 })

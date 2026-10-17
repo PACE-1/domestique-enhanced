@@ -101,3 +101,11 @@ test("Plan lists the generated weeks and steps through them", async ({ page }) =
   await next.click()
   await expect(page.getByRole("heading", { name: /^Week \d+/ })).toBeVisible()
 })
+
+test("a session can be dismissed and restored from the Plan", async ({ page }) => {
+  await page.goto("#/plan")
+  await page.getByRole("button", { name: /^Dismiss / }).first().click()
+  await expect(page.getByText(/· dismissed/).first()).toBeVisible()
+  await page.getByRole("button", { name: /^Restore / }).first().click()
+  await expect(page.getByText(/· dismissed/)).toHaveCount(0)
+})
