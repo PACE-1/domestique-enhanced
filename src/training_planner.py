@@ -9317,6 +9317,9 @@ def generate_plan(
     _enforce_slot_file_coherence(weeks, library,
                                  plan_start_date=plan_start_date,
                                  seed_salt=seed_salt, micro_only=_micro)
+    # Last: the coherence pass re-serves files, so the intensity rail is
+    # checked on what the rider will actually receive.
+    _enforce_z5plus_share_ceiling(weeks, library)
 
     return phases, weeks
 
@@ -10066,6 +10069,25 @@ def _ensure_fresh_legs_before_ftp_tests(weeks: list) -> None:
             "the whole cycle.")
 
 
+def _demote_slot_to_easy(slot, new_type: str, library: list, why: str) -> "PlannedSession | None":
+    """Match a REAL endurance/tempo library file for ``slot``. Returns the
+    matched session only if its content is genuinely non-HIT (a tempo match can
+    fall back to a sweet_spot file, which still counts as HIT) - else None so
+    the caller can try a safer type or a clear empty marker."""
+    demoted = PlannedSession(
+        day=slot.day, day_name=slot.day_name,
+        session_type=new_type,
+        duration_min=slot.duration_min,
+        tss_estimate=round(slot.duration_min / 60
+                           * TSS_PER_HOUR.get(new_type, 45)),
+        description=f"{new_type} ({slot.duration_min}min) - {why}",
+    )
+    matched = match_zwo(demoted, library)
+    if matched.zwo_file and not _session_is_hit(matched):
+        return matched
+    return None
+
+
 def _enforce_weekly_hit_cap(weeks: list, library: list[dict]) -> None:
     """FIX-1b (safety) — FINAL guaranteed weekly HIT cap.
 
@@ -10087,23 +10109,8 @@ def _enforce_weekly_hit_cap(weeks: list, library: list[dict]) -> None:
         return
 
     def _demote_slot(slot, new_type: str) -> "PlannedSession | None":
-        """Match a REAL endurance/tempo library file for this slot. Returns the
-        matched session only if its content is genuinely non-HIT (a tempo match
-        can fall back to a sweet_spot file, which still counts as HIT) — else
-        None so the caller can try a safer type or a clear empty marker."""
-        demoted = PlannedSession(
-            day=slot.day, day_name=slot.day_name,
-            session_type=new_type,
-            duration_min=slot.duration_min,
-            tss_estimate=round(slot.duration_min / 60
-                               * TSS_PER_HOUR.get(new_type, 45)),
-            description=f"{new_type} ({slot.duration_min}min) — "
-                        f"weekly-HIT-cap demotion",
-        )
-        matched = match_zwo(demoted, library)
-        if matched.zwo_file and not _session_is_hit(matched):
-            return matched
-        return None
+        return _demote_slot_to_easy(slot, new_type, library,
+                                    "weekly-HIT-cap demotion")
 
     for wk in weeks:
         # v3.5.4 — a stepback/deload week must carry ZERO HIT (Issurin
@@ -10196,6 +10203,88 @@ def _enforce_weekly_hit_cap(weeks: list, library: list[dict]) -> None:
                     description="Easy endurance (no suitable workout)",
                     zwo_file="", zwo_name="", matched=False,
                 )
+
+
+# Absolute safety rail: a full week may carry at most this share of its minutes
+# above 106% FTP (z5+). tests/test_tid_plan_properties.py holds the same line.
+_MAX_Z5PLUS_SHARE = 0.18
+
+
+def _week_z5plus_share(wk, library_by_file: dict) -> tuple[float, list]:
+    """(share of the week's minutes at z5+, [(z5plus minutes, index)] per served
+    session). Same arithmetic as the property test: the library row's zone
+    percentages scaled by how much of the file the slot plays."""
+    total = 0.0
+    parts = []
+    for i, s in enumerate(wk.sessions):
+        row = library_by_file.get(getattr(s, "zwo_file", "") or "")
+        if not row:
+            continue
+        fd = float(row.get("Duration(min)", 0) or 0)
+        k = (float(s.duration_min or 0) / fd) if fd > 0 else 1.0
+        zm = _row_zone_minutes(row)
+        total += sum(zm.values()) * k
+        parts.append((zm["z5plus"] * k, i))
+    return ((sum(p for p, _ in parts) / total) if total > 0 else 0.0), parts
+
+
+def _enforce_z5plus_share_ceiling(weeks: list, library: list[dict],
+                                  today_floor: "date | None" = None) -> None:
+    """#11/#24 - no week may exceed ``_MAX_Z5PLUS_SHARE`` of its minutes at z5+.
+
+    The sampler and the floor passes serve what the library offers, so a short
+    week (a 6 h rider) could be handed a single vo2max file that alone was over
+    the line. For a week over it, the heaviest z5+ session is swapped for a real
+    endurance (or tempo) library file, the same demotion the weekly HIT cap uses
+    - a hard .zwo is never relabeled. Preserved rider state is never touched.
+    """
+    if not weeks or not library:
+        return
+    by_file = {r.get("File"): r for r in library}
+    for wk in weeks:
+        for _ in range(len(wk.sessions) + 1):
+            share, parts = _week_z5plus_share(wk, by_file)
+            if share <= _MAX_Z5PLUS_SHARE:
+                break
+            victims = [
+                (z5, i) for z5, i in parts
+                if z5 > 0
+                and _session_is_hit(wk.sessions[i])
+                and wk.sessions[i].session_type != "ftp_test"
+                and not getattr(wk.sessions[i], "is_opener", False)
+                and not _protect_race(wk.sessions[i])
+                and getattr(wk.sessions[i], "status", "pending") == "pending"
+                and not getattr(wk.sessions[i], "adapted", False)
+                and not getattr(wk.sessions[i], "user_moved", False)
+                and (today_floor is None or wk.sessions[i].day >= today_floor)
+            ]
+            # A class sitting exactly on its phase floor is not shed here: the
+            # floor is a training requirement and the safety pass runs after it.
+            floors = _PHASE_HARD_FLOORS.get(getattr(wk, "phase", "") or "", {})
+            counts: dict[str, int] = {}
+            for s_ in wk.sessions:
+                c_ = _content_class_for_zwo(s_.zwo_file or "") or s_.session_type or ""
+                counts[c_] = counts.get(c_, 0) + 1
+            victims = [
+                (z5, i) for z5, i in victims
+                if not (c_ := (_content_class_for_zwo(wk.sessions[i].zwo_file or "")
+                               or wk.sessions[i].session_type or "")) in floors
+                or counts.get(c_, 0) > floors[c_]
+            ]
+            if not victims:
+                break
+            _z5, i = max(victims)
+            slot = wk.sessions[i]
+            matched = None
+            if slot.duration_min >= 60:
+                matched = _demote_slot_to_easy(slot, "tempo", library,
+                                               "z5+ share ceiling")
+            if matched is None:
+                matched = _demote_slot_to_easy(slot, "z2", library,
+                                               "z5+ share ceiling")
+            if matched is None:
+                break      # nothing easy fits: leave the week as it is
+            wk.sessions[i] = matched
 
 
 # v2.1.0 (E1) — weekly volume-ceiling enforcement.
@@ -13840,6 +13929,7 @@ def regenerate_from_today(
         _future_weeks, library,
         plan_start_date=(phase_start_date if new_phases else today),
         seed_salt=seed_salt, micro_only=bool(getattr(goal, "vo2_microintervals_only", False)))
+    _enforce_z5plus_share_ceiling(_future_weeks, library)
     return new_phases, all_weeks, regen_info
 
 
@@ -14423,6 +14513,7 @@ def recalculate_plan(
         new_weeks, library,
         plan_start_date=(new_phases[0].start if new_phases else regen_start),
         seed_salt=seed_salt, micro_only=bool(getattr(goal, "vo2_microintervals_only", False)))
+    _enforce_z5plus_share_ceiling(new_weeks, library)
 
     recalc_info = {
         "action": "recalculated",
@@ -14766,6 +14857,7 @@ def extend_continuous_plan(
     # Slot/file coherence, ONCE, LAST (R4a parity — after the clamp).
     _enforce_slot_file_coherence(
         new_weeks, library, plan_start_date=append_start, seed_salt=seed_salt, micro_only=bool(getattr(goal, "vo2_microintervals_only", False)))
+    _enforce_z5plus_share_ceiling(new_weeks, library)
 
     all_weeks = list(current_plan_weeks) + new_weeks
 
@@ -15230,6 +15322,7 @@ def refit_remaining_week(
         plan_start_date=(current_plan_weeks[0].start if current_plan_weeks
                          else week.start),
         seed_salt=seed_salt, today_floor=today, micro_only=bool(getattr(goal, "vo2_microintervals_only", False)))
+    _enforce_z5plus_share_ceiling([week], library, today_floor=today)
     return current_plan_weeks, refit_info
 
 
