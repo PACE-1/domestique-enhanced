@@ -62,15 +62,3 @@ export function AppShell({ tab, children }: { tab: TabId; children: ReactNode })
     </ShellContext.Provider>
   )
 }
-
-export function NotMigrated({ label }: { label: string }) {
-  return (
-    <div className="rounded-xl border p-6 text-sm">
-      <p className="font-medium">{label} has not moved to the new interface yet.</p>
-      <p className="mt-1 text-muted-foreground">It still works in the current dashboard.</p>
-      <Button className="mt-3" variant="outline" render={<a href="/" />}>
-        Open current dashboard
-      </Button>
-    </div>
-  )
-}
