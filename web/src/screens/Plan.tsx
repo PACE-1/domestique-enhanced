@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react"
 import type { PlanRead, PlanWeek } from "@/api/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { currentWeek, dismissSession, fmtMinutes, getPlan, isoDay, moveSession, plannedTss, weekSessions } from "@/lib/home"
+import { currentWeek, dismissSession, fmtMinutes, getPlan, isoDay, moveSession, plannedTss, SWAP_TYPES, swapSessionType, weekSessions } from "@/lib/home"
 
 type Load = { state: "loading" } | { state: "ok"; plan: PlanRead } | { state: "error"; message: string }
 
@@ -26,6 +26,7 @@ export function Plan() {
   const [busy, setBusy] = useState<string | null>(null)
   const [actionError, setActionError] = useState("")
   const [moving, setMoving] = useState<{ day: string; to: string } | null>(null)
+  const [swapping, setSwapping] = useState<{ day: string; type: string; minutes: number } | null>(null)
   const today = isoDay()
 
   const run = useCallback(() => {
@@ -54,6 +55,9 @@ export function Plan() {
     }
   }
   const toggleDismissed = (day: string, undo: boolean) => change(day, () => dismissSession(day, undo))
+  const confirmSwap = async () => {
+    if (swapping && (await change(swapping.day, () => swapSessionType(swapping.day, swapping.type, swapping.minutes)))) setSwapping(null)
+  }
   const confirmMove = async () => {
     if (moving && (await change(moving.day, () => moveSession(moving.day, moving.to)))) setMoving(null)
   }
@@ -149,6 +153,47 @@ export function Plan() {
                         Move
                       </Button>
                     )}
+                    {canToggle && !dismissed && swapping?.day !== s.day && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        aria-label={`Change type ${dayLabel(s.day)}`}
+                        onClick={() => setSwapping({ day: s.day, type: s.session_type, minutes: s.duration_min })}
+                      >
+                        Change type
+                      </Button>
+                    )}
+                    {swapping?.day === s.day && (
+                      <span className="flex flex-wrap items-center gap-2">
+                        <select
+                          aria-label="New type"
+                          className="rounded-md border px-2 py-1 text-sm"
+                          value={swapping.type}
+                          onChange={(e) => setSwapping({ ...swapping, type: e.target.value })}
+                        >
+                          {SWAP_TYPES.map(([id, label]) => (
+                            <option key={id} value={id}>
+                              {label}
+                            </option>
+                          ))}
+                        </select>
+                        <input
+                          type="number"
+                          aria-label="Minutes"
+                          className="w-20 rounded-md border px-2 py-1 text-sm"
+                          min={30}
+                          max={300}
+                          value={swapping.minutes}
+                          onChange={(e) => setSwapping({ ...swapping, minutes: Number(e.target.value) })}
+                        />
+                        <Button size="sm" disabled={busy === s.day || swapping.minutes < 30} onClick={confirmSwap}>
+                          Apply
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => setSwapping(null)}>
+                          Cancel
+                        </Button>
+                      </span>
+                    )}
                     {moving?.day === s.day && (
                       <span className="flex items-center gap-2">
                         <input
@@ -188,7 +233,7 @@ export function Plan() {
               Couldn’t change that session: {actionError}
             </p>
           )}
-          <p className="text-xs text-muted-foreground">Swapping type and regenerating still happen in the current dashboard.</p>
+          <p className="text-xs text-muted-foreground">Regenerating the plan still happens in the current dashboard.</p>
         </CardContent>
       </Card>
     </div>

@@ -68,6 +68,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/plan/swap-type": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_plan_swap_type_api_plan_swap_type_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/profile/dfa-backfill": {
         parameters: {
             query?: never;
@@ -917,6 +933,42 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** SessionSwapped */
+        SessionSwapped: {
+            /** Day */
+            day: string;
+            /**
+             * Duration Min
+             * @default 0
+             */
+            duration_min: number;
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
+            /** Session Type */
+            session_type: string;
+            /** Sessions Modified */
+            sessions_modified?: number | null;
+            /**
+             * Tss Estimate
+             * @default 0
+             */
+            tss_estimate: number;
+            /**
+             * Zwo File
+             * @default
+             */
+            zwo_file: string;
+            /**
+             * Zwo Name
+             * @default
+             */
+            zwo_name: string;
+        } & {
+            [key: string]: unknown;
+        };
         /** SetupDefaults */
         SetupDefaults: {
             /** Ftp */
@@ -1047,6 +1099,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SessionMoved"];
+                };
+            };
+        };
+    };
+    api_plan_swap_type_api_plan_swap_type_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionSwapped"];
                 };
             };
         };

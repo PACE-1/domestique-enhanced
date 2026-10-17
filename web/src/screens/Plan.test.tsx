@@ -138,4 +138,37 @@ describe("Plan", () => {
     await userEvent.click(screen.getByRole("button", { name: "Cancel" }))
     expect(screen.queryByLabelText("Move to")).toBeNull()
   })
+
+  it("changes a session's type and length and re-reads the plan", async () => {
+    const posts: unknown[] = []
+    vi.stubGlobal("fetch", vi.fn(async (url: string, init?: RequestInit) => {
+      if (url === "/api/plan/swap-type") {
+        posts.push(JSON.parse(String(init?.body)))
+        return new Response(JSON.stringify({ ok: true, day: "", session_type: "vo2max", duration_min: 60, tss_estimate: 70 }))
+      }
+      return new Response(JSON.stringify(PLAN))
+    }))
+    render(<Plan />)
+    const day = PLAN.plan_json.weeks[1].sessions[0].day
+    await userEvent.click(await screen.findByRole("button", { name: /^Change type / }))
+    await userEvent.selectOptions(screen.getByLabelText("New type"), "vo2max")
+    const minutes = screen.getByLabelText("Minutes")
+    await userEvent.clear(minutes)
+    await userEvent.type(minutes, "60")
+    await userEvent.click(screen.getByRole("button", { name: "Apply" }))
+    await waitFor(() => expect(posts).toEqual([{ date: day, session_type: "vo2max", duration_min: 60 }]))
+    await waitFor(() => expect(screen.queryByLabelText("New type")).toBeNull())
+  })
+
+  it("keeps the type picker open and shows the server's message on failure", async () => {
+    vi.stubGlobal("fetch", vi.fn(async (url: string) =>
+      url === "/api/plan/swap-type"
+        ? new Response(JSON.stringify({ error: "Unknown session_type: x" }), { status: 400 })
+        : new Response(JSON.stringify(PLAN))))
+    render(<Plan />)
+    await userEvent.click(await screen.findByRole("button", { name: /^Change type / }))
+    await userEvent.click(screen.getByRole("button", { name: "Apply" }))
+    expect((await screen.findByRole("alert")).textContent).toContain("Unknown session_type")
+    expect(screen.getByLabelText("New type")).toBeTruthy()
+  })
 })

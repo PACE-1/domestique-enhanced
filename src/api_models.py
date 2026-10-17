@@ -280,3 +280,14 @@ class SessionMoved(_Model):
     moved: Optional[PlanSession] = None
     vacated: Optional[str] = None      # date the move left empty, if any
     swapped: Optional[PlanSession] = None   # the session now on the source date, on a swap
+
+
+class SessionSwapped(_Model):
+    ok: bool = True
+    day: str
+    session_type: str
+    duration_min: int = 0
+    tss_estimate: float = 0
+    zwo_file: str = ""
+    zwo_name: str = ""
+    sessions_modified: Optional[int] = None   # later sessions the reforecast rebalanced

@@ -109,3 +109,13 @@ test("a session can be dismissed and restored from the Plan", async ({ page }) =
   await page.getByRole("button", { name: /^Restore / }).first().click()
   await expect(page.getByText(/· dismissed/)).toHaveCount(0)
 })
+
+test("a session's type can be changed from the Plan", async ({ page }) => {
+  await page.goto("#/plan")
+  await page.getByRole("button", { name: /^Change type / }).first().click()
+  await page.getByLabel("New type").selectOption("tempo")
+  await page.getByLabel("Minutes").fill("60")
+  await page.getByRole("button", { name: "Apply" }).click()
+  await expect(page.getByLabel("New type")).toHaveCount(0)
+  await expect(page.getByRole("alert")).toHaveCount(0)
+})

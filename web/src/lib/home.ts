@@ -1,4 +1,4 @@
-import type { PlanJson, PlanRead, PlanSession, PlanWeek, ProgrammeSummary, RiderStats, SessionDismissed, SessionMoved } from "@/api/types"
+import type { PlanJson, PlanRead, PlanSession, PlanWeek, ProgrammeSummary, RiderStats, SessionDismissed, SessionMoved, SessionSwapped } from "@/api/types"
 import { api } from "@/lib/api"
 
 export const getPlan = () => api<PlanRead>("/api/plan")
@@ -10,6 +10,26 @@ export const dismissSession = (date: string, undo = false) =>
 /** Move the session on `date` to `newDate`. Onto a day with one session the two swap; a ridden or crowded day is refused. */
 export const moveSession = (date: string, newDate: string) =>
   api<SessionMoved>("/api/plan/move-session", { method: "POST", json: { date, new_date: newDate } })
+
+// The types the server accepts for a swap (_SWAP_TYPES in app.py).
+export const SWAP_TYPES = [
+  ["recovery", "Recovery"],
+  ["z2", "Endurance"],
+  ["tempo", "Tempo"],
+  ["sweetspot", "Sweet spot"],
+  ["threshold", "Threshold"],
+  ["overunder", "Over-under"],
+  ["vo2max", "VO2max"],
+  ["sprint", "Sprint"],
+  ["ftp_test", "FTP test"],
+] as const
+
+/** Change the day's session to another type and length; the server pins it and rebalances the rest. */
+export const swapSessionType = (date: string, sessionType: string, durationMin: number) =>
+  api<SessionSwapped>("/api/plan/swap-type", {
+    method: "POST",
+    json: { date, session_type: sessionType, duration_min: durationMin },
+  })
 
 export const getStats = () => api<RiderStats>("/api/rider-stats")
 

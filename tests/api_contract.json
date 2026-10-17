@@ -1546,6 +1546,61 @@
         "title": "SessionMoved",
         "type": "object"
       },
+      "SessionSwapped": {
+        "additionalProperties": true,
+        "properties": {
+          "day": {
+            "title": "Day",
+            "type": "string"
+          },
+          "duration_min": {
+            "default": 0,
+            "title": "Duration Min",
+            "type": "integer"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "session_type": {
+            "title": "Session Type",
+            "type": "string"
+          },
+          "sessions_modified": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sessions Modified"
+          },
+          "tss_estimate": {
+            "default": 0,
+            "title": "Tss Estimate",
+            "type": "number"
+          },
+          "zwo_file": {
+            "default": "",
+            "title": "Zwo File",
+            "type": "string"
+          },
+          "zwo_name": {
+            "default": "",
+            "title": "Zwo Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "day",
+          "session_type"
+        ],
+        "title": "SessionSwapped",
+        "type": "object"
+      },
       "SetupDefaults": {
         "additionalProperties": true,
         "properties": {
@@ -1753,6 +1808,23 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SessionMoved"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/plan/swap-type": {
+      "post": {
+        "operationId": "api_plan_swap_type_api_plan_swap_type_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionSwapped"
                 }
               }
             },
