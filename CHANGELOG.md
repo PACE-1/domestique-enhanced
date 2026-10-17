@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- **AI coach.** Connect a model in Settings → AI coach: Anthropic, OpenAI, OpenRouter, or a local Ollama or LM Studio. Then ask questions about your training on Home, get a review of your week, or open a ride and choose Review this ride. Only a short summary of your fitness, week and recent rides is sent, never ride files or your intervals.icu key. The connection is stored in your profile folder, readable only by you.
 - **Dropdown lists are readable in the dark theme.** They were white with white text.
 - **The route catalog is removed.** It held 622 fixed routes in 26 regions (Europe, the US mainland, game worlds) and nothing for most of the world, and a route could not be sent to a Garmin. The Routes & Climbs screen, the route and course downloads, and the bundled course data are gone. Routes and climbs come back when they can be pulled from Garmin.
 - The setup wizard no longer asks for a routes folder.

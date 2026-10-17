@@ -340,7 +340,7 @@ test("Settings refuses a folder outside the home folder and offers to connect in
   // This server has no OAuth secret, so the only way to connect is an API key.
   await expect(page.getByRole("link", { name: "Connect intervals.icu" })).toHaveCount(0)
   await page.getByRole("button", { name: "Connect with an API key" }).click()
-  await page.getByLabel("API key").fill("not-a-real-key")
+  await page.getByLabel("API key", { exact: true }).fill("not-a-real-key")
   await expect(page.getByRole("button", { name: "Connect", exact: true })).toBeEnabled()
   await expect(page.getByText("Connect intervals.icu first.")).toBeVisible()
 })
@@ -416,4 +416,15 @@ test("Home shows this week and last week", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "This week so far" })).toBeVisible()
   await expect(page.getByRole("heading", { name: "Last week" })).toBeVisible()
   await expect(page.getByRole("heading", { name: "DFA α1" })).toBeVisible()
+})
+
+test("AI coach: Settings offers a connection, and asking without one points to Settings", async ({ page }) => {
+  await page.goto("#/settings")
+  await expect(page.getByRole("heading", { name: "AI coach" })).toBeVisible()
+  await expect(page.getByText("No provider connected.")).toBeVisible()
+  await page.goto("#/home")
+  await page.getByLabel("Your question").fill("Am I ready?")
+  await page.getByRole("button", { name: "Ask", exact: true }).click()
+  await expect(page.getByRole("alert").filter({ hasText: "No AI provider is connected" })).toBeVisible()
+  await expect(page.getByRole("link", { name: "Open Settings" })).toBeVisible()
 })

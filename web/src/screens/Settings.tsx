@@ -11,6 +11,7 @@ import { CalendarPush } from "@/screens/CalendarPush"
 import { Diagnostics } from "@/screens/Diagnostics"
 import { Folders } from "@/screens/Folders"
 import { ApiKeyConnect } from "@/screens/ApiKeyConnect"
+import { AiCoachSettings } from "@/screens/Coach"
 import { FtpHistory } from "@/screens/FtpHistory"
 import { Panel, Row, useLoad } from "@/screens/panel"
 import { ZonesEditor } from "@/screens/ZonesEditor"
@@ -258,6 +259,7 @@ export function Settings() {
         <Rider />
       </div>
       <Sync />
+      <AiCoachSettings />
       <CalendarPush />
       <Folders />
       <About />

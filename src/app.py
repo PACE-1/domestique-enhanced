@@ -822,6 +822,9 @@ from hr import (  # noqa: F401
     _fit_hr_mode, _prescription_hr_rows, _hr_bias, _fit_hr_params,
 )
 
+import llm  # noqa: E402  (AI coach connection)
+
+
 # Request logging middleware — logs all API errors
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -6593,6 +6596,123 @@ def api_picker(subjective: float = Query(7), duration: int = Query(75)):
         "baseline_used": baseline_used,
         "workouts": unique[:5],
     }
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# AI COACH
+# ═══════════════════════════════════════════════════════════════════════════════
+# The rider connects a model provider (llm.py); these endpoints send it a compact
+# summary of their own training and return its reply. Raw samples, GPS and
+# credentials are never part of the prompt.
+
+_COACH_SYSTEM = (
+    "You are a cycling coach reading a rider's training data. Be specific and "
+    "brief: name numbers from the data, give at most three points, and end with "
+    "one thing to do next. Use only the data given; say so when it is not enough. "
+    "No medical advice. Plain text, no markdown headings."
+)
+_RIDE_DROP = ("samples", "efforts", "prs", "intervals", "activity_id")
+
+
+def _coach_cfg() -> dict:
+    from profile_manager import ProfileManager
+    return llm.load(ProfileManager.get().active_dir)
+
+
+def _coach_ask(user_text: str, history: list | None = None) -> dict:
+    cfg = _coach_cfg()
+    msgs = [m for m in (history or []) if isinstance(m, dict)
+            and m.get("role") in ("user", "assistant") and isinstance(m.get("content"), str)][-10:]
+    msgs.append({"role": "user", "content": user_text})
+    try:
+        text = llm.complete(cfg, _COACH_SYSTEM, msgs)
+    except llm.LlmError as e:
+        raise HTTPException(status_code=502, detail=str(e))
+    return {"text": text, "model": cfg["model"]}
+
+
+def _coach_context() -> dict:
+    """Fitness, the current week and the last ten rides, as plain numbers."""
+    s = api_settings()
+    ctx = {
+        "rider": {k: s.get(k) for k in ("ftp", "eftp", "weight", "lthr", "max_hr", "w_per_kg")},
+        "fitness_last_14_days": [
+            {k: w.get(k) for k in ("date", "ctl", "atl", "tsb", "hrv", "rhr", "sleep_h")}
+            for w in api_wellness(days=14, date_from=None, date_to=None)[-14:]
+        ],
+        "this_week": api_week_summary(week_offset=0),
+        "recent_rides": [
+            {k: a.get(k) for k in ("date", "name", "sport", "duration_min", "tss", "avg_power", "avg_hr")}
+            for a in (api_activities() or [])[:10]
+        ],
+    }
+    return ctx
+
+
+@app.get("/api/llm", responses={200: {"model": api_models.LlmConnection}})
+def api_llm_get():
+    return llm.public(_coach_cfg())
+
+
+@app.post("/api/llm", responses={200: {"model": api_models.LlmConnection}})
+async def api_llm_save(request: Request):
+    from profile_manager import ProfileManager
+    body = await _get_json_body(request)
+    key = body.get("api_key")
+    try:
+        cfg = llm.save(ProfileManager.get().active_dir, body.get("provider"), body.get("base_url"),
+                       body.get("model"), key if isinstance(key, str) and key.strip() else None)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return llm.public(cfg)
+
+
+@app.delete("/api/llm", responses={200: {"model": api_models.LlmConnection}})
+def api_llm_delete():
+    from profile_manager import ProfileManager
+    llm.clear(ProfileManager.get().active_dir)
+    return llm.public({})
+
+
+@app.post("/api/llm/test", responses={200: {"model": api_models.Insight}})
+def api_llm_test():
+    cfg = _coach_cfg()
+    try:
+        text = llm.complete(cfg, "Reply with the single word OK.", [{"role": "user", "content": "ping"}], max_tokens=16)
+    except llm.LlmError as e:
+        raise HTTPException(status_code=502, detail=str(e))
+    return {"text": text, "model": cfg["model"]}
+
+
+@app.post("/api/insights/week", responses={200: {"model": api_models.Insight}})
+async def api_insights_week(request: Request):
+    body = await _get_json_body(request)
+    offset = body.get("week_offset", 0)
+    if not isinstance(offset, int) or isinstance(offset, bool) or not -52 <= offset <= 0:
+        raise HTTPException(status_code=400, detail="week_offset must be an integer from -52 to 0")
+    data = {"week": api_week_summary(week_offset=offset), "context": _coach_context()}
+    return _coach_ask("Summarise this week against the plan and say what to adjust.\n\n"
+                      + json.dumps(data, default=str))
+
+
+@app.post("/api/insights/ride/{ride_id}", responses={200: {"model": api_models.Insight}})
+def api_insights_ride(ride_id: str):
+    ride = api_ride_full_detail(ride_id, include="")
+    ride = ride.model_dump() if hasattr(ride, "model_dump") else dict(ride)
+    ride = {k: v for k, v in ride.items() if k not in _RIDE_DROP and v not in (None, [], {})}
+    data = {"ride": ride, "context": _coach_context()}
+    return _coach_ask("Review this ride: pacing, intensity against zones, and what to change.\n\n"
+                      + json.dumps(data, default=str))
+
+
+@app.post("/api/insights/ask", responses={200: {"model": api_models.Insight}})
+async def api_insights_ask(request: Request):
+    body = await _get_json_body(request)
+    q = body.get("question")
+    if not isinstance(q, str) or not q.strip() or len(q) > 2000:
+        raise HTTPException(status_code=400, detail="question is required (up to 2000 characters)")
+    return _coach_ask(f"My training data:\n{json.dumps(_coach_context(), default=str)}\n\nQuestion: {q.strip()}",
+                      body.get("history"))
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

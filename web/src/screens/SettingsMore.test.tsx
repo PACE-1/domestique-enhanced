@@ -216,6 +216,7 @@ describe("Connect with an API key", () => {
     "/api/setup/limits": () => json({}),
     "/api/icu/connection": conn,
     "/api/sync/status": () => json({ wellness_records: 0, activity_records: 0 }),
+    "/api/llm": () => json({ configured: false, provider: "", base_url: "", model: "", has_key: false }),
     "/api/version": () => json({ app: "domestique", version: "1.0.1", data_dir: "/d" }),
     "/api/profile/ftp-history": () => json({ ftp_current: 250, history: [] }),
     "/api/icu/push": () => json({ connected: false, write_ok: false, sync_enabled: false, horizon_days: 14 }),

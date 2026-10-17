@@ -175,3 +175,13 @@ with a tag still fails when `ICU_OAUTH_CLIENT_SECRET` is unset.
 Not verified: a real desktop session (Wayland, GPU), distributions other than
 Ubuntu 22.04 and Debian 12, and the web interface (`/v2`) inside the AppImage on a real desktop.
 The AppImage runs as one user; it does not use the server access token.
+
+## AI coach
+
+Settings → AI coach stores one model connection per profile in
+`<profile>/llm.json` (mode 0600; the API never returns the key). The server
+makes the outbound call, so inside Docker `localhost` is the container: reach
+Ollama or LM Studio on the host with `http://host.docker.internal:11434/v1`
+(add `--add-host=host.docker.internal:host-gateway` on Linux). Each request
+sends a JSON summary of fitness, the current week and the last ten rides;
+samples, GPS and credentials are never included.

@@ -1070,3 +1070,16 @@ class DfaSnapshot(_Model):
     n_no_rr_data: int = 0
     n_fetch_failed: int = 0
     message: str = ""
+
+
+class LlmConnection(_Model):
+    configured: bool = False
+    provider: str = ""
+    base_url: str = ""
+    model: str = ""
+    has_key: bool = False             # the key itself is never returned
+
+
+class Insight(_Model):
+    text: str
+    model: str = ""
