@@ -1,6 +1,6 @@
-<img src="https://img.shields.io/badge/Version-v3.13.1-brightgreen" alt="Version">
+<img src="https://img.shields.io/badge/Version-v1.0.0-brightgreen" alt="Version">
 
-Latest: **[v3.13.1 — Your own workouts, added to the full library](https://github.com/PACE-1/domestique-enhanced/releases/latest)** (2026-10-14).
+Latest: **[v1.0.0 — A new interface and a safer server](https://github.com/PACE-1/domestique-enhanced/releases/latest)** (2026-10-16).
 
 
 See also:
