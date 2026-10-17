@@ -31,6 +31,20 @@ export const swapSessionType = (date: string, sessionType: string, durationMin: 
     json: { date, session_type: sessionType, duration_min: durationMin },
   })
 
+export interface GenerateRequest {
+  goal: "general" | "ftp" | "event"
+  hours_per_week: number
+  plan_weeks: number
+  rest_days: number[] // 0 = Monday
+  start_date?: string
+  event_name?: string
+  event_date?: string
+}
+
+/** Build a new plan from the form. The server replaces the stored plan. */
+export const generatePlan = (req: GenerateRequest) =>
+  api<PlanRead>("/api/plan/generate", { method: "POST", json: req })
+
 export const getStats = () => api<RiderStats>("/api/rider-stats")
 
 /** Local calendar day as YYYY-MM-DD (the plan stores local dates). */

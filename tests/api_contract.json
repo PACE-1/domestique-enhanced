@@ -1799,6 +1799,23 @@
         }
       }
     },
+    "/api/plan/generate": {
+      "post": {
+        "operationId": "api_plan_generate_api_plan_generate_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanRead"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/plan/move-session": {
       "post": {
         "operationId": "api_plan_move_session_api_plan_move_session_post",
