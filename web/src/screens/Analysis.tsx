@@ -6,6 +6,7 @@ import { fmtMinutes } from "@/lib/home"
 import { rideRoute } from "@/lib/rides"
 import { LineChart } from "@/screens/Chart"
 import { EnergySystems } from "@/screens/EnergySystems"
+import { HistoryBackfill } from "@/screens/HistoryBackfill"
 import { Panel, useLoad } from "@/screens/panel"
 import { Label } from "@/components/ui/label"
 import { NativeSelect } from "@/components/ui/native-select"
@@ -68,7 +69,7 @@ const TICKS = [5, 60, 300, 1200, 3600]
 function Power() {
   const [days, setDays] = useState(90)
   const fetcher = useCallback(() => getPowerCurve(days), [days])
-  const [load, retry] = useLoad<PowerCurve>(fetcher)
+  const [load, retry, refresh] = useLoad<PowerCurve>(fetcher)
   return (
     <Panel title="Power curve" load={load} retry={retry}>
       {(c) => {
@@ -77,7 +78,8 @@ function Power() {
           return (
             <div className="space-y-3">
               <Range value={days} onChange={setDays} label="Range" />
-              <p className="text-sm">No power data in this range yet{c.needs_backfill ? ". Import rides or run the history backfill." : "."}</p>
+              <p className="text-sm">No power data in this range yet{c.needs_backfill ? ". Your rides have not been read for power yet." : "."}</p>
+              {c.needs_backfill && <HistoryBackfill onFinished={refresh} />}
             </div>
           )
         const series: Series[] = [

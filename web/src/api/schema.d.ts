@@ -20,6 +20,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/diag/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_diag_health_api_diag_health_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/diag/recent-errors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_diag_recent_errors_api_diag_recent_errors_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/event/projection": {
         parameters: {
             query?: never;
@@ -44,6 +76,54 @@ export interface paths {
             cookie?: never;
         };
         get: operations["api_icu_connection_api_icu_connection_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/icu/disconnect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_icu_disconnect_api_icu_disconnect_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/icu/push": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_icu_push_status_api_icu_push_get"];
+        put?: never;
+        post: operations["api_icu_push_api_icu_push_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_logs_api_logs_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -334,6 +414,38 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["api_plan_swap_type_api_plan_swap_type_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/profile/backfill-history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["api_profile_backfill_history_api_profile_backfill_history_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/profile/backfill-history/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_profile_backfill_history_status_api_profile_backfill_history_status_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -788,6 +900,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/settings/workout-folders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_workout_folders_api_settings_workout_folders_get"];
+        put?: never;
+        post: operations["api_set_extra_workout_folder_api_settings_workout_folders_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/settings/zones": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["update_custom_zones_api_settings_zones_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/setup/defaults": {
         parameters: {
             query?: never;
@@ -1150,6 +1294,46 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** BackfillHistoryStarted */
+        BackfillHistoryStarted: {
+            /** Status */
+            status: string;
+            /** Task Id */
+            task_id?: string | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** BackfillHistoryStatus */
+        BackfillHistoryStatus: {
+            /**
+             * Already Cached
+             * @default 0
+             */
+            already_cached: number;
+            /**
+             * Backfilled
+             * @default 0
+             */
+            backfilled: number;
+            /** Done */
+            done?: number | null;
+            /**
+             * Failed
+             * @default 0
+             */
+            failed: number;
+            /**
+             * State
+             * @default running
+             */
+            state: string;
+            /** Task Id */
+            task_id?: string | null;
+            /** Total */
+            total?: number | null;
+        } & {
+            [key: string]: unknown;
+        };
         /** BackfillStarted */
         BackfillStarted: {
             /** Status */
@@ -1372,6 +1556,40 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** DiagErrors */
+        DiagErrors: {
+            /**
+             * Count
+             * @default 0
+             */
+            count: number;
+            /**
+             * Items
+             * @default []
+             */
+            items: {
+                [key: string]: unknown;
+            }[];
+        } & {
+            [key: string]: unknown;
+        };
+        /** DiagHealth */
+        DiagHealth: {
+            /**
+             * Checks
+             * @default {}
+             */
+            checks: {
+                [key: string]: unknown;
+            };
+            /**
+             * Ok
+             * @default false
+             */
+            ok: boolean;
+        } & {
+            [key: string]: unknown;
+        };
         /** EnsureProfile */
         EnsureProfile: {
             /** Id */
@@ -1423,6 +1641,23 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** ExtraFolder */
+        ExtraFolder: {
+            /**
+             * Added
+             * @default 0
+             */
+            added: number;
+            /**
+             * Files
+             * @default 0
+             */
+            files: number;
+            /** Path */
+            path: string;
+        } & {
+            [key: string]: unknown;
+        };
         /** Fitness3dStatus */
         Fitness3dStatus: {
             /**
@@ -1435,6 +1670,16 @@ export interface components {
              * @default 0
              */
             rides_with_ss: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** FolderCount */
+        FolderCount: {
+            /**
+             * Count
+             * @default 0
+             */
+            count: number;
         } & {
             [key: string]: unknown;
         };
@@ -1702,6 +1947,89 @@ export interface components {
              * @default false
              */
             write_ok: boolean;
+        } & {
+            [key: string]: unknown;
+        };
+        /** IcuPushResult */
+        IcuPushResult: {
+            /** Deleted */
+            deleted?: number | null;
+            /** Error */
+            error?: string | null;
+            /** Needs Reconnect */
+            needs_reconnect?: boolean | null;
+            /**
+             * Ok
+             * @default false
+             */
+            ok: boolean;
+            /** Pushed */
+            pushed?: number | null;
+            /** Sync Enabled */
+            sync_enabled?: boolean | null;
+            /** Updated */
+            updated?: number | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** IcuPushStatus */
+        IcuPushStatus: {
+            /**
+             * Connected
+             * @default false
+             */
+            connected: boolean;
+            /**
+             * Horizon Days
+             * @default 14
+             */
+            horizon_days: number;
+            /** Last Result */
+            last_result?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Method
+             * @default none
+             */
+            method: string;
+            /**
+             * Sync Enabled
+             * @default false
+             */
+            sync_enabled: boolean;
+            /**
+             * Write Ok
+             * @default false
+             */
+            write_ok: boolean;
+        } & {
+            [key: string]: unknown;
+        };
+        /** LogTail */
+        LogTail: {
+            /**
+             * Exists
+             * @default false
+             */
+            exists: boolean;
+            /**
+             * Lines
+             * @default []
+             */
+            lines: string[];
+            /**
+             * Path
+             * @default
+             */
+            path: string;
+            /** Size Kb */
+            size_kb?: number | null;
+            /**
+             * Total
+             * @default 0
+             */
+            total: number;
         } & {
             [key: string]: unknown;
         };
@@ -3229,6 +3557,13 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** WorkoutFolders */
+        WorkoutFolders: {
+            builtin: components["schemas"]["FolderCount"];
+            extra?: components["schemas"]["ExtraFolder"] | null;
+        } & {
+            [key: string]: unknown;
+        };
         /** WorkoutRow */
         WorkoutRow: {
             /**
@@ -3317,6 +3652,20 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** ZonesSaved */
+        ZonesSaved: {
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
+            /** Reset */
+            reset?: boolean | null;
+            /** Zones */
+            zones?: components["schemas"]["ZoneBand"][] | null;
+        } & {
+            [key: string]: unknown;
+        };
     };
     responses: never;
     parameters: never;
@@ -3366,6 +3715,46 @@ export interface operations {
             };
         };
     };
+    api_diag_health_api_diag_health_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiagHealth"];
+                };
+            };
+        };
+    };
+    api_diag_recent_errors_api_diag_recent_errors_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiagErrors"];
+                };
+            };
+        };
+    };
     api_event_projection_api_event_projection_get: {
         parameters: {
             query?: never;
@@ -3402,6 +3791,86 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["IcuConnection"];
+                };
+            };
+        };
+    };
+    api_icu_disconnect_api_icu_disconnect_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Ok"];
+                };
+            };
+        };
+    };
+    api_icu_push_status_api_icu_push_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IcuPushStatus"];
+                };
+            };
+        };
+    };
+    api_icu_push_api_icu_push_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IcuPushResult"];
+                };
+            };
+        };
+    };
+    api_logs_api_logs_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LogTail"];
                 };
             };
         };
@@ -3762,6 +4231,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SessionSwapped"];
+                };
+            };
+        };
+    };
+    api_profile_backfill_history_api_profile_backfill_history_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BackfillHistoryStarted"];
+                };
+            };
+        };
+    };
+    api_profile_backfill_history_status_api_profile_backfill_history_status_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BackfillHistoryStatus"];
                 };
             };
         };
@@ -4362,6 +4871,66 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SettingsSaved"];
+                };
+            };
+        };
+    };
+    api_workout_folders_api_settings_workout_folders_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkoutFolders"];
+                };
+            };
+        };
+    };
+    api_set_extra_workout_folder_api_settings_workout_folders_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkoutFolders"];
+                };
+            };
+        };
+    };
+    update_custom_zones_api_settings_zones_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ZonesSaved"];
                 };
             };
         };

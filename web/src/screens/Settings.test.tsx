@@ -18,13 +18,15 @@ function mock(over: Record<string, (body: unknown) => Response> = {}) {
   vi.stubGlobal("fetch", vi.fn(async (url: string, init?: RequestInit) => {
     const body = init?.body ? JSON.parse(init.body as string) : undefined
     calls.push({ url, method: init?.method, body })
-    const key = Object.keys(over).find((k) => url.startsWith(k))
+    const key = Object.keys(over).find((k) => url === k || (k !== "/api/settings" && url.startsWith(k)))
     if (key) return over[key](body)
     if (url === "/api/settings" && !init?.method) return json(SETTINGS)
     if (url === "/api/setup/limits") return json(LIMITS)
     if (url === "/api/icu/connection") return json({ connected: true, name: "Isaac", write_ok: true })
     if (url === "/api/sync/status") return json({ last_sync: { timestamp: "2026-10-16T08:00:00" }, wellness_records: 90, activity_records: 40, auth_disabled: false })
     if (url === "/api/version") return json({ app: "domestique", version: "1.0.0", data_dir: "/data" })
+    if (url === "/api/icu/push") return json({ connected: true, write_ok: true, sync_enabled: false, horizon_days: 14 })
+    if (url === "/api/settings/workout-folders") return json({ builtin: { count: 4300 }, extra: null })
     if (url === "/api/profile/ftp-history") return json({ ftp_current: 250, ftp_source: "manual", history: [] })
     return json({}, 404)
   }))
@@ -96,7 +98,7 @@ describe("Settings", () => {
     const calls = mock({ "/api/sync": () => json({ detail: "ICU unreachable" }, 502) })
     render(<Settings />)
     await userEvent.click(await screen.findByRole("button", { name: "Sync now" }))
-    expect((await screen.findByText(/Sync failed: ICU unreachable/))).toBeTruthy()
+    expect((await screen.findByText(/Couldn’t do that: ICU unreachable/))).toBeTruthy()
     expect(calls.filter((c) => c.url === "/api/sync/status").length).toBeGreaterThan(1)
   })
 

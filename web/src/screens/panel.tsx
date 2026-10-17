@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type ReactNode } from "react"
+import { Component, useCallback, useEffect, useState, type ReactNode } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -26,6 +26,28 @@ export function useLoad<T>(fetcher: () => Promise<T>) {
   return [value, run, refresh] as const
 }
 
+/** A card that throws while rendering (a response with an unexpected shape) shows a message instead of blanking the page. */
+class Guard extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false }
+  static getDerivedStateFromError() {
+    return { failed: true }
+  }
+  render() {
+    return this.state.failed ? (
+      <p role="alert" className="text-sm">
+        This card couldn’t be shown. Reload the page to try again.
+      </p>
+    ) : (
+      this.props.children
+    )
+  }
+}
+
+// The render function runs inside the guard, not before it, so a throw is caught.
+function Render<T>({ fn, data }: { fn: (d: T) => ReactNode; data: T }) {
+  return <>{fn(data)}</>
+}
+
 export function Panel<T>({
   title,
   load,
@@ -50,7 +72,11 @@ export function Panel<T>({
             </Button>
           </div>
         )}
-        {load.state === "ok" && children(load.data)}
+        {load.state === "ok" && (
+          <Guard>
+            <Render fn={children} data={load.data} />
+          </Guard>
+        )}
       </CardContent>
     </Card>
   )

@@ -258,7 +258,7 @@ test("Analysis shows its cards with empty states and no errors", async ({ page }
 test("Settings saves a changed value and shows the zones", async ({ page, request }) => {
   await page.goto("#/settings")
   await expect(page.getByRole("heading", { name: "Rider" })).toBeVisible()
-  await expect(page.getByText("Power zones")).toBeVisible()
+  await expect(page.getByText("Power zones", { exact: true })).toBeVisible()
   const weight = page.getByLabel("Weight (kg)")
   await weight.fill("72.5")
   await page.getByRole("button", { name: "Save changes" }).click()
@@ -324,4 +324,35 @@ test("Analysis shows the energy-system card", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Energy systems" })).toBeVisible()
   await expect(page.getByText(/rides have energy-system data|No energy-system data yet/).first()).toBeVisible()
   await expect(page.getByRole("alert")).toHaveCount(0)
+})
+
+test("Settings edits and resets custom power zones", async ({ page, request }) => {
+  await page.goto("#/settings")
+  await page.getByRole("button", { name: "Edit power zones" }).click()
+  await page.getByLabel("Power Z1 high").fill("100")
+  await page.getByRole("button", { name: "Save zones" }).click()
+  await expect(page.getByRole("button", { name: "Edit power zones" })).toBeVisible()
+  const custom = await (await request.get(BASE + "/api/settings")).json()
+  expect(custom.power_zones[0].high).toBe(100)
+  await page.getByRole("button", { name: "Edit power zones" }).click()
+  await page.getByRole("button", { name: "Use automatic zones" }).click()
+  await expect(page.getByRole("button", { name: "Edit power zones" })).toBeVisible()
+  const auto = await (await request.get(BASE + "/api/settings")).json()
+  expect(auto.power_zones[0].high).not.toBe(100)
+})
+
+test("Settings refuses a folder outside the home folder and offers to connect intervals.icu", async ({ page }) => {
+  await page.goto("#/settings")
+  await expect(page.getByText(/always included/)).toBeVisible()
+  await page.getByLabel(/Folder with your own/).fill("/definitely/outside/home")
+  await page.getByRole("button", { name: "Add folder" }).click()
+  await expect(page.getByRole("alert").filter({ hasText: /inside your home folder/ })).toBeVisible()
+  await expect(page.getByRole("link", { name: "Connect intervals.icu" })).toHaveAttribute("href", /\/oauth\/icu\/start\?return_to=/)
+  await expect(page.getByText("Connect intervals.icu first.")).toBeVisible()
+})
+
+test("Settings diagnostics runs a health check", async ({ page }) => {
+  await page.goto("#/settings")
+  await page.getByRole("button", { name: "Check health" }).click()
+  await expect(page.getByRole("status").filter({ hasText: /Every check passed|need attention/ })).toBeVisible()
 })

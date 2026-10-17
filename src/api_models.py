@@ -850,3 +850,78 @@ class MigrationResult(_Model):
     to_version: Optional[str] = None
     rider_data_preserved: Optional[bool] = None
 
+
+# ── Settings: intervals.icu push, folders, zones, logs, diagnostics, history backfill ──
+
+class IcuPushStatus(_Model):
+    connected: bool = False
+    method: str = "none"
+    write_ok: bool = False
+    sync_enabled: bool = False
+    horizon_days: int = 14
+    last_result: Optional[dict] = None
+
+
+class IcuPushResult(_Model):
+    ok: bool = False
+    error: Optional[str] = None
+    needs_reconnect: Optional[bool] = None
+    sync_enabled: Optional[bool] = None
+    pushed: Optional[int] = None
+    updated: Optional[int] = None
+    deleted: Optional[int] = None
+
+
+class FolderCount(_Model):
+    count: int = 0
+
+
+class ExtraFolder(_Model):
+    path: str
+    files: int = 0
+    added: int = 0
+
+
+class WorkoutFolders(_Model):
+    builtin: FolderCount
+    extra: Optional[ExtraFolder] = None
+
+
+class ZonesSaved(_Model):
+    ok: bool = True
+    reset: Optional[bool] = None
+    zones: Optional[list[ZoneBand]] = None
+
+
+class LogTail(_Model):
+    lines: list[str] = []
+    total: int = 0
+    path: str = ""
+    size_kb: Optional[float] = None
+    exists: bool = False
+
+
+class DiagErrors(_Model):
+    count: int = 0
+    items: list[dict] = []
+
+
+class DiagHealth(_Model):
+    ok: bool = False
+    checks: dict = {}
+
+
+class BackfillHistoryStarted(_Model):
+    status: str                         # started | already_running
+    task_id: Optional[str] = None
+
+
+class BackfillHistoryStatus(_Model):
+    task_id: Optional[str] = None
+    state: str = "running"             # running | done | error
+    backfilled: int = 0
+    already_cached: int = 0
+    failed: int = 0
+    done: Optional[int] = None
+    total: Optional[int] = None
+

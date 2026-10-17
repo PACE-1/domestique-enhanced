@@ -106,6 +106,91 @@
         "title": "Backfill3d",
         "type": "object"
       },
+      "BackfillHistoryStarted": {
+        "additionalProperties": true,
+        "properties": {
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Id"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "BackfillHistoryStarted",
+        "type": "object"
+      },
+      "BackfillHistoryStatus": {
+        "additionalProperties": true,
+        "properties": {
+          "already_cached": {
+            "default": 0,
+            "title": "Already Cached",
+            "type": "integer"
+          },
+          "backfilled": {
+            "default": 0,
+            "title": "Backfilled",
+            "type": "integer"
+          },
+          "done": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Done"
+          },
+          "failed": {
+            "default": 0,
+            "title": "Failed",
+            "type": "integer"
+          },
+          "state": {
+            "default": "running",
+            "title": "State",
+            "type": "string"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Id"
+          },
+          "total": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total"
+          }
+        },
+        "title": "BackfillHistoryStatus",
+        "type": "object"
+      },
       "BackfillStarted": {
         "additionalProperties": true,
         "properties": {
@@ -837,6 +922,45 @@
         "title": "DfaZoneMinutes",
         "type": "object"
       },
+      "DiagErrors": {
+        "additionalProperties": true,
+        "properties": {
+          "count": {
+            "default": 0,
+            "title": "Count",
+            "type": "integer"
+          },
+          "items": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "title": "DiagErrors",
+        "type": "object"
+      },
+      "DiagHealth": {
+        "additionalProperties": true,
+        "properties": {
+          "checks": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Checks",
+            "type": "object"
+          },
+          "ok": {
+            "default": false,
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "title": "DiagHealth",
+        "type": "object"
+      },
       "EnsureProfile": {
         "additionalProperties": true,
         "properties": {
@@ -1046,6 +1170,30 @@
         "title": "EventProjection",
         "type": "object"
       },
+      "ExtraFolder": {
+        "additionalProperties": true,
+        "properties": {
+          "added": {
+            "default": 0,
+            "title": "Added",
+            "type": "integer"
+          },
+          "files": {
+            "default": 0,
+            "title": "Files",
+            "type": "integer"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "title": "ExtraFolder",
+        "type": "object"
+      },
       "Fitness3dStatus": {
         "additionalProperties": true,
         "properties": {
@@ -1061,6 +1209,18 @@
           }
         },
         "title": "Fitness3dStatus",
+        "type": "object"
+      },
+      "FolderCount": {
+        "additionalProperties": true,
+        "properties": {
+          "count": {
+            "default": 0,
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "title": "FolderCount",
         "type": "object"
       },
       "FtpHistory": {
@@ -1491,6 +1651,169 @@
           }
         },
         "title": "IcuConnection",
+        "type": "object"
+      },
+      "IcuPushResult": {
+        "additionalProperties": true,
+        "properties": {
+          "deleted": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deleted"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "needs_reconnect": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Needs Reconnect"
+          },
+          "ok": {
+            "default": false,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "pushed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pushed"
+          },
+          "sync_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sync Enabled"
+          },
+          "updated": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated"
+          }
+        },
+        "title": "IcuPushResult",
+        "type": "object"
+      },
+      "IcuPushStatus": {
+        "additionalProperties": true,
+        "properties": {
+          "connected": {
+            "default": false,
+            "title": "Connected",
+            "type": "boolean"
+          },
+          "horizon_days": {
+            "default": 14,
+            "title": "Horizon Days",
+            "type": "integer"
+          },
+          "last_result": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Result"
+          },
+          "method": {
+            "default": "none",
+            "title": "Method",
+            "type": "string"
+          },
+          "sync_enabled": {
+            "default": false,
+            "title": "Sync Enabled",
+            "type": "boolean"
+          },
+          "write_ok": {
+            "default": false,
+            "title": "Write Ok",
+            "type": "boolean"
+          }
+        },
+        "title": "IcuPushStatus",
+        "type": "object"
+      },
+      "LogTail": {
+        "additionalProperties": true,
+        "properties": {
+          "exists": {
+            "default": false,
+            "title": "Exists",
+            "type": "boolean"
+          },
+          "lines": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "path": {
+            "default": "",
+            "title": "Path",
+            "type": "string"
+          },
+          "size_kb": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Kb"
+          },
+          "total": {
+            "default": 0,
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "title": "LogTail",
         "type": "object"
       },
       "MetricPoint": {
@@ -5009,6 +5332,29 @@
         "title": "WorkoutDetail",
         "type": "object"
       },
+      "WorkoutFolders": {
+        "additionalProperties": true,
+        "properties": {
+          "builtin": {
+            "$ref": "#/components/schemas/FolderCount"
+          },
+          "extra": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExtraFolder"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "builtin"
+        ],
+        "title": "WorkoutFolders",
+        "type": "object"
+      },
       "WorkoutRow": {
         "additionalProperties": true,
         "properties": {
@@ -5171,6 +5517,43 @@
         ],
         "title": "ZoneBand",
         "type": "object"
+      },
+      "ZonesSaved": {
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "reset": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reset"
+          },
+          "zones": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ZoneBand"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zones"
+          }
+        },
+        "title": "ZonesSaved",
+        "type": "object"
       }
     }
   },
@@ -5212,6 +5595,40 @@
         }
       }
     },
+    "/api/diag/health": {
+      "get": {
+        "operationId": "api_diag_health_api_diag_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiagHealth"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/diag/recent-errors": {
+      "get": {
+        "operationId": "api_diag_recent_errors_api_diag_recent_errors_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiagErrors"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/event/projection": {
       "get": {
         "operationId": "api_event_projection_api_event_projection_get",
@@ -5238,6 +5655,72 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/IcuConnection"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/icu/disconnect": {
+      "post": {
+        "operationId": "api_icu_disconnect_api_icu_disconnect_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ok"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/icu/push": {
+      "get": {
+        "operationId": "api_icu_push_status_api_icu_push_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IcuPushStatus"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "operationId": "api_icu_push_api_icu_push_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IcuPushResult"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/logs": {
+      "get": {
+        "operationId": "api_logs_api_logs_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogTail"
                 }
               }
             },
@@ -5548,6 +6031,40 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SessionSwapped"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/profile/backfill-history": {
+      "post": {
+        "operationId": "api_profile_backfill_history_api_profile_backfill_history_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackfillHistoryStarted"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/profile/backfill-history/status": {
+      "get": {
+        "operationId": "api_profile_backfill_history_status_api_profile_backfill_history_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackfillHistoryStatus"
                 }
               }
             },
@@ -6058,6 +6575,55 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SettingsSaved"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/settings/workout-folders": {
+      "get": {
+        "operationId": "api_workout_folders_api_settings_workout_folders_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutFolders"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "operationId": "api_set_extra_workout_folder_api_settings_workout_folders_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutFolders"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/settings/zones": {
+      "post": {
+        "operationId": "update_custom_zones_api_settings_zones_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZonesSaved"
                 }
               }
             },

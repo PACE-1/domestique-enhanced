@@ -1331,12 +1331,12 @@ def _workout_folders_state() -> dict:
     return out
 
 
-@app.get("/api/settings/workout-folders")
+@app.get("/api/settings/workout-folders", responses={200: {"model": api_models.WorkoutFolders}})
 def api_workout_folders():
     return _workout_folders_state()
 
 
-@app.post("/api/settings/workout-folders")
+@app.post("/api/settings/workout-folders", responses={200: {"model": api_models.WorkoutFolders}})
 def api_set_extra_workout_folder(body: dict):
     """Set or clear (extra_dir "") the active profile's extra workouts folder.
     Its .zwo files join the built-in library; the built-in one is always on."""
@@ -2394,7 +2394,7 @@ def _run_backfill_job(task_id: str) -> None:
             pass
 
 
-@app.post("/api/profile/backfill-history")
+@app.post("/api/profile/backfill-history", responses={200: {"model": api_models.BackfillHistoryStarted}})
 def api_profile_backfill_history():
     """v1.3.0 — kicks off a one-shot ICU history backfill job.
 
@@ -2431,7 +2431,7 @@ def api_profile_backfill_history():
     return {"status": "started", "task_id": task_id}
 
 
-@app.get("/api/profile/backfill-history/status")
+@app.get("/api/profile/backfill-history/status", responses={200: {"model": api_models.BackfillHistoryStatus}})
 def api_profile_backfill_history_status(task_id: str = Query(...)):
     """v1.3.0 — poll the in-memory state of a backfill job.
 
@@ -7485,7 +7485,7 @@ def _tail_lines(p: Path, n: int = 2000) -> list[str]:
         return data.decode("utf-8", "replace").splitlines()[-n:]
 
 
-@app.get("/api/logs")
+@app.get("/api/logs", responses={200: {"model": api_models.LogTail}})
 def api_logs(lines: int = Query(100)):
     """Return last N lines of the log file for debugging.
 
@@ -7976,7 +7976,7 @@ def api_oauth_icu_callback(code: str = Query(""), state: str = Query(""),
         return _back("icu=error&reason=exchange")
 
 
-@app.post("/api/icu/disconnect")
+@app.post("/api/icu/disconnect", responses={200: {"model": api_models.Ok}})
 def api_icu_disconnect():
     """AC3b: disconnect = clear the token AND purge the profile's synced data
     (activities/wellness/sync_log rows + icu-sourced athlete mirrors). The next
@@ -8276,7 +8276,7 @@ def _icu_push_daily_from_sync() -> None:
         _log.warning("daily ICU calendar push failed", exc_info=True)
 
 
-@app.get("/api/icu/push")
+@app.get("/api/icu/push", responses={200: {"model": api_models.IcuPushStatus}})
 def api_icu_push_status():
     """Push-button + sync-toggle state for the UI. Never raises."""
     import icu_calendar_push as _icp
@@ -8306,7 +8306,7 @@ def api_icu_push_status():
     }
 
 
-@app.post("/api/icu/push")
+@app.post("/api/icu/push", responses={200: {"model": api_models.IcuPushResult}})
 def api_icu_push(body: "dict | None" = None):
     """No body / {} → run the reconcile NOW (the plan-tab button).
     {"sync": true|false} → flip the keep-in-sync toggle; OFF runs the final
@@ -9155,7 +9155,7 @@ def _hr_zones(lthr, max_hr, pm=None):
     ]
 
 
-@app.post("/api/settings/zones")
+@app.post("/api/settings/zones", responses={200: {"model": api_models.ZonesSaved}})
 def update_custom_zones(body: dict):
     """Save or reset CUSTOM power/HR zones for the active profile.
 
@@ -20222,7 +20222,7 @@ _DIAG_HEALTH_CACHE: dict = {"ts": 0.0, "result": None}
 _DIAG_HEALTH_CACHE_TTL = 60.0
 
 
-@app.get("/api/diag/recent-errors")
+@app.get("/api/diag/recent-errors", responses={200: {"model": api_models.DiagErrors}})
 def api_diag_recent_errors(
     request: Request,
     since: str | None = Query(None),
@@ -20291,7 +20291,7 @@ async def api_diag_frontend_error(request: Request):
     return {"ok": True, "code": code}
 
 
-@app.get("/api/diag/health")
+@app.get("/api/diag/health", responses={200: {"model": api_models.DiagHealth}})
 def api_diag_health(request: Request):
     """v1.6.0 — system-state self-check.
 

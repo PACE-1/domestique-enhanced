@@ -1,4 +1,4 @@
-import type { SettingsRead, SettingsSaved, SyncStatus, UpdateCheck, VersionInfo } from "@/api/types"
+import type { BackfillHistoryStarted, BackfillHistoryStatus, DiagErrors, DiagHealth, IcuPushResult, IcuPushStatus, LogTail, SettingsRead, SettingsSaved, SyncStatus, UpdateCheck, VersionInfo, WorkoutFolders, ZonesSaved } from "@/api/types"
 import { api } from "@/lib/api"
 
 export const getSettings = () => api<SettingsRead>("/api/settings")
@@ -50,3 +50,48 @@ export function diff(s: SettingsRead, f: RiderForm, limits: Limits = {}) {
   if (f.targetMode !== (s.target_mode === "hr" ? "hr" : "power")) changes.target_mode = f.targetMode
   return { changes, problems }
 }
+
+// ── intervals.icu connection and calendar push ─────────────────────────────
+
+/** Signs in through intervals.icu and returns to Settings. */
+export const connectUrl = `/oauth/icu/start?return_to=${encodeURIComponent("/v2/?wizard=settings")}`
+export const disconnectIcu = () => api<{ ok: boolean }>("/api/icu/disconnect", { method: "POST" })
+export const getPush = () => api<IcuPushStatus>("/api/icu/push")
+/** `sync` turns the keep-in-sync switch on or off. */
+export const setPushSync = (sync: boolean) => api<IcuPushResult>("/api/icu/push", { method: "POST", json: { sync } })
+export const pushNow = () => api<IcuPushResult>("/api/icu/push", { method: "POST", json: {} })
+
+// ── workout folders ───────────────────────────────────────────────────────
+export const getFolders = () => api<WorkoutFolders>("/api/settings/workout-folders")
+/** An empty path clears the extra folder. */
+export const setExtraFolder = (extraDir: string) => api<WorkoutFolders>("/api/settings/workout-folders", { method: "POST", json: { extra_dir: extraDir } })
+
+// ── custom zones ──────────────────────────────────────────────────────────
+export interface ZoneRow {
+  zone: string
+  name: string
+  low: number
+  high: number
+}
+/** `null` resets the kind to the automatic zones. */
+export const saveZones = (kind: "power" | "hr", zones: ZoneRow[] | null) => api<ZonesSaved>("/api/settings/zones", { method: "POST", json: { kind, zones } })
+
+/** What is wrong with the rows, or "". The server enforces 0 ≤ low < high ≤ 3000 for each zone. */
+export function zoneProblem(rows: { low: string; high: string }[]): string {
+  for (let i = 0; i < rows.length; i++) {
+    const lo = Number(rows[i].low)
+    const hi = Number(rows[i].high)
+    if (rows[i].low === "" || rows[i].high === "" || !Number.isFinite(lo) || !Number.isFinite(hi)) return `Zone ${i + 1}: enter both numbers.`
+    if (!(lo >= 0 && lo < hi && hi <= 3000)) return `Zone ${i + 1}: the low number must be below the high number, and both between 0 and 3000.`
+  }
+  return ""
+}
+
+// ── logs and health ───────────────────────────────────────────────────────
+export const getLogs = (lines: number) => api<LogTail>(`/api/logs?lines=${lines}`)
+export const getErrors = () => api<DiagErrors>("/api/diag/recent-errors?limit=30")
+export const getHealth = () => api<DiagHealth>("/api/diag/health")
+
+// ── power history backfill ────────────────────────────────────────────────
+export const startHistory = () => api<BackfillHistoryStarted>("/api/profile/backfill-history", { method: "POST" })
+export const historyStatus = (id: string) => api<BackfillHistoryStatus>(`/api/profile/backfill-history/status?task_id=${encodeURIComponent(id)}`)

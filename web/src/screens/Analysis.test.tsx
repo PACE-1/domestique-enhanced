@@ -68,6 +68,6 @@ describe("Analysis", () => {
   it("points to the backfill when rides exist but no curve is built", async () => {
     mock({ "/api/profile/power-curve": () => json({ ...CURVE, rider_curve: [], needs_backfill: true }) })
     render(<Analysis />)
-    expect(await screen.findByText(/run the history backfill/)).toBeTruthy()
+    expect(await screen.findByText(/have not been read for power yet/)).toBeTruthy()
   })
 })
