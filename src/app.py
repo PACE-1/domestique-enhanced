@@ -11582,7 +11582,7 @@ def _replaced_weeks_before(old_plan: dict, cutoff: date) -> list[dict]:
     return sorted(out, key=lambda w: w.get("start") or "")
 
 
-@app.post("/api/plan/generate")
+@app.post("/api/plan/generate", responses={200: {"model": api_models.PlanRead}})
 async def api_plan_generate(request: Request):
     """Generate a training plan from UI form data."""
     body = await _get_json_body(request)

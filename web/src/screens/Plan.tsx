@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react"
 import type { PlanRead, PlanWeek } from "@/api/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { PlanGenerate } from "@/screens/PlanGenerate"
 import { currentWeek, dismissSession, fmtMinutes, getPlan, isoDay, moveSession, plannedTss, SWAP_TYPES, swapSessionType, weekSessions } from "@/lib/home"
 
 type Load = { state: "loading" } | { state: "ok"; plan: PlanRead } | { state: "error"; message: string }
@@ -26,6 +27,7 @@ export function Plan() {
   const [busy, setBusy] = useState<string | null>(null)
   const [actionError, setActionError] = useState("")
   const [moving, setMoving] = useState<{ day: string; to: string } | null>(null)
+  const [replacing, setReplacing] = useState(false)
   const [swapping, setSwapping] = useState<{ day: string; type: string; minutes: number } | null>(null)
   const today = isoDay()
 
@@ -77,12 +79,9 @@ export function Plan() {
   const weeks: PlanWeek[] = plan?.weeks ?? []
   if (!weeks.length)
     return (
-      <div className="rounded-xl border p-6 text-sm">
-        <p className="font-medium">No training plan yet.</p>
-        <p className="mt-1 text-muted-foreground">Creating a plan still happens in the current dashboard.</p>
-        <Button className="mt-3" variant="outline" render={<a href="/" />}>
-          Open current dashboard
-        </Button>
+      <div className="space-y-4">
+        <p className="text-sm font-medium">No training plan yet.</p>
+        <PlanGenerate hasPlan={false} onDone={run} />
       </div>
     )
 
@@ -233,9 +232,16 @@ export function Plan() {
               Couldn’t change that session: {actionError}
             </p>
           )}
-          <p className="text-xs text-muted-foreground">Regenerating the plan still happens in the current dashboard.</p>
         </CardContent>
       </Card>
+
+      {replacing ? (
+        <PlanGenerate hasPlan onDone={() => { setReplacing(false); setIndex(null); run() }} />
+      ) : (
+        <Button variant="outline" size="sm" onClick={() => setReplacing(true)}>
+          Replace the plan…
+        </Button>
+      )}
     </div>
   )
 }

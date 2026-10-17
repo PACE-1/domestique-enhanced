@@ -119,3 +119,14 @@ test("a session's type can be changed from the Plan", async ({ page }) => {
   await expect(page.getByLabel("New type")).toHaveCount(0)
   await expect(page.getByRole("alert")).toHaveCount(0)
 })
+
+test("the Plan can be replaced by a new one built from the form", async ({ page, request }) => {
+  await page.goto("#/plan")
+  await page.getByRole("button", { name: "Replace the plan…" }).click()
+  await page.getByLabel("Goal").selectOption("ftp")
+  await page.getByLabel("Plan length (weeks)").fill("6")
+  await page.getByRole("button", { name: "Replace plan" }).click()
+  await expect(page.getByText(/6 weeks/)).toBeVisible()
+  const plan = await (await request.get("http://127.0.0.1:" + (process.env.E2E_PORT ?? 22488) + "/api/plan")).json()
+  expect(plan.plan_json.weeks.length).toBeGreaterThanOrEqual(6)
+})
