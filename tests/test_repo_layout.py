@@ -25,7 +25,7 @@ CODE_DIR = Path(tp.__file__).resolve().parent
 
 # ── Layer 3: sibling data targets exist next to the modules ─────────────────
 
-_SIBLING_DIRS = ("workouts", "courses", "templates", "static", "profiles")
+_SIBLING_DIRS = ("workouts", "courses", "profiles")
 _SIBLING_FILES = ("routes.json", "profiles_indexed.json",
                   "surface_types.json", "config.py")
 
@@ -88,7 +88,7 @@ def test_bundled_workout_dir_is_populated():
 # these as _MEIPASS-siblings, so this set changing means runtime breakage.
 # Change it only together with the code that reads the moved data.
 _PINNED_DESTINATIONS = {
-    "templates", "courses", "workouts", "static", "assets", ".", "scripts",
+    "web/dist", "courses", "workouts", "assets", ".", "scripts",
 }
 
 
@@ -108,7 +108,8 @@ def _spec_datas() -> list[tuple[str, str]]:
 
 def test_spec_datas_sources_exist():
     entries, spec_dir = _spec_datas()
-    missing = [s for s, _ in entries if not (spec_dir / s).exists()]
+    # web/dist is a build output (`pnpm build`), checked by the build scripts instead.
+    missing = [s for s, d in entries if d != "web/dist" and not (spec_dir / s).exists()]
     assert missing == [], f"spec datas sources missing: {missing}"
 
 
@@ -126,7 +127,7 @@ def test_spec_datas_destinations_pinned():
 def test_spec_bundles_the_critical_data():
     entries, _ = _spec_datas()
     dests = {d for _, d in entries}
-    for needed in ("workouts", "templates", "static", "courses"):
+    for needed in ("workouts", "web/dist", "courses"):
         assert needed in dests, f"spec no longer bundles {needed}/"
     # VERSION must land at the bundle root.
     assert any(d == "." and s.endswith("VERSION") for s, d in entries)
