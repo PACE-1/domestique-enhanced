@@ -137,3 +137,38 @@ def test_insights_without_a_provider_and_a_failing_provider_are_502(c):
     r = c.post("/api/insights/ask", json={"question": "hi"})
     assert r.status_code == 502 and "No AI provider" in r.json()["detail"]
     assert c.post("/api/llm/test").status_code == 502
+
+
+def test_a_new_provider_or_address_never_inherits_the_saved_key(tmp_path):
+    llm.save(tmp_path, "anthropic", "", "claude-x", "sk-secret")
+    with pytest.raises(ValueError, match="Enter the API key"):
+        llm.save(tmp_path, "openai", "http://evil.example/v1", "m", None)
+    with pytest.raises(ValueError, match="Enter the API key"):
+        llm.save(tmp_path, "anthropic", "https://other.example", "claude-x", None)
+    assert llm.load(tmp_path)["api_key"] == "sk-secret" and llm.load(tmp_path)["base_url"] == "https://api.anthropic.com"
+    # Same provider and address, new model: the key is kept.
+    assert llm.save(tmp_path, "anthropic", "", "claude-y", None)["api_key"] == "sk-secret"
+    # Switching to a keyless local server is fine and carries no key.
+    llm.save(tmp_path, "openai", "http://localhost:11434/v1", "llama3", "")
+    assert llm.save(tmp_path, "openai", "http://localhost:11434/v1", "llama3", None)["api_key"] == ""
+
+
+def test_the_slow_model_call_runs_in_a_worker_thread_and_a_missing_ride_is_a_404(c):
+    from fastapi.concurrency import run_in_threadpool
+
+    c.post("/api/llm", json={"provider": "openai", "base_url": "http://localhost:11434/v1", "model": "m"})
+    offloaded = []
+
+    async def spy(fn, *args, **kwargs):
+        offloaded.append(fn.__name__)
+        return await run_in_threadpool(fn, *args, **kwargs)
+
+    try:
+        with mock.patch.object(app_module, "run_in_threadpool", spy), mock.patch.object(llm, "complete", return_value="ok"):
+            assert c.post("/api/insights/week", json={}).status_code == 200
+            assert c.post("/api/insights/ask", json={"question": "hi"}).status_code == 200
+        assert offloaded == ["work", "work"]
+        gone = c.post("/api/insights/ride/does-not-exist")
+        assert gone.status_code == 404, gone.text
+    finally:
+        c.delete("/api/llm")

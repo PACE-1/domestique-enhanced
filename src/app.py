@@ -60,6 +60,7 @@ from obs import (  # noqa: F401
 
 from fastapi import FastAPI, File, Form, Request, Query, UploadFile, HTTPException, Body
 import api_models
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, Response
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -6691,14 +6692,19 @@ async def api_insights_week(request: Request):
     offset = body.get("week_offset", 0)
     if not isinstance(offset, int) or isinstance(offset, bool) or not -52 <= offset <= 0:
         raise HTTPException(status_code=400, detail="week_offset must be an integer from -52 to 0")
-    data = {"week": api_week_summary(week_offset=offset), "context": _coach_context()}
-    return _coach_ask("Summarise this week against the plan and say what to adjust.\n\n"
-                      + json.dumps(data, default=str))
+    def work():
+        data = {"week": api_week_summary(week_offset=offset), "context": _coach_context()}
+        return _coach_ask("Summarise this week against the plan and say what to adjust.\n\n"
+                          + json.dumps(data, default=str))
+    # The model call is a blocking HTTP request of up to 90 s: keep it off the event loop.
+    return await run_in_threadpool(work)
 
 
 @app.post("/api/insights/ride/{ride_id}", responses={200: {"model": api_models.Insight}})
 def api_insights_ride(ride_id: str):
     ride = api_ride_full_detail(ride_id, include="")
+    if isinstance(ride, Response):  # a 404 or 400 for an unknown or invalid ride
+        return ride
     ride = ride.model_dump() if hasattr(ride, "model_dump") else dict(ride)
     ride = {k: v for k, v in ride.items() if k not in _RIDE_DROP and v not in (None, [], {})}
     data = {"ride": ride, "context": _coach_context()}
@@ -6712,8 +6718,10 @@ async def api_insights_ask(request: Request):
     q = body.get("question")
     if not isinstance(q, str) or not q.strip() or len(q) > 2000:
         raise HTTPException(status_code=400, detail="question is required (up to 2000 characters)")
-    return _coach_ask(f"My training data:\n{json.dumps(_coach_context(), default=str)}\n\nQuestion: {q.strip()}",
-                      body.get("history"))
+    def work():
+        return _coach_ask(f"My training data:\n{json.dumps(_coach_context(), default=str)}\n\nQuestion: {q.strip()}",
+                          body.get("history"))
+    return await run_in_threadpool(work)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

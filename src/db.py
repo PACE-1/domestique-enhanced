@@ -1062,13 +1062,18 @@ def upsert_daily_log(dt: str, sleep_quality: int, fatigue: int, soreness: int,
     # caller can pass to CLEAR a rating. Nothing exposes clearing today — the
     # form only ever adds the key, and re-rating overwrites. If a clear
     # affordance is ever added it needs its own sentinel, not None.
-    if readiness_to_train is None:
+    # Notes work the same way: a save that omits them (the check-in form has no notes field)
+    # must not erase what was stored.
+    if readiness_to_train is None or notes is None:
         try:
             prior = db.execute(
-                "SELECT readiness_to_train FROM daily_log WHERE date = ?", (dt,)
+                "SELECT readiness_to_train, notes FROM daily_log WHERE date = ?", (dt,)
             ).fetchone()
-            if prior is not None and prior[0] is not None:
-                readiness_to_train = int(prior[0])
+            if prior is not None:
+                if readiness_to_train is None and prior[0] is not None:
+                    readiness_to_train = int(prior[0])
+                if notes is None:
+                    notes = prior[1]
         except sqlite3.Error:
             pass
     db.execute(
