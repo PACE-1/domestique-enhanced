@@ -244,3 +244,13 @@ test("Routes lists courses, filters them, and opens one", async ({ page }) => {
   await expect(page.getByRole("img", { name: /^Elevation profile/ })).toBeVisible()
   await expect(page.getByRole("link", { name: "Download course (.crs)" })).toBeVisible()
 })
+
+test("Analysis shows its cards with empty states and no errors", async ({ page }) => {
+  await page.goto("#/analysis")
+  await expect(page.getByRole("heading", { name: "Fitness and form" })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Power curve" })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Recent rides" })).toBeVisible()
+  await expect(page.getByText(/No fitness data|Latest \(/)).toBeVisible()
+  await expect(page.getByText(/Loading…/)).toHaveCount(0)
+  await expect(page.getByRole("alert")).toHaveCount(0)
+})

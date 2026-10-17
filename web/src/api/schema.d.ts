@@ -340,6 +340,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/profile/power-curve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_profile_power_curve_api_profile_power_curve_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/profiles": {
         parameters: {
             query?: never;
@@ -484,6 +500,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/rides": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_rides_api_rides_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/routes": {
         parameters: {
             query?: never;
@@ -596,6 +628,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/wellness": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_wellness_api_wellness_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/workout/{category}/{filename}": {
         parameters: {
             query?: never;
@@ -604,6 +652,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["api_workout_detail_api_workout__category___filename__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/workouts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_workouts_api_workouts_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1284,6 +1348,74 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** PowerBaselinePoint */
+        PowerBaselinePoint: {
+            /** Duration S */
+            duration_s: number;
+            /**
+             * Watts At Current Weight
+             * @default 0
+             */
+            watts_at_current_weight: number;
+            /**
+             * Watts Per Kg
+             * @default 0
+             */
+            watts_per_kg: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** PowerCurve */
+        PowerCurve: {
+            /** Cp W */
+            cp_w?: number | null;
+            /** Current Ftp */
+            current_ftp?: number | null;
+            /**
+             * N Rides
+             * @default 0
+             */
+            n_rides: number;
+            /** Needs Backfill */
+            needs_backfill?: boolean | null;
+            /**
+             * Pg 2011 Baseline
+             * @default []
+             */
+            pg_2011_baseline: components["schemas"]["PowerBaselinePoint"][];
+            /** Pmax W */
+            pmax_w?: number | null;
+            /**
+             * Rider Curve
+             * @default []
+             */
+            rider_curve: components["schemas"]["PowerCurvePoint"][];
+            /** Weight Kg */
+            weight_kg?: number | null;
+            /** Window Days */
+            window_days: number;
+            /** Wprime J */
+            wprime_j?: number | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** PowerCurvePoint */
+        PowerCurvePoint: {
+            /** Date */
+            date?: string | null;
+            /** Duration S */
+            duration_s: number;
+            /** Pct Ftp */
+            pct_ftp?: number | null;
+            /** Ride Id */
+            ride_id?: string | null;
+            /** Watts */
+            watts: number;
+            /** Watts Per Kg */
+            watts_per_kg?: number | null;
+        } & {
+            [key: string]: unknown;
+        };
         /** ProfileCreated */
         ProfileCreated: {
             /** Id */
@@ -1610,6 +1742,39 @@ export interface components {
             changed?: number | null;
             /** Ok */
             ok?: boolean | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** RideSummary */
+        RideSummary: {
+            /** Avg Power W */
+            avg_power_w?: number | null;
+            /** Distance Km */
+            distance_km?: number | null;
+            /** Duration S */
+            duration_s?: number | null;
+            /** Elevation M */
+            elevation_m?: number | null;
+            /**
+             * Name
+             * @default
+             */
+            name: string;
+            /** Np W */
+            np_w?: number | null;
+            /** Ride Id */
+            ride_id: string;
+            /**
+             * Source
+             * @default
+             */
+            source: string;
+            /** Sport */
+            sport?: string | null;
+            /** Started At */
+            started_at?: string | null;
+            /** Tss */
+            tss?: number | null;
         } & {
             [key: string]: unknown;
         };
@@ -1975,6 +2140,27 @@ export interface components {
              * @default holiday
              */
             type: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** WellnessDay */
+        WellnessDay: {
+            /** Atl */
+            atl?: number | null;
+            /** Ctl */
+            ctl?: number | null;
+            /** Date */
+            date: string;
+            /** Eftp */
+            eftp?: number | null;
+            /** Hrv */
+            hrv?: number | null;
+            /** Rhr */
+            rhr?: number | null;
+            /** Sleep H */
+            sleep_h?: number | null;
+            /** Tsb */
+            tsb?: number | null;
         } & {
             [key: string]: unknown;
         };
@@ -2527,6 +2713,26 @@ export interface operations {
             };
         };
     };
+    api_profile_power_curve_api_profile_power_curve_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PowerCurve"];
+                };
+            };
+        };
+    };
     api_profiles_api_profiles_get: {
         parameters: {
             query?: never;
@@ -2727,6 +2933,26 @@ export interface operations {
             };
         };
     };
+    api_rides_api_rides_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RideSummary"][];
+                };
+            };
+        };
+    };
     api_routes_api_routes_get: {
         parameters: {
             query?: never;
@@ -2867,6 +3093,26 @@ export interface operations {
             };
         };
     };
+    api_wellness_api_wellness_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WellnessDay"][];
+                };
+            };
+        };
+    };
     api_workout_detail_api_workout__category___filename__get: {
         parameters: {
             query?: never;
@@ -2883,6 +3129,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["WorkoutDetail"];
+                };
+            };
+        };
+    };
+    api_workouts_api_workouts_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkoutRow"][];
                 };
             };
         };

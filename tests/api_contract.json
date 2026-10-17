@@ -1480,6 +1480,194 @@
         "title": "PlanWeek",
         "type": "object"
       },
+      "PowerBaselinePoint": {
+        "additionalProperties": true,
+        "properties": {
+          "duration_s": {
+            "title": "Duration S",
+            "type": "integer"
+          },
+          "watts_at_current_weight": {
+            "default": 0,
+            "title": "Watts At Current Weight",
+            "type": "number"
+          },
+          "watts_per_kg": {
+            "default": 0,
+            "title": "Watts Per Kg",
+            "type": "number"
+          }
+        },
+        "required": [
+          "duration_s"
+        ],
+        "title": "PowerBaselinePoint",
+        "type": "object"
+      },
+      "PowerCurve": {
+        "additionalProperties": true,
+        "properties": {
+          "cp_w": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cp W"
+          },
+          "current_ftp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Ftp"
+          },
+          "n_rides": {
+            "default": 0,
+            "title": "N Rides",
+            "type": "integer"
+          },
+          "needs_backfill": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Needs Backfill"
+          },
+          "pg_2011_baseline": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PowerBaselinePoint"
+            },
+            "title": "Pg 2011 Baseline",
+            "type": "array"
+          },
+          "pmax_w": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pmax W"
+          },
+          "rider_curve": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PowerCurvePoint"
+            },
+            "title": "Rider Curve",
+            "type": "array"
+          },
+          "weight_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight Kg"
+          },
+          "window_days": {
+            "title": "Window Days",
+            "type": "integer"
+          },
+          "wprime_j": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wprime J"
+          }
+        },
+        "required": [
+          "window_days"
+        ],
+        "title": "PowerCurve",
+        "type": "object"
+      },
+      "PowerCurvePoint": {
+        "additionalProperties": true,
+        "properties": {
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date"
+          },
+          "duration_s": {
+            "title": "Duration S",
+            "type": "integer"
+          },
+          "pct_ftp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct Ftp"
+          },
+          "ride_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ride Id"
+          },
+          "watts": {
+            "title": "Watts",
+            "type": "number"
+          },
+          "watts_per_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Watts Per Kg"
+          }
+        },
+        "required": [
+          "duration_s",
+          "watts"
+        ],
+        "title": "PowerCurvePoint",
+        "type": "object"
+      },
       "ProfileCreated": {
         "additionalProperties": true,
         "properties": {
@@ -2250,6 +2438,118 @@
           }
         },
         "title": "RematchResult",
+        "type": "object"
+      },
+      "RideSummary": {
+        "additionalProperties": true,
+        "properties": {
+          "avg_power_w": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Power W"
+          },
+          "distance_km": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance Km"
+          },
+          "duration_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration S"
+          },
+          "elevation_m": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Elevation M"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          },
+          "np_w": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Np W"
+          },
+          "ride_id": {
+            "title": "Ride Id",
+            "type": "string"
+          },
+          "source": {
+            "default": "",
+            "title": "Source",
+            "type": "string"
+          },
+          "sport": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sport"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "tss": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tss"
+          }
+        },
+        "required": [
+          "ride_id"
+        ],
+        "title": "RideSummary",
         "type": "object"
       },
       "RiderStats": {
@@ -3101,6 +3401,97 @@
         "title": "UnavailablePeriod",
         "type": "object"
       },
+      "WellnessDay": {
+        "additionalProperties": true,
+        "properties": {
+          "atl": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Atl"
+          },
+          "ctl": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ctl"
+          },
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "eftp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eftp"
+          },
+          "hrv": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hrv"
+          },
+          "rhr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rhr"
+          },
+          "sleep_h": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sleep H"
+          },
+          "tsb": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tsb"
+          }
+        },
+        "required": [
+          "date"
+        ],
+        "title": "WellnessDay",
+        "type": "object"
+      },
       "WorkoutDetail": {
         "additionalProperties": true,
         "properties": {
@@ -3672,6 +4063,23 @@
         }
       }
     },
+    "/api/profile/power-curve": {
+      "get": {
+        "operationId": "api_profile_power_curve_api_profile_power_curve_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PowerCurve"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/profiles": {
       "get": {
         "operationId": "api_profiles_api_profiles_get",
@@ -3840,6 +4248,27 @@
         }
       }
     },
+    "/api/rides": {
+      "get": {
+        "operationId": "api_rides_api_rides_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RideSummary"
+                  },
+                  "title": "Response 200 Api Rides Api Rides Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/routes": {
       "get": {
         "operationId": "api_routes_api_routes_get",
@@ -3959,6 +4388,27 @@
         }
       }
     },
+    "/api/wellness": {
+      "get": {
+        "operationId": "api_wellness_api_wellness_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WellnessDay"
+                  },
+                  "title": "Response 200 Api Wellness Api Wellness Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/workout/{category}/{filename}": {
       "get": {
         "operationId": "api_workout_detail_api_workout__category___filename__get",
@@ -3968,6 +4418,27 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/WorkoutDetail"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/workouts": {
+      "get": {
+        "operationId": "api_workouts_api_workouts_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WorkoutRow"
+                  },
+                  "title": "Response 200 Api Workouts Api Workouts Get",
+                  "type": "array"
                 }
               }
             },

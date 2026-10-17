@@ -2183,7 +2183,7 @@ _backfill_tasks: dict[str, dict] = {}
 _backfill_thread_lock = threading.Lock()
 
 
-@app.get("/api/profile/power-curve")
+@app.get("/api/profile/power-curve", responses={200: {"model": api_models.PowerCurve}})
 def api_profile_power_curve(window_days: int = Query(90, ge=1, le=3650),
                               refresh: int = Query(0)):
     """v1.3.0 — aggregated rider mean-max curve + P&G 2011 baseline.
@@ -5005,7 +5005,7 @@ def _wellness_record_to_api_dict(w: dict) -> dict:
     }
 
 
-@app.get("/api/wellness")
+@app.get("/api/wellness", responses={200: {"model": list[api_models.WellnessDay]}})
 def api_wellness(days: int = Query(28),
                  date_from: str | None = Query(None, alias="from"),
                  date_to: str | None = Query(None, alias="to")):
@@ -19135,7 +19135,7 @@ def api_rides_sync(force: int = Query(0)):
     return result
 
 
-@app.get("/api/rides")
+@app.get("/api/rides", responses={200: {"model": list[api_models.RideSummary]}})
 def api_rides(limit: int = Query(0)):
     """List all saved rides as a single flat array sorted newest-first.
 

@@ -562,3 +562,58 @@ class RegionsList(_Model):
     worlds: list[RegionWorld] = []
     real_world_meta: Optional[RealWorldMeta] = None
 
+
+# ── Analysis: fitness and form, power curve, rides ──────────────────────────
+
+class WellnessDay(_Model):
+    date: str
+    ctl: Optional[float] = None
+    atl: Optional[float] = None
+    tsb: Optional[float] = None
+    hrv: Optional[float] = None
+    rhr: Optional[float] = None
+    sleep_h: Optional[float] = None
+    eftp: Optional[float] = None
+
+
+class PowerCurvePoint(_Model):
+    duration_s: int
+    watts: float
+    watts_per_kg: Optional[float] = None
+    pct_ftp: Optional[float] = None
+    ride_id: Optional[str] = None
+    date: Optional[str] = None
+
+
+class PowerBaselinePoint(_Model):
+    duration_s: int
+    watts_per_kg: float = 0
+    watts_at_current_weight: float = 0
+
+
+class PowerCurve(_Model):
+    window_days: int
+    n_rides: int = 0
+    weight_kg: Optional[float] = None
+    current_ftp: Optional[float] = None
+    rider_curve: list[PowerCurvePoint] = []
+    pg_2011_baseline: list[PowerBaselinePoint] = []
+    cp_w: Optional[float] = None
+    wprime_j: Optional[float] = None
+    pmax_w: Optional[float] = None
+    needs_backfill: Optional[bool] = None
+
+
+class RideSummary(_Model):
+    ride_id: str
+    source: str = ""
+    name: str = ""
+    sport: Optional[str] = None
+    started_at: Optional[str] = None
+    duration_s: Optional[int] = None
+    distance_km: Optional[float] = None
+    elevation_m: Optional[int] = None
+    avg_power_w: Optional[int] = None
+    np_w: Optional[int] = None
+    tss: Optional[float] = None
+

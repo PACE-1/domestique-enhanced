@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from "react"
 
 import { AppShell, NotMigrated, TABS, isTab } from "@/components/AppShell"
+import { Analysis } from "@/screens/Analysis"
 import { Dfa } from "@/screens/Dfa"
 import { Home } from "@/screens/Home"
 import { Library } from "@/screens/Library"
@@ -29,7 +30,7 @@ export function App() {
   const tab = isTab(route) ? route : "home"
   return (
     <AppShell tab={tab}>
-      {tab === "dfa" ? <Dfa /> : tab === "home" ? <Home /> : tab === "plan" ? <Plan /> : tab === "library" ? <Library /> : tab === "picker" ? <Shuffle /> : tab === "courses" ? <Routes /> : <NotMigrated label={TABS.find((t) => t.id === tab)!.label} />}
+      {tab === "dfa" ? <Dfa /> : tab === "home" ? <Home /> : tab === "plan" ? <Plan /> : tab === "library" ? <Library /> : tab === "picker" ? <Shuffle /> : tab === "courses" ? <Routes /> : tab === "analysis" ? <Analysis /> : <NotMigrated label={TABS.find((t) => t.id === tab)!.label} />}
     </AppShell>
   )
 }

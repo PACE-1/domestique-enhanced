@@ -23,7 +23,7 @@ def contract() -> dict:
         for method, op in ops.items():
             ok = op.get("responses", {}).get("200", {}).get("content", {}).get(
                 "application/json", {}).get("schema", {})
-            if "$ref" in ok:        # only routes with a declared model
+            if "$ref" in ok or "$ref" in ok.get("items", {}):   # only routes with a declared model (or a list of one)
                 kept[method] = {
                     "operationId": op.get("operationId"),
                     "responses": {"200": {"description": "OK", "content": {
