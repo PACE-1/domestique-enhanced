@@ -399,3 +399,34 @@ test("the plan form takes advanced options and previews the phases", async ({ pa
   await expect(page.getByText(/\d+ weeks/).first()).toBeVisible()
   await expect(page.getByRole("alert")).toHaveCount(0)
 })
+
+test("Analysis shows the training-model cards and the model check runs on request", async ({ page }) => {
+  await page.goto("#/analysis")
+  await expect(page.getByRole("heading", { name: "Fatigue resistance" })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Your training-load time constants" })).toBeVisible()
+  await page.getByRole("button", { name: "Check the model" }).click()
+  await expect(page.getByRole("button", { name: "Recompute" })).toBeVisible({ timeout: 60000 })
+  await expect(page.getByRole("alert")).toHaveCount(0)
+})
+
+test("Library filters by type and downloads the outdoor variant", async ({ page }) => {
+  await page.goto("#/library")
+  await page.getByLabel(/^Type/).selectOption("threshold")
+  await page.getByRole("checkbox", { name: "Outdoor variant for downloads" }).click()
+  await expect(page.getByRole("alert")).toHaveCount(0)
+  await expect(page.getByRole("button", { name: "Clear filters" })).toBeVisible()
+})
+
+test("Routes suggests routes for a ride length", async ({ page }) => {
+  await page.goto("#/courses")
+  await page.getByRole("button", { name: "Suggest routes" }).click()
+  await expect(page.getByRole("button", { name: "Show others" })).toBeVisible()
+  await expect(page.getByRole("alert")).toHaveCount(0)
+})
+
+test("Home shows this week and last week", async ({ page }) => {
+  await page.goto("#/home")
+  await expect(page.getByRole("heading", { name: "This week so far" })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Last week" })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "DFA α1" })).toBeVisible()
+})

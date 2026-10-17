@@ -60,5 +60,5 @@ function WeekCard({ offset, title }: { offset: number; title: string }) {
   )
 }
 
-export const ThisWeek = () => <WeekCard offset={0} title="This week" />
+export const ThisWeek = () => <WeekCard offset={0} title="This week so far" />
 export const LastWeek = () => <WeekCard offset={-1} title="Last week" />

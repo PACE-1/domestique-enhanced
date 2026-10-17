@@ -19,16 +19,16 @@ consumer map that decides what can be deleted.
 
 | Workflow | New UI | Main endpoints | Tests | Legacy behaviour not yet in the new UI (from the route list, not an exhaustive audit) |
 |---|---|---|---|---|
-| First-run setup | `Setup.tsx` | `/api/setup/*`, `/api/icu/connection` | vitest, e2e | none known |
-| Profiles | `ProfilePicker.tsx`, `ProfileSetup.tsx` | `/api/profiles*` | vitest, e2e | none known |
-| Home | `Home.tsx`, `Readiness.tsx`, `DailyCheckIn.tsx` | `/api/plan`, `/api/rider-stats`, `/api/programme/summary`, `/api/readiness`, `/api/today-session*`, `/api/daily-log` | vitest, e2e | HRV upload, morning log extras, retest nudges, blood markers and body metrics, event projection, fitness sparkline |
-| Plan | `Plan.tsx`, `PlanGenerate`, `PlanTimeOff`, `PlanRace`, `PlanAvailability`, `PlanRematch`, `PlanRedraw` | `/api/plan*` | vitest, e2e | month calendar and drag to move, per-day availability grid, plan blueprint and custom bands, several events, start-date entry modes, calendar push to intervals.icu, plan preview |
-| Workout Library | `Library.tsx`, `WorkoutCard.tsx` | `/api/workouts`, `/api/workout/*` | vitest, e2e | tag and content-class filters, bulk segment view, FIT export of a workout |
-| Workout Shuffle | `Shuffle.tsx` | `/api/picker` | vitest, e2e | none known |
-| Routes & Climbs | `Routes.tsx` | `/api/routes*`, `/api/course/*` | vitest, e2e | route suggestion, GPX upload, world cards, surface filter |
-| Analysis | `Analysis.tsx`, `Chart.tsx` | `/api/wellness`, `/api/profile/power-curve`, `/api/rides` | vitest, e2e | ride detail, FIT import, ride notes and PRs, FTP-test review, fatigue resistance, energy-system chart |
-| Settings | `Settings.tsx` | `/api/settings`, `/api/icu/connection`, `/api/sync*`, `/api/version`, `/api/update/check` | vitest, e2e | connect and disconnect intervals.icu, extra workout folders, custom zones, logs viewer, data export |
-| DFA α1 | `Dfa.tsx` | `/api/profile/dfa-*` | vitest, e2e | none known |
+| First-run setup | `Setup.tsx` | `/api/setup/*`, `/api/icu/connection` | vitest, e2e | none |
+| Profiles | `ProfilePicker.tsx`, `ProfileSetup.tsx` | `/api/profiles*` | vitest, e2e | none |
+| Home | `Home.tsx`, `Readiness.tsx`, `DailyCheckIn.tsx`, `Hrv.tsx`, `BodyPerf.tsx`, `Records.tsx`, `RetestNudge.tsx`, `WeekSummary.tsx`, `DfaSnapshot.tsx` | `/api/plan`, `/api/rider-stats`, `/api/programme/summary`, `/api/readiness*`, `/api/today-session*`, `/api/daily-log`, `/api/wellness/*`, `/api/metrics/*`, `/api/week-summary` | vitest, e2e | none |
+| Plan | `Plan.tsx`, `PlanGenerate` (+`PlanAdvanced`), `PlanCalendar`, `PlanTimeOff`, `PlanRace`, `PlanAvailability`, `PlanRematch`, `PlanRedraw`, `SessionExport`, `GoalEvent` | `/api/plan*`, `/api/calendar`, `/api/icu/races` | vitest, e2e | the small power-block pictures on completed days of the legacy grid (`/api/activities/blocks`): the new calendar links each ridden day to its ride instead |
+| Workout Library | `Library.tsx`, `WorkoutCard.tsx` | `/api/workouts*`, `/api/workout/*`, `/api/download/zwo/*`, `/api/export/fit-workout`, `/api/surface-types` | vitest, e2e | the mini power profile in each list row (`/api/workouts/bulk-segments`): the profile shows when a workout is opened |
+| Workout Shuffle | `Shuffle.tsx` | `/api/picker` | vitest, e2e | none |
+| Routes & Climbs | `Routes.tsx`, `RouteFinder.tsx` | `/api/routes*`, `/api/course/*` | vitest, e2e | none: world cards are the region list; `/api/virtual-routes` and `/api/courses` are replaced by `/api/routes`; the server has no GPX upload |
+| Analysis | `Analysis.tsx`, `Chart.tsx`, `RideDetail.tsx`, `RideTools.tsx`, `EnergySystems.tsx`, `TrainingModels.tsx`, `HistoryBackfill.tsx` | `/api/wellness`, `/api/profile/*`, `/api/rides*`, `/api/ride/*`, `/api/activity/*/race` | vitest, e2e | none |
+| Settings | `Settings.tsx`, `ZonesEditor.tsx`, `Folders.tsx`, `CalendarPush.tsx`, `Diagnostics.tsx`, `FtpHistory.tsx` | `/api/settings*`, `/api/icu/*`, `/api/sync*`, `/api/version`, `/api/update/check`, `/api/logs`, `/api/diag/*` | vitest, e2e | none |
+| DFA α1 | `Dfa.tsx` | `/api/profile/dfa-*` | vitest, e2e | none |
 
 ## Retirement rule
 
