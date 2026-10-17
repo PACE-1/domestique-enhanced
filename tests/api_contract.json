@@ -1503,6 +1503,49 @@
         "title": "SessionDismissed",
         "type": "object"
       },
+      "SessionMoved": {
+        "additionalProperties": true,
+        "properties": {
+          "moved": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlanSession"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "swapped": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlanSession"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "vacated": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vacated"
+          }
+        },
+        "title": "SessionMoved",
+        "type": "object"
+      },
       "SetupDefaults": {
         "additionalProperties": true,
         "properties": {
@@ -1693,6 +1736,23 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SessionDismissed"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/plan/move-session": {
+      "post": {
+        "operationId": "api_plan_move_session_api_plan_move_session_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionMoved"
                 }
               }
             },

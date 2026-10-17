@@ -14368,7 +14368,7 @@ def _auto_apply_missed_moves(plan: dict, today: date) -> list[dict]:
     return applied
 
 
-@app.post("/api/plan/move-session")
+@app.post("/api/plan/move-session", responses={200: {"model": api_models.SessionMoved}})
 async def api_plan_move_session(request: Request):
     """Move a session from one date to another (fix26 §6.2).
 
