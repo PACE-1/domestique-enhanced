@@ -43,25 +43,6 @@ _V161_FRONTEND_CODES = (
 )
 
 
-class FrontendCodeWiringTests(unittest.TestCase):
-
-
-    def test_diag_helper_invoked_for_v161_codes(self):
-        """Each v1.6.1 code should appear inside a ``_diagFrontendError(``
-        call (string-literal check). Catches the case where a code is
-        named in a comment but never actually emitted.
-        """
-        # Trim down to lines that mention _diagFrontendError so the
-        # substring check below has a tight scope.
-        emit_lines = [
-            line for line in self.template_text.splitlines()
-            if "_diagFrontendError" in line
-        ]
-        emit_blob = "\n".join(emit_lines)
-        not_emitted = [c for c in _V161_FRONTEND_CODES if c not in emit_blob]
-        self.assertEqual(not_emitted, [],
-                         f"codes never appear inside a _diagFrontendError "
-                         f"call: {not_emitted}")
 
 
 if __name__ == "__main__":

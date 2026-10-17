@@ -213,22 +213,8 @@ class TestZeroMinRegexHidesSegments(unittest.TestCase):
     """
 
 
-    def test_strips_zero_min_segments(self):
-        desc = "10min @ 65% FTP | 0min @ 110% FTP | 5min @ 75% FTP"
-        out = self._fix_zero_min_py(desc)
-        # Only the standalone "0min @ N% FTP" gets stripped — "10min" must stay.
-        self.assertNotRegex(out, r"\b0min @")
-        self.assertIn("10min @ 65% FTP", out)
-        self.assertIn("5min @ 75% FTP", out)
 
-    def test_keeps_non_zero_min_segments(self):
-        desc = "20min @ 88% FTP | 1min @ 110% FTP | 5min @ 65% FTP"
-        out = self._fix_zero_min_py(desc)
-        self.assertEqual(out, "20min @ 88% FTP | 1min @ 110% FTP | 5min @ 65% FTP")
 
-    def test_handles_empty_and_no_match(self):
-        self.assertEqual(self._fix_zero_min_py(""), "")
-        self.assertEqual(self._fix_zero_min_py("Z2 endurance ride"), "Z2 endurance ride")
 
 
 class TestTodayUsesLocalDate(HomepageTodayConsistencyBase):

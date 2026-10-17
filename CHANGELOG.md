@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.0.1 — One interface (2026-10-16)
+## v1.0.1 — One interface (2026-10-17)
 
 The old dashboard is gone. Everything it did now lives in the new interface, which is the only one the app opens. Your data folder (`~/.domestique`) is unchanged.
 
