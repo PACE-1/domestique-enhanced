@@ -83,7 +83,7 @@ function Connect({ c, onChange }: { c: LlmConnection; onChange: () => void }) {
             type="password"
             autoComplete="off"
             value={f.api_key}
-            placeholder={c.has_key ? "Saved. Leave empty to keep it." : "Not needed for Ollama or LM Studio"}
+            placeholder={c.has_key ? "Saved. Leave empty to keep it for the same provider and address." : "Not needed for Ollama or LM Studio"}
             onChange={(e) => setF({ ...f, api_key: e.target.value })}
           />
         </Label>

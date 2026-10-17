@@ -62,7 +62,16 @@ def save(profile_dir: Path, provider: str, base_url: str, model: str, api_key: "
         base_url = DEFAULT_BASE[provider]
     if not base_url.startswith(("http://", "https://")):
         raise ValueError("base URL must start with http:// or https://")
-    key = load(profile_dir).get("api_key", "") if api_key is None else (api_key or "").strip()
+    if api_key is None:
+        # Keep the stored key only for the same server. A blank key on a new provider or address
+        # must never carry the old secret to it.
+        old = load(profile_dir)
+        same_server = old.get("provider") == provider and old.get("base_url") == base_url
+        if old.get("api_key") and not same_server:
+            raise ValueError("Enter the API key for this provider. The saved key is only reused for the same provider and address.")
+        key = old.get("api_key", "") if same_server else ""
+    else:
+        key = (api_key or "").strip()
     if any(c in key for c in "\r\n"):
         raise ValueError("API key may not contain newlines")
     if provider == "anthropic" and not key:

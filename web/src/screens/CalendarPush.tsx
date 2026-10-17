@@ -66,6 +66,9 @@ export function CalendarPush() {
             </div>
             {msg && <p role="status">{msg}</p>}
             {error && <p role="alert">Couldn’t do that: {error}</p>}
+            <p className="text-xs text-muted-foreground">
+              intervals.icu sends planned workouts on to every service you linked there. To stop them going to Zwift, open intervals.icu → Settings → Connections → Zwift and turn off workout upload.
+            </p>
           </div>
         )
       }}

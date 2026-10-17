@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- **Fixed: changing the AI provider could send the old API key to the new server.** A saved key is now reused only for the same provider and address; otherwise you must enter one.
+- **Fixed: AI coach requests no longer freeze the rest of the app** while the model is answering.
+- **Fixed: editing a daily check-in no longer erases its saved notes.**
+- **Fixed: asking the coach to review a ride that does not exist returns "not found"** instead of an error.
+- **The programme summary image opens in a new tab** instead of downloading.
+- **Settings now says how to stop planned workouts going to Zwift** (an intervals.icu setting).
 - **Daily check-in uses a 1 to 5 scale, 5 best.** It is stored on the Hooper 1 to 7 scale (1 best) that the readiness checks were built on, so nothing changes in how readiness works and earlier check-ins still read correctly. After saving it shows an overall wellness score out of 5.
 - **Fixed the setup "Auto-fill from your data" message.** It said "Nothing to fill yet" even when it had filled your numbers. It now lists what it filled, or says whether intervals.icu has no numbers or could not be read.
 - **Setup and profile pages use more of the screen.** The setup wizard is wider with more padding, the profile fields sit in two columns, and the rider picker is centred. A padding regression from the new look (text touching card edges on setup and DFA) is fixed.

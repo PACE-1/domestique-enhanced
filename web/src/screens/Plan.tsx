@@ -203,7 +203,7 @@ export function Plan() {
         <Button size="sm" variant="outline" disabled={updating} onClick={updateNow}>
           {updating ? "Updating…" : "Update plan"}
         </Button>
-        <a className={buttonVariants({ size: "sm", variant: "ghost" })} href={summaryImageUrl} download="programme-summary.png">
+        <a className={buttonVariants({ size: "sm", variant: "ghost" })} href={summaryImageUrl} target="_blank" rel="noopener noreferrer">
           Summary image
         </a>
       </div>
