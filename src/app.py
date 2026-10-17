@@ -7510,7 +7510,7 @@ def api_logs(lines: int = Query(100)):
         return JSONResponse({"error": "Failed to read log file", "path": str(log_path)}, 500)
 
 
-@app.get("/api/version")
+@app.get("/api/version", responses={200: {"model": api_models.VersionInfo}})
 def api_version():
     """Return app version and system info for bug reports.
 
@@ -8649,7 +8649,7 @@ def api_icu_athlete_numbers():
     return out
 
 
-@app.get("/api/update/check")
+@app.get("/api/update/check", responses={200: {"model": api_models.UpdateCheck}})
 def api_update_check(force: int = Query(0)):
     """Live GitHub-Releases poll with 6h cache + platform-specific asset.
 
@@ -8754,7 +8754,7 @@ def api_update_check(force: int = Query(0)):
         }
 
 
-@app.get("/api/settings")
+@app.get("/api/settings", responses={200: {"model": api_models.SettingsRead}})
 def api_settings():
     from profile_manager import ProfileManager
     pm = ProfileManager.get()
@@ -8828,7 +8828,7 @@ def api_settings():
     }
 
 
-@app.post("/api/settings")
+@app.post("/api/settings", responses={200: {"model": api_models.SettingsSaved}})
 def update_settings(request_body: dict):
     """Update athlete settings — writes to active profile's athlete.json.
 
@@ -9208,7 +9208,7 @@ def api_sync():
     return result
 
 
-@app.get("/api/sync/status")
+@app.get("/api/sync/status", responses={200: {"model": api_models.SyncStatus}})
 def api_sync_status():
     return db.get_sync_status()
 

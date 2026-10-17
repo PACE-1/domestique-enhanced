@@ -617,3 +617,61 @@ class RideSummary(_Model):
     np_w: Optional[int] = None
     tss: Optional[float] = None
 
+
+# ── Settings, sync and version ──────────────────────────────────────────────
+
+class ZoneBand(_Model):
+    zone: str
+    name: str = ""
+    low: float = 0
+    high: float = 0
+
+
+class SettingsRead(_Model):
+    weight: float
+    ftp: float
+    eftp: Optional[float] = None
+    lthr: float
+    max_hr: float
+    target_mode: str = "power"          # power | hr
+    lthr_is_set: bool = False
+    w_per_kg: Optional[float] = None
+    ftp_source: Optional[str] = None
+    ftp_source_date: Optional[str] = None
+    lthr_source: Optional[str] = None
+    power_zones: list[ZoneBand] = []
+    hr_zones: list[ZoneBand] = []
+
+
+class SettingsSaved(_Model):
+    ok: bool = True
+    updated: dict = {}
+    settings: SettingsRead
+
+
+class SyncStatus(_Model):
+    last_sync: Optional[dict] = None
+    wellness_records: int = 0
+    activity_records: int = 0
+    auth_disabled: bool = False
+    consecutive_failures: int = 0
+    last_error: Optional[str] = None
+
+
+class VersionInfo(_Model):
+    app: str
+    version: str
+    python: str = ""
+    frozen: bool = False
+    data_dir: str = ""
+
+
+class UpdateCheck(_Model):
+    current: str
+    latest: Optional[str] = None
+    update_available: bool = False
+    release_url: Optional[str] = None
+    download_url: Optional[str] = None
+    checked_at: Optional[str] = None
+    error: Optional[str] = None
+

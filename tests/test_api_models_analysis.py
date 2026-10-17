@@ -37,3 +37,20 @@ def test_a_power_curve_point_validates():
     p = api_models.PowerCurvePoint.model_validate({
         "duration_s": 300, "watts": 310, "watts_per_kg": 4.4, "pct_ftp": 124.0, "ride_id": "icu_1", "date": "2026-10-01"})
     assert p.watts == 310
+
+
+def test_settings_save_sync_status_and_version_validate():
+    from fastapi.testclient import TestClient
+    import app
+    with TestClient(app.app) as c:
+        read = api_models.SettingsRead.model_validate(c.get("/api/settings").json())
+        assert read.power_zones and read.hr_zones and read.target_mode in ("power", "hr")
+        r = c.post("/api/settings", json={"weight": 71.5})
+        assert r.status_code == 200
+        saved = api_models.SettingsSaved.model_validate(r.json())
+        assert saved.settings.weight == 71.5
+        assert c.post("/api/settings", json={"lthr": 999}).status_code == 400
+        assert c.post("/api/settings", json={"target_mode": "hr", "max_hr": 150, "lthr": 160}).status_code == 400
+        api_models.SyncStatus.model_validate(c.get("/api/sync/status").json())
+        v = api_models.VersionInfo.model_validate(c.get("/api/version").json())
+        assert v.app == "domestique" and v.version

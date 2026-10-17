@@ -2973,6 +2973,140 @@
         "title": "SessionSwapped",
         "type": "object"
       },
+      "SettingsRead": {
+        "additionalProperties": true,
+        "properties": {
+          "eftp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eftp"
+          },
+          "ftp": {
+            "title": "Ftp",
+            "type": "number"
+          },
+          "ftp_source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp Source"
+          },
+          "ftp_source_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp Source Date"
+          },
+          "hr_zones": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ZoneBand"
+            },
+            "title": "Hr Zones",
+            "type": "array"
+          },
+          "lthr": {
+            "title": "Lthr",
+            "type": "number"
+          },
+          "lthr_is_set": {
+            "default": false,
+            "title": "Lthr Is Set",
+            "type": "boolean"
+          },
+          "lthr_source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lthr Source"
+          },
+          "max_hr": {
+            "title": "Max Hr",
+            "type": "number"
+          },
+          "power_zones": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ZoneBand"
+            },
+            "title": "Power Zones",
+            "type": "array"
+          },
+          "target_mode": {
+            "default": "power",
+            "title": "Target Mode",
+            "type": "string"
+          },
+          "w_per_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "W Per Kg"
+          },
+          "weight": {
+            "title": "Weight",
+            "type": "number"
+          }
+        },
+        "required": [
+          "weight",
+          "ftp",
+          "lthr",
+          "max_hr"
+        ],
+        "title": "SettingsRead",
+        "type": "object"
+      },
+      "SettingsSaved": {
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/SettingsRead"
+          },
+          "updated": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Updated",
+            "type": "object"
+          }
+        },
+        "required": [
+          "settings"
+        ],
+        "title": "SettingsSaved",
+        "type": "object"
+      },
       "SetupDefaults": {
         "additionalProperties": true,
         "properties": {
@@ -3110,6 +3244,56 @@
           }
         },
         "title": "SyncProgress",
+        "type": "object"
+      },
+      "SyncStatus": {
+        "additionalProperties": true,
+        "properties": {
+          "activity_records": {
+            "default": 0,
+            "title": "Activity Records",
+            "type": "integer"
+          },
+          "auth_disabled": {
+            "default": false,
+            "title": "Auth Disabled",
+            "type": "boolean"
+          },
+          "consecutive_failures": {
+            "default": 0,
+            "title": "Consecutive Failures",
+            "type": "integer"
+          },
+          "last_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Error"
+          },
+          "last_sync": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Sync"
+          },
+          "wellness_records": {
+            "default": 0,
+            "title": "Wellness Records",
+            "type": "integer"
+          }
+        },
+        "title": "SyncStatus",
         "type": "object"
       },
       "TierDownApplied": {
@@ -3401,6 +3585,114 @@
         "title": "UnavailablePeriod",
         "type": "object"
       },
+      "UpdateCheck": {
+        "additionalProperties": true,
+        "properties": {
+          "checked_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked At"
+          },
+          "current": {
+            "title": "Current",
+            "type": "string"
+          },
+          "download_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Download Url"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "latest": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest"
+          },
+          "release_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Release Url"
+          },
+          "update_available": {
+            "default": false,
+            "title": "Update Available",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "current"
+        ],
+        "title": "UpdateCheck",
+        "type": "object"
+      },
+      "VersionInfo": {
+        "additionalProperties": true,
+        "properties": {
+          "app": {
+            "title": "App",
+            "type": "string"
+          },
+          "data_dir": {
+            "default": "",
+            "title": "Data Dir",
+            "type": "string"
+          },
+          "frozen": {
+            "default": false,
+            "title": "Frozen",
+            "type": "boolean"
+          },
+          "python": {
+            "default": "",
+            "title": "Python",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "app",
+          "version"
+        ],
+        "title": "VersionInfo",
+        "type": "object"
+      },
       "WellnessDay": {
         "additionalProperties": true,
         "properties": {
@@ -3681,6 +3973,35 @@
           "type"
         ],
         "title": "WorkoutSegment",
+        "type": "object"
+      },
+      "ZoneBand": {
+        "additionalProperties": true,
+        "properties": {
+          "high": {
+            "default": 0,
+            "title": "High",
+            "type": "number"
+          },
+          "low": {
+            "default": 0,
+            "title": "Low",
+            "type": "number"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          },
+          "zone": {
+            "title": "Zone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "zone"
+        ],
+        "title": "ZoneBand",
         "type": "object"
       }
     }
@@ -4303,6 +4624,38 @@
         }
       }
     },
+    "/api/settings": {
+      "get": {
+        "operationId": "api_settings_api_settings_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsRead"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "operationId": "update_settings_api_settings_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsSaved"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/setup/defaults": {
       "get": {
         "operationId": "setup_defaults_api_setup_defaults_get",
@@ -4354,6 +4707,23 @@
         }
       }
     },
+    "/api/sync/status": {
+      "get": {
+        "operationId": "api_sync_status_api_sync_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncStatus"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/today-session": {
       "get": {
         "operationId": "api_today_session_api_today_session_get",
@@ -4380,6 +4750,40 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/TodayPersisted"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/update/check": {
+      "get": {
+        "operationId": "api_update_check_api_update_check_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateCheck"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/version": {
+      "get": {
+        "operationId": "api_version_api_version_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionInfo"
                 }
               }
             },

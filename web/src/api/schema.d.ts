@@ -548,6 +548,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_settings_api_settings_get"];
+        put?: never;
+        post: operations["update_settings_api_settings_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/setup/defaults": {
         parameters: {
             query?: never;
@@ -596,6 +612,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/sync/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_sync_status_api_sync_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/today-session": {
         parameters: {
             query?: never;
@@ -622,6 +654,38 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["api_today_session_persist_api_today_session_persist_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/update/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_update_check_api_update_check_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/version": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["api_version_api_version_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1964,6 +2028,67 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** SettingsRead */
+        SettingsRead: {
+            /** Eftp */
+            eftp?: number | null;
+            /** Ftp */
+            ftp: number;
+            /** Ftp Source */
+            ftp_source?: string | null;
+            /** Ftp Source Date */
+            ftp_source_date?: string | null;
+            /**
+             * Hr Zones
+             * @default []
+             */
+            hr_zones: components["schemas"]["ZoneBand"][];
+            /** Lthr */
+            lthr: number;
+            /**
+             * Lthr Is Set
+             * @default false
+             */
+            lthr_is_set: boolean;
+            /** Lthr Source */
+            lthr_source?: string | null;
+            /** Max Hr */
+            max_hr: number;
+            /**
+             * Power Zones
+             * @default []
+             */
+            power_zones: components["schemas"]["ZoneBand"][];
+            /**
+             * Target Mode
+             * @default power
+             */
+            target_mode: string;
+            /** W Per Kg */
+            w_per_kg?: number | null;
+            /** Weight */
+            weight: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** SettingsSaved */
+        SettingsSaved: {
+            /**
+             * Ok
+             * @default true
+             */
+            ok: boolean;
+            settings: components["schemas"]["SettingsRead"];
+            /**
+             * Updated
+             * @default {}
+             */
+            updated: {
+                [key: string]: unknown;
+            };
+        } & {
+            [key: string]: unknown;
+        };
         /** SetupDefaults */
         SetupDefaults: {
             /** Ftp */
@@ -2006,6 +2131,37 @@ export interface components {
             ts?: number | null;
             /** Updated */
             updated?: number | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** SyncStatus */
+        SyncStatus: {
+            /**
+             * Activity Records
+             * @default 0
+             */
+            activity_records: number;
+            /**
+             * Auth Disabled
+             * @default false
+             */
+            auth_disabled: boolean;
+            /**
+             * Consecutive Failures
+             * @default 0
+             */
+            consecutive_failures: number;
+            /** Last Error */
+            last_error?: string | null;
+            /** Last Sync */
+            last_sync?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Wellness Records
+             * @default 0
+             */
+            wellness_records: number;
         } & {
             [key: string]: unknown;
         };
@@ -2143,6 +2299,52 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** UpdateCheck */
+        UpdateCheck: {
+            /** Checked At */
+            checked_at?: string | null;
+            /** Current */
+            current: string;
+            /** Download Url */
+            download_url?: string | null;
+            /** Error */
+            error?: string | null;
+            /** Latest */
+            latest?: string | null;
+            /** Release Url */
+            release_url?: string | null;
+            /**
+             * Update Available
+             * @default false
+             */
+            update_available: boolean;
+        } & {
+            [key: string]: unknown;
+        };
+        /** VersionInfo */
+        VersionInfo: {
+            /** App */
+            app: string;
+            /**
+             * Data Dir
+             * @default
+             */
+            data_dir: string;
+            /**
+             * Frozen
+             * @default false
+             */
+            frozen: boolean;
+            /**
+             * Python
+             * @default
+             */
+            python: string;
+            /** Version */
+            version: string;
+        } & {
+            [key: string]: unknown;
+        };
         /** WellnessDay */
         WellnessDay: {
             /** Atl */
@@ -2261,6 +2463,28 @@ export interface components {
             start: number;
             /** Type */
             type: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** ZoneBand */
+        ZoneBand: {
+            /**
+             * High
+             * @default 0
+             */
+            high: number;
+            /**
+             * Low
+             * @default 0
+             */
+            low: number;
+            /**
+             * Name
+             * @default
+             */
+            name: string;
+            /** Zone */
+            zone: string;
         } & {
             [key: string]: unknown;
         };
@@ -2993,6 +3217,46 @@ export interface operations {
             };
         };
     };
+    api_settings_api_settings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettingsRead"];
+                };
+            };
+        };
+    };
+    update_settings_api_settings_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettingsSaved"];
+                };
+            };
+        };
+    };
     setup_defaults_api_setup_defaults_get: {
         parameters: {
             query?: never;
@@ -3053,6 +3317,26 @@ export interface operations {
             };
         };
     };
+    api_sync_status_api_sync_status_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SyncStatus"];
+                };
+            };
+        };
+    };
     api_today_session_api_today_session_get: {
         parameters: {
             query?: never;
@@ -3089,6 +3373,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TodayPersisted"];
+                };
+            };
+        };
+    };
+    api_update_check_api_update_check_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UpdateCheck"];
+                };
+            };
+        };
+    };
+    api_version_api_version_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VersionInfo"];
                 };
             };
         };
