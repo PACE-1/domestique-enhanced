@@ -38,7 +38,7 @@ export function AppShell({ tab, children }: { tab: TabId; children: ReactNode })
   if (activeId === null) return null
   return (
     <ShellContext.Provider value={value}>
-      <div className="mx-auto max-w-6xl px-4 py-4">
+      <div className="mx-auto max-w-7xl px-4 py-4">
         <nav className="mb-4 flex flex-wrap items-center gap-1" aria-label="Sections">
           {TABS.map((t) => (
             <Button
