@@ -123,6 +123,7 @@ The app runs as one worker process. Everything below runs inside it.
 | History backfill, `pc-backfill`, `backfill-history` | `jobs.start_thread` | single flight (`acquire_backfill_lock`, `already_running`) | `stopping()` checked in the loop |
 | DFA backfill, `dfa-backfill` | `jobs.start_thread` | single flight (`_dfa_backfill_lock`) | cancel hook plus `stopping()` |
 | DFA computation | `jobs.Slot` | one at a time; a timed-out run keeps the slot until it ends | bounded, not interrupted |
+| Weekly fitness recalc | `_after_background_sync`, once per calendar day | the endpoint rebuilds only when the last recalc is over 7 days old | rides on the sync loop |
 | Calendar push debounce | one shared `threading.Timer` (30 s) | one pending timer | cancelled in lifespan shutdown |
 | Plan generation | worker thread under the plan lock | one at a time | finishes or the process exits |
 | Ride and HRV import | request handler | at most 2 at once; later requests wait before their body is read | the request ends with the process |

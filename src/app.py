@@ -8206,6 +8206,7 @@ def _after_background_sync() -> None:
     The daily calendar reconcile, and the F5 eFTP auto-apply (opt-in, behind
     the plausibility guard), which /api/weekly-plan used to run on a read."""
     _icu_push_daily_from_sync()
+    _auto_recalc_from_sync()
     try:
         from profile_manager import ProfileManager
         if not ProfileManager.get().prefs.get("eftp_auto_apply", False):
@@ -8217,6 +8218,29 @@ def _after_background_sync() -> None:
             clear_cache()
     except Exception as _e:  # noqa: BLE001 - never break the sync loop
         _log.debug(f"eftp auto-apply skipped: {_e}")
+
+
+_auto_recalc_last_day: "str | None" = None
+
+
+def _auto_recalc_from_sync() -> None:
+    """db.post_sync_callback: the weekly fitness recalc, once per calendar day.
+    The old dashboard fired /api/plan/auto-recalc when the Plan tab opened; the
+    server now owns it so the new UI need not. The endpoint's own >7-day gate
+    decides whether anything is rebuilt."""
+    global _auto_recalc_last_day
+    today = clock.today().isoformat()
+    if _auto_recalc_last_day == today:
+        return
+    _auto_recalc_last_day = today
+    try:
+        res = api_plan_auto_recalc()
+        if res.get("action") == "recalculated":
+            clear_cache()
+        _log.info("EVENT=auto_recalc_daily action=%s", res.get("action"))
+    except Exception:  # noqa: BLE001 - never break the sync loop
+        _auto_recalc_last_day = None    # retry next sync pass
+        _log.warning("daily auto-recalc failed", exc_info=True)
 
 
 def _icu_push_daily_from_sync() -> None:
