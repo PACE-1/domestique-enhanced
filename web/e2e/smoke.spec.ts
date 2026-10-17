@@ -244,3 +244,36 @@ test("Routes lists courses, filters them, and opens one", async ({ page }) => {
   await expect(page.getByRole("img", { name: /^Elevation profile/ })).toBeVisible()
   await expect(page.getByRole("link", { name: "Download course (.crs)" })).toBeVisible()
 })
+
+test("Analysis shows its cards with empty states and no errors", async ({ page }) => {
+  await page.goto("#/analysis")
+  await expect(page.getByRole("heading", { name: "Fitness and form" })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Power curve" })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Recent rides" })).toBeVisible()
+  await expect(page.getByText(/No fitness data|Latest \(/)).toBeVisible()
+  await expect(page.getByText(/Loading…/)).toHaveCount(0)
+  await expect(page.getByRole("alert")).toHaveCount(0)
+})
+
+test("Settings saves a changed value and shows the zones", async ({ page, request }) => {
+  await page.goto("#/settings")
+  await expect(page.getByRole("heading", { name: "Rider" })).toBeVisible()
+  await expect(page.getByText("Power zones")).toBeVisible()
+  const weight = page.getByLabel("Weight (kg)")
+  await weight.fill("72.5")
+  await page.getByRole("button", { name: "Save changes" }).click()
+  await expect(page.getByRole("status")).toHaveText("Saved.")
+  const s = await (await request.get(BASE + "/api/settings")).json()
+  expect(s.weight).toBe(72.5)
+  await weight.fill("5")
+  await expect(page.getByText(/Weight must be between/)).toBeVisible()
+  await expect(page.getByRole("button", { name: "Save changes" })).toBeDisabled()
+})
+
+test("Settings shows the version and says intervals.icu is not connected", async ({ page }) => {
+  await page.goto("#/settings")
+  await expect(page.getByRole("heading", { name: "About" })).toBeVisible()
+  await expect(page.getByText("Data folder")).toBeVisible()
+  await expect(page.getByText(/Not connected/)).toBeVisible()
+  await expect(page.getByRole("button", { name: "Sync now" })).toBeDisabled()
+})

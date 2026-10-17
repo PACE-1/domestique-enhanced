@@ -1480,6 +1480,194 @@
         "title": "PlanWeek",
         "type": "object"
       },
+      "PowerBaselinePoint": {
+        "additionalProperties": true,
+        "properties": {
+          "duration_s": {
+            "title": "Duration S",
+            "type": "integer"
+          },
+          "watts_at_current_weight": {
+            "default": 0,
+            "title": "Watts At Current Weight",
+            "type": "number"
+          },
+          "watts_per_kg": {
+            "default": 0,
+            "title": "Watts Per Kg",
+            "type": "number"
+          }
+        },
+        "required": [
+          "duration_s"
+        ],
+        "title": "PowerBaselinePoint",
+        "type": "object"
+      },
+      "PowerCurve": {
+        "additionalProperties": true,
+        "properties": {
+          "cp_w": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cp W"
+          },
+          "current_ftp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Ftp"
+          },
+          "n_rides": {
+            "default": 0,
+            "title": "N Rides",
+            "type": "integer"
+          },
+          "needs_backfill": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Needs Backfill"
+          },
+          "pg_2011_baseline": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PowerBaselinePoint"
+            },
+            "title": "Pg 2011 Baseline",
+            "type": "array"
+          },
+          "pmax_w": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pmax W"
+          },
+          "rider_curve": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PowerCurvePoint"
+            },
+            "title": "Rider Curve",
+            "type": "array"
+          },
+          "weight_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight Kg"
+          },
+          "window_days": {
+            "title": "Window Days",
+            "type": "integer"
+          },
+          "wprime_j": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wprime J"
+          }
+        },
+        "required": [
+          "window_days"
+        ],
+        "title": "PowerCurve",
+        "type": "object"
+      },
+      "PowerCurvePoint": {
+        "additionalProperties": true,
+        "properties": {
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date"
+          },
+          "duration_s": {
+            "title": "Duration S",
+            "type": "integer"
+          },
+          "pct_ftp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct Ftp"
+          },
+          "ride_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ride Id"
+          },
+          "watts": {
+            "title": "Watts",
+            "type": "number"
+          },
+          "watts_per_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Watts Per Kg"
+          }
+        },
+        "required": [
+          "duration_s",
+          "watts"
+        ],
+        "title": "PowerCurvePoint",
+        "type": "object"
+      },
       "ProfileCreated": {
         "additionalProperties": true,
         "properties": {
@@ -2252,6 +2440,118 @@
         "title": "RematchResult",
         "type": "object"
       },
+      "RideSummary": {
+        "additionalProperties": true,
+        "properties": {
+          "avg_power_w": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Power W"
+          },
+          "distance_km": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance Km"
+          },
+          "duration_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration S"
+          },
+          "elevation_m": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Elevation M"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          },
+          "np_w": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Np W"
+          },
+          "ride_id": {
+            "title": "Ride Id",
+            "type": "string"
+          },
+          "source": {
+            "default": "",
+            "title": "Source",
+            "type": "string"
+          },
+          "sport": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sport"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "tss": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tss"
+          }
+        },
+        "required": [
+          "ride_id"
+        ],
+        "title": "RideSummary",
+        "type": "object"
+      },
       "RiderStats": {
         "additionalProperties": true,
         "properties": {
@@ -2673,6 +2973,140 @@
         "title": "SessionSwapped",
         "type": "object"
       },
+      "SettingsRead": {
+        "additionalProperties": true,
+        "properties": {
+          "eftp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eftp"
+          },
+          "ftp": {
+            "title": "Ftp",
+            "type": "number"
+          },
+          "ftp_source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp Source"
+          },
+          "ftp_source_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftp Source Date"
+          },
+          "hr_zones": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ZoneBand"
+            },
+            "title": "Hr Zones",
+            "type": "array"
+          },
+          "lthr": {
+            "title": "Lthr",
+            "type": "number"
+          },
+          "lthr_is_set": {
+            "default": false,
+            "title": "Lthr Is Set",
+            "type": "boolean"
+          },
+          "lthr_source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lthr Source"
+          },
+          "max_hr": {
+            "title": "Max Hr",
+            "type": "number"
+          },
+          "power_zones": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ZoneBand"
+            },
+            "title": "Power Zones",
+            "type": "array"
+          },
+          "target_mode": {
+            "default": "power",
+            "title": "Target Mode",
+            "type": "string"
+          },
+          "w_per_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "W Per Kg"
+          },
+          "weight": {
+            "title": "Weight",
+            "type": "number"
+          }
+        },
+        "required": [
+          "weight",
+          "ftp",
+          "lthr",
+          "max_hr"
+        ],
+        "title": "SettingsRead",
+        "type": "object"
+      },
+      "SettingsSaved": {
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/SettingsRead"
+          },
+          "updated": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Updated",
+            "type": "object"
+          }
+        },
+        "required": [
+          "settings"
+        ],
+        "title": "SettingsSaved",
+        "type": "object"
+      },
       "SetupDefaults": {
         "additionalProperties": true,
         "properties": {
@@ -2810,6 +3244,56 @@
           }
         },
         "title": "SyncProgress",
+        "type": "object"
+      },
+      "SyncStatus": {
+        "additionalProperties": true,
+        "properties": {
+          "activity_records": {
+            "default": 0,
+            "title": "Activity Records",
+            "type": "integer"
+          },
+          "auth_disabled": {
+            "default": false,
+            "title": "Auth Disabled",
+            "type": "boolean"
+          },
+          "consecutive_failures": {
+            "default": 0,
+            "title": "Consecutive Failures",
+            "type": "integer"
+          },
+          "last_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Error"
+          },
+          "last_sync": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Sync"
+          },
+          "wellness_records": {
+            "default": 0,
+            "title": "Wellness Records",
+            "type": "integer"
+          }
+        },
+        "title": "SyncStatus",
         "type": "object"
       },
       "TierDownApplied": {
@@ -3101,6 +3585,205 @@
         "title": "UnavailablePeriod",
         "type": "object"
       },
+      "UpdateCheck": {
+        "additionalProperties": true,
+        "properties": {
+          "checked_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked At"
+          },
+          "current": {
+            "title": "Current",
+            "type": "string"
+          },
+          "download_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Download Url"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "latest": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest"
+          },
+          "release_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Release Url"
+          },
+          "update_available": {
+            "default": false,
+            "title": "Update Available",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "current"
+        ],
+        "title": "UpdateCheck",
+        "type": "object"
+      },
+      "VersionInfo": {
+        "additionalProperties": true,
+        "properties": {
+          "app": {
+            "title": "App",
+            "type": "string"
+          },
+          "data_dir": {
+            "default": "",
+            "title": "Data Dir",
+            "type": "string"
+          },
+          "frozen": {
+            "default": false,
+            "title": "Frozen",
+            "type": "boolean"
+          },
+          "python": {
+            "default": "",
+            "title": "Python",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "app",
+          "version"
+        ],
+        "title": "VersionInfo",
+        "type": "object"
+      },
+      "WellnessDay": {
+        "additionalProperties": true,
+        "properties": {
+          "atl": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Atl"
+          },
+          "ctl": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ctl"
+          },
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "eftp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eftp"
+          },
+          "hrv": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hrv"
+          },
+          "rhr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rhr"
+          },
+          "sleep_h": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sleep H"
+          },
+          "tsb": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tsb"
+          }
+        },
+        "required": [
+          "date"
+        ],
+        "title": "WellnessDay",
+        "type": "object"
+      },
       "WorkoutDetail": {
         "additionalProperties": true,
         "properties": {
@@ -3290,6 +3973,35 @@
           "type"
         ],
         "title": "WorkoutSegment",
+        "type": "object"
+      },
+      "ZoneBand": {
+        "additionalProperties": true,
+        "properties": {
+          "high": {
+            "default": 0,
+            "title": "High",
+            "type": "number"
+          },
+          "low": {
+            "default": 0,
+            "title": "Low",
+            "type": "number"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          },
+          "zone": {
+            "title": "Zone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "zone"
+        ],
+        "title": "ZoneBand",
         "type": "object"
       }
     }
@@ -3672,6 +4384,23 @@
         }
       }
     },
+    "/api/profile/power-curve": {
+      "get": {
+        "operationId": "api_profile_power_curve_api_profile_power_curve_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PowerCurve"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/profiles": {
       "get": {
         "operationId": "api_profiles_api_profiles_get",
@@ -3840,6 +4569,27 @@
         }
       }
     },
+    "/api/rides": {
+      "get": {
+        "operationId": "api_rides_api_rides_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RideSummary"
+                  },
+                  "title": "Response 200 Api Rides Api Rides Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/routes": {
       "get": {
         "operationId": "api_routes_api_routes_get",
@@ -3866,6 +4616,38 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/RegionsList"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/settings": {
+      "get": {
+        "operationId": "api_settings_api_settings_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsRead"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "operationId": "update_settings_api_settings_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsSaved"
                 }
               }
             },
@@ -3925,6 +4707,23 @@
         }
       }
     },
+    "/api/sync/status": {
+      "get": {
+        "operationId": "api_sync_status_api_sync_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncStatus"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/today-session": {
       "get": {
         "operationId": "api_today_session_api_today_session_get",
@@ -3959,6 +4758,61 @@
         }
       }
     },
+    "/api/update/check": {
+      "get": {
+        "operationId": "api_update_check_api_update_check_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateCheck"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/version": {
+      "get": {
+        "operationId": "api_version_api_version_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionInfo"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/wellness": {
+      "get": {
+        "operationId": "api_wellness_api_wellness_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WellnessDay"
+                  },
+                  "title": "Response 200 Api Wellness Api Wellness Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/workout/{category}/{filename}": {
       "get": {
         "operationId": "api_workout_detail_api_workout__category___filename__get",
@@ -3968,6 +4822,27 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/WorkoutDetail"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/workouts": {
+      "get": {
+        "operationId": "api_workouts_api_workouts_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WorkoutRow"
+                  },
+                  "title": "Response 200 Api Workouts Api Workouts Get",
+                  "type": "array"
                 }
               }
             },

@@ -562,3 +562,116 @@ class RegionsList(_Model):
     worlds: list[RegionWorld] = []
     real_world_meta: Optional[RealWorldMeta] = None
 
+
+# ── Analysis: fitness and form, power curve, rides ──────────────────────────
+
+class WellnessDay(_Model):
+    date: str
+    ctl: Optional[float] = None
+    atl: Optional[float] = None
+    tsb: Optional[float] = None
+    hrv: Optional[float] = None
+    rhr: Optional[float] = None
+    sleep_h: Optional[float] = None
+    eftp: Optional[float] = None
+
+
+class PowerCurvePoint(_Model):
+    duration_s: int
+    watts: float
+    watts_per_kg: Optional[float] = None
+    pct_ftp: Optional[float] = None
+    ride_id: Optional[str] = None
+    date: Optional[str] = None
+
+
+class PowerBaselinePoint(_Model):
+    duration_s: int
+    watts_per_kg: float = 0
+    watts_at_current_weight: float = 0
+
+
+class PowerCurve(_Model):
+    window_days: int
+    n_rides: int = 0
+    weight_kg: Optional[float] = None
+    current_ftp: Optional[float] = None
+    rider_curve: list[PowerCurvePoint] = []
+    pg_2011_baseline: list[PowerBaselinePoint] = []
+    cp_w: Optional[float] = None
+    wprime_j: Optional[float] = None
+    pmax_w: Optional[float] = None
+    needs_backfill: Optional[bool] = None
+
+
+class RideSummary(_Model):
+    ride_id: str
+    source: str = ""
+    name: str = ""
+    sport: Optional[str] = None
+    started_at: Optional[str] = None
+    duration_s: Optional[int] = None
+    distance_km: Optional[float] = None
+    elevation_m: Optional[int] = None
+    avg_power_w: Optional[int] = None
+    np_w: Optional[int] = None
+    tss: Optional[float] = None
+
+
+# ── Settings, sync and version ──────────────────────────────────────────────
+
+class ZoneBand(_Model):
+    zone: str
+    name: str = ""
+    low: float = 0
+    high: float = 0
+
+
+class SettingsRead(_Model):
+    weight: float
+    ftp: float
+    eftp: Optional[float] = None
+    lthr: float
+    max_hr: float
+    target_mode: str = "power"          # power | hr
+    lthr_is_set: bool = False
+    w_per_kg: Optional[float] = None
+    ftp_source: Optional[str] = None
+    ftp_source_date: Optional[str] = None
+    lthr_source: Optional[str] = None
+    power_zones: list[ZoneBand] = []
+    hr_zones: list[ZoneBand] = []
+
+
+class SettingsSaved(_Model):
+    ok: bool = True
+    updated: dict = {}
+    settings: SettingsRead
+
+
+class SyncStatus(_Model):
+    last_sync: Optional[dict] = None
+    wellness_records: int = 0
+    activity_records: int = 0
+    auth_disabled: bool = False
+    consecutive_failures: int = 0
+    last_error: Optional[str] = None
+
+
+class VersionInfo(_Model):
+    app: str
+    version: str
+    python: str = ""
+    frozen: bool = False
+    data_dir: str = ""
+
+
+class UpdateCheck(_Model):
+    current: str
+    latest: Optional[str] = None
+    update_available: bool = False
+    release_url: Optional[str] = None
+    download_url: Optional[str] = None
+    checked_at: Optional[str] = None
+    error: Optional[str] = None
+
