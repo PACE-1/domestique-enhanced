@@ -20,9 +20,6 @@ import profile_manager as pm_mod  # noqa: E402
 import ride_storage as rs  # noqa: E402
 import training_planner as tp  # noqa: E402
 
-HTML = (Path(__file__).resolve().parent.parent / "src" / "templates"
-        / "dashboard.html").read_text(encoding="utf-8")
-
 
 @pytest.fixture(autouse=True)
 def _module_state_guard():
@@ -165,6 +162,3 @@ def test_custom_workout_dir_and_diagnostics_follow_the_switch(tmp_path):
 
 # ── 4. per-tab "already shown" flag is scoped by profile ────────────────────
 
-def test_modal_seen_flag_is_profile_scoped():
-    assert "'ftp-modal-seen-' + __ACTIVE_PROFILE_ID + ':' + rideId" in HTML
-    assert "'ftp-modal-seen-' + rideId" not in HTML

@@ -124,15 +124,6 @@ def test_a_lap_shape_it_does_not_understand_is_silent_not_fatal(workout_on_disk)
     assert out is None
 
 
-def test_the_renderer_is_wired_to_the_payload():
-    """Both halves of the wiring stay in place; only the switch is off. Flipping
-    BLOCK_EVAL_SURFACED must be all it takes."""
-    dash = (Path(app_module.__file__).parent / "templates" / "dashboard.html"
-            ).read_text(encoding="utf-8")
-    assert "function _blockEvalHtml(b)" in dash
-    assert "_blockEvalHtml(ex.blocks)" in dash
-
-
 def test_the_block_report_is_surfaced():
     """Flipped in v3.7.0 with the library gate at zero misgrades and both
     adversarial passes' findings closed. If this goes False again, the
@@ -141,25 +132,6 @@ def test_the_block_report_is_surfaced():
 
 
 # ── the rating reads back ────────────────────────────────────────────────────
-
-def _dash() -> str:
-    return (Path(app_module.__file__).parent / "templates" / "dashboard.html"
-            ).read_text(encoding="utf-8")
-
-
-def test_the_morning_form_preselects_what_is_stored():
-    src = _dash()
-    assert "function showMorningForm(stored)" in src
-    assert "stored.readiness_to_train" in src
-    assert "window._todayLog" in src
-
-
-def test_the_ride_rating_reflects_its_own_save():
-    """setRideRpe touched no local state, and the modal caches its payload — so
-    the control re-rendered unselected on the next open."""
-    src = _dash()
-    assert "rpe-row-" in src
-    assert "cached.rpe = rpe" in src
 
 
 # ── the rating's own shape ───────────────────────────────────────────────────

@@ -212,22 +212,6 @@ class TestZeroMinRegexHidesSegments(unittest.TestCase):
     diverge.
     """
 
-    @staticmethod
-    def _fix_zero_min_py(desc: str) -> str:
-        """Python mirror of the JS fixZeroMin() in templates/dashboard.html."""
-        if not desc:
-            return desc
-        # Strip "Nmin @ N% FTP" only when the leading number is exactly 0.
-        out = re.sub(
-            r"(\d+)min @ (\d+)% FTP",
-            lambda m: "" if m.group(1) == "0" else m.group(0),
-            desc,
-        )
-        out = re.sub(r"\|\s*\|", "|", out)        # collapse "X | | Y"
-        out = re.sub(r"\s*\|\s*$", "", out)         # trailing pipe
-        out = re.sub(r"^\s*\|\s*", "", out)         # leading pipe
-        out = re.sub(r"\s*\n\s*\n", "\n", out)      # blank lines
-        return out.strip()
 
     def test_strips_zero_min_segments(self):
         desc = "10min @ 65% FTP | 0min @ 110% FTP | 5min @ 75% FTP"
@@ -245,29 +229,6 @@ class TestZeroMinRegexHidesSegments(unittest.TestCase):
     def test_handles_empty_and_no_match(self):
         self.assertEqual(self._fix_zero_min_py(""), "")
         self.assertEqual(self._fix_zero_min_py("Z2 endurance ride"), "Z2 endurance ride")
-
-    def test_dashboard_html_exposes_fixzeromin_at_render_sites(self):
-        """The four description-rendering call sites in dashboard.html must
-        all wrap their description through fixZeroMin so a stray 0min token
-        from the workout library can never reach the user's screen."""
-        html = (Path(__file__).parent.parent / "src" / "templates" /
-                "dashboard.html").read_text(encoding="utf-8")
-        # Must define the helper.
-        self.assertIn("function fixZeroMin", html,
-                      "fixZeroMin helper missing from dashboard.html")
-        # Must use it at every description render site we audited.
-        # 1) workout modal description (~line 2406)
-        # 2) homepage hero planned description
-        # 3) homepage hero adjusted description (chip)
-        # 4) Today's Session detail modal
-        # 5) plan-grid session detail modal
-        # We don't pin line numbers — count occurrences instead. With the
-        # surgical Pillar D edits this should be ≥4 distinct callers.
-        n = html.count("fixZeroMin(")
-        self.assertGreaterEqual(
-            n, 4,
-            f"fixZeroMin() should be applied at ≥4 description render sites, found {n}",
-        )
 
 
 class TestTodayUsesLocalDate(HomepageTodayConsistencyBase):
@@ -354,13 +315,6 @@ class TestNoSessionInsideAPlan(HomepageTodayConsistencyBase):
         data = self.client.get("/api/today-session").json()
         self.assertIsNone(data["planned"])
         self.assertFalse(data["has_plan"])
-
-    def test_the_card_branches_on_has_plan(self):
-        """The dashboard reads the server's flag before its Plan-tab global."""
-        src = (Path(app_module.__file__).parent / "templates" / "dashboard.html").read_text(encoding="utf-8")
-        i = src.index("if (!d.planned) {")
-        branch = src[i:i + 1500]
-        self.assertLess(branch.index("d.has_plan"), branch.index("window._planData"))
 
 
 if __name__ == "__main__":

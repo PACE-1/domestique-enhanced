@@ -120,18 +120,6 @@ def test_no_signal_returns_none():
 
 # ── UI contract ─────────────────────────────────────────────────────────────
 
-def test_ui_uses_the_foster_anchors_and_posts_to_the_endpoint():
-    from pathlib import Path
-    src = (Path(app_module.__file__).parent / "templates" / "dashboard.html"
-           ).read_text(encoding="utf-8")
-    assert "RPE_ANCHORS" in src
-    # Anchors are what make a rating reproducible — numbers alone are not.
-    for anchor in ("Very easy", "Somewhat hard", "Very hard", "Maximal"):
-        assert anchor in src, anchor
-    assert "/rpe" in src and "setRideRpe" in src
-    assert "How hard did that feel?" in src
-    assert "(optional)" in src, "rating must read as optional"
-
 
 # ── FIT-only riders (no intervals.icu account) ──────────────────────────────
 

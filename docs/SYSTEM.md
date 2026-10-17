@@ -48,14 +48,12 @@ Backend (pure Python, no build step)
 ├── rebuild_routes_json.py      → Rebuild route index from course files
 └── gpx_to_gc.py                → GPX → GoldenCheetah CRS converter (elevation smoothing)
 
-Frontend (vanilla JS, no npm)
-├── templates/                  → Server-rendered HTML entry points
-├── static/js/                  → Modular JS (no bundler, loaded via <script type="module">)
-├── static/css/                 → Hand-written CSS, light/dark theme
+Frontend (TypeScript)
+├── ../web/                     → React 19 + Tailwind + shadcn app, built to web/dist and served under /v2
 └── assets/                     → Icons and static images
 ```
 
-No npm, no webpack, no TypeScript compiler. The frontend is plain HTML/CSS/JS served by Flask.
+The server redirects `/` to the web app. `pnpm build` in `web/` must run before the server or a packaged build starts.
 
 ---
 

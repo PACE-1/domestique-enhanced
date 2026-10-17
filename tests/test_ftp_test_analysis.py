@@ -87,33 +87,6 @@ def test_analysis_endpoint_404_without_suggestion(tmp_path, monkeypatch):
 _HTML = None
 
 
-def _html():
-    global _HTML
-    if _HTML is None:
-        from pathlib import Path
-        _HTML = (Path(__file__).resolve().parent.parent / "src" / "templates"
-                 / "dashboard.html").read_text(encoding="utf-8")
-    return _HTML
-
-
-def test_modal_opens_the_tunnel_when_ride_known():
-    h = _html()
-    assert 'id="ftp-analysis-host"' in h
-    assert "if (opts.rideId) { try { renderFtpTestAnalysis(opts.rideId, fs); } catch(_) {} }" in h
-    assert "/ftp-test-analysis`" in h
-    for label in ("1 · RECOGNISE", "2 · MEASURE", "3 · COMPUTE", "4 · APPLY"):
-        assert label in h, label
-
-
-def test_banner_review_button_and_ride_id_on_actions():
-    h = _html()
-    assert "Review the evidence" in h
-    assert "rideId: window._lastFtpSuggestion.rideId" in h
-    # all three actions from the banner carry the ride id → review persisted.
-    assert h.count("{rideId: '${escJs(String(rideId))}'}") == 3
-    assert "haltStep: s.ftp_test_halt_step, rideId: rideId };" in h
-
-
 # ── FIT branch of the analysis endpoint (synthetic activity FIT) ─────────────
 
 def _activity_fit_bytes(series, start_ts=1_700_000_000):

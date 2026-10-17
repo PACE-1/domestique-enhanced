@@ -36,8 +36,6 @@ import app as app_module  # noqa: E402
 
 client = TestClient(app_module.app)
 
-DASHBOARD = ROOT / "src" / "templates" / "dashboard.html"
-
 
 def _get(**params):
     r = client.get("/api/workouts", params=params)
@@ -278,71 +276,3 @@ def test_lev1_helper():
 # ── frontend: highlighter escape-safety + "/" hotkey guard (node harness) ────
 
 
-def _extract_js_function(src: str, name: str) -> str:
-    """Slice `function <name>(...) {...}` out of dashboard.html by brace count."""
-    start = src.index(f"function {name}")
-    i = src.index("{", start)
-    depth = 0
-    for j in range(i, len(src)):
-        if src[j] == "{":
-            depth += 1
-        elif src[j] == "}":
-            depth -= 1
-            if depth == 0:
-                return src[start:j + 1]
-    raise AssertionError(f"unbalanced braces extracting {name}")
-
-
-@pytest.mark.skipif(shutil.which("node") is None, reason="node not installed")
-def test_highlight_is_escape_safe():
-    src = DASHBOARD.read_text(encoding="utf-8")
-    fn = _extract_js_function(src, "_libHighlightName")
-    harness = """
-const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
-  .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-let _libSearchTokens = [];
-%s
-// 1) token "amp" over a name with "&" must not corrupt the entity
-_libSearchTokens = ['amp'];
-let out = _libHighlightName('R&B ramp 60min');
-if (out.includes('&<mark>amp</mark>;')) throw new Error('entity corrupted: ' + out);
-if (!out.includes('&amp;')) throw new Error('& not escaped: ' + out);
-if (!out.includes('r<mark>amp</mark>')) throw new Error('match lost: ' + out);
-// 2) hostile name is fully escaped
-_libSearchTokens = ['script'];
-out = _libHighlightName('<script>alert(1)</script>');
-if (out.includes('<script')) throw new Error('unescaped tag: ' + out);
-if (!out.includes('<mark>script</mark>')) throw new Error('no mark: ' + out);
-// 3) structure token matches the pretty display form (3×16)
-_libSearchTokens = ['3x16'];
-out = _libHighlightName('Threshold 118min — 3×16min @ 91%%');
-if (!out.includes('<mark>3×16</mark>')) throw new Error('display-form miss: ' + out);
-// 4) regex metacharacters in a token must not throw
-_libSearchTokens = ['a+b(', '**'];
-out = _libHighlightName('a+b( zone **test');
-if (!out.includes('<mark>a+b(</mark>')) throw new Error('meta token miss: ' + out);
-// 5) no tokens → plain escaped passthrough
-_libSearchTokens = [];
-out = _libHighlightName('A & B');
-if (out !== 'A &amp; B') throw new Error('passthrough broken: ' + out);
-console.log('OK');
-""" % fn
-    res = subprocess.run(["node", "-e", harness], capture_output=True, text=True,
-                         timeout=30)
-    assert res.returncode == 0, res.stderr
-    assert "OK" in res.stdout
-
-
-def test_slash_hotkey_guards_present():
-    """The "/" handler must gate on: library tab active, no other input
-    focused, no modal open — and Esc-clear must live on the search box."""
-    src = DASHBOARD.read_text(encoding="utf-8")
-    i = src.index("e.key !== '/'")
-    handler = src[i:i + 700]
-    assert "sec-library" in handler and "classList.contains('active')" in handler
-    assert "'input'" in handler and "'textarea'" in handler and "'select'" in handler
-    assert "isContentEditable" in handler
-    assert "#modal-overlay.open" in handler
-    assert "preventDefault" in handler
-    assert 'onkeydown="onLibSearchKeydown(event)"' in src
-    assert "onLibSearchKeydown" in src and "e.key !== 'Escape'" in src

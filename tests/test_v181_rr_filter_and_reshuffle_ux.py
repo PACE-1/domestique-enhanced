@@ -109,22 +109,3 @@ def test_rr_filter_drops_above_3s():
     assert sorted(rrs) == [0.500, 0.700]
 
 
-def test_dashboard_reshuffle_accept_paints_staged_progress():
-    """v1.8.1 progress UX: accept flow paints 4 stages (WORKOUT
-    RESHUFFLED → UPDATING PLAN → UPDATING CALENDAR → DONE) so the
-    multi-second refresh is legible. Pin the wiring."""
-    dash = Path(__file__).resolve().parent.parent / "src" / "templates" / "dashboard.html"
-    text = dash.read_text(encoding="utf-8")
-    # Locate the _rematchAccept function body.
-    start = text.index("async function _rematchAccept(day)")
-    end = text.index("function _rematchDecline", start)
-    body = text[start:end]
-    # All 4 stage labels present in the body.
-    for label in ("WORKOUT RESHUFFLED", "UPDATING PLAN", "UPDATING CALENDAR", "DONE"):
-        assert label in body, f"missing stage label: {label}"
-    # paintProgress helper drives the staged display.
-    assert "paintProgress" in body
-    # Final 'Plan updated' confirmation still surfaces download buttons.
-    assert "Plan updated" in body
-    assert "downloadZwoFile" in body
-    assert "downloadFIT" in body

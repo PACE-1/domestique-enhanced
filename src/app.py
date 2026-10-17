@@ -60,8 +60,6 @@ from obs import (  # noqa: F401
 from fastapi import FastAPI, File, Form, Request, Query, UploadFile, HTTPException, Body
 import api_models
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, Response
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 
 sys.path.insert(0, str(Path(__file__).parent))
 
@@ -1025,12 +1023,14 @@ async def _security_headers(request, call_next):
     return resp
 
 
-templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
-_static_dir = Path(__file__).parent / "static"
-_static_dir.mkdir(exist_ok=True)
-app.mount("/static", StaticFiles(directory=str(_static_dir)), name="static")
-from web_spa import mount_spa
-mount_spa(app, Path(__file__).resolve().parent.parent / "web" / "dist")
+from web_spa import mount_spa, spa_dist
+_SPA_DIST = spa_dist(Path(__file__).resolve().parent)
+if not mount_spa(app, _SPA_DIST):
+    @app.get("/v2/{rest:path}")
+    def spa_not_built(rest: str = ""):
+        return Response(
+            "The web interface is not built. Run `pnpm install && pnpm build` in web/ and restart.",
+            status_code=503, media_type="text/plain")
 
 
 
@@ -1059,9 +1059,10 @@ def _active_profile_entry(pm) -> dict:
 # SETUP WIZARD
 # ═══════════════════════════════════════════════════════════════════════════════
 
-@app.get("/setup", response_class=HTMLResponse)
-def setup_page(request: Request):
-    return templates.TemplateResponse(request=request, name="setup.html")
+@app.get("/setup")
+def setup_page():
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/v2/#/setup")
 
 
 @app.get("/api/setup/status")
@@ -3558,14 +3559,16 @@ def api_activity_set_race(activity_id: str, body: dict):
     return Response(status_code=204)
 
 
-@app.get("/profile-picker", response_class=HTMLResponse)
-def profile_picker_page(request: Request):
-    return templates.TemplateResponse(request=request, name="profile_picker.html")
+@app.get("/profile-picker")
+def profile_picker_page():
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/v2/#/profile-picker")
 
 
-@app.get("/profile-setup", response_class=HTMLResponse)
-def profile_setup_page(request: Request):
-    return templates.TemplateResponse(request=request, name="profile_setup.html")
+@app.get("/profile-setup")
+def profile_setup_page():
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/v2/#/profile-setup")
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -7796,7 +7799,7 @@ def api_oauth_icu_start(return_to: str = Query("/")):
     import secrets as _secrets
     from urllib.parse import urlencode
     if not getattr(config, "ICU_OAUTH_CLIENT_ID", ""):
-        return RedirectResponse(url="/?icu=unavailable")
+        return RedirectResponse(url="/v2/?wizard=setup&icu=unavailable")
     now = time.time()
     _icu_oauth_prune(now)
     try:
@@ -20432,11 +20435,11 @@ def api_diag_health(request: Request):
 # HTML
 # ═══════════════════════════════════════════════════════════════════════════════
 
-@app.get("/", response_class=HTMLResponse)
-def dashboard(request: Request):
+@app.get("/")
+def dashboard():
+    """Send the rider to the right screen of the web app (served under /v2)."""
     from fastapi.responses import RedirectResponse
     from profile_manager import ProfileManager
-    active_profile_id = ""
     try:
         pm = ProfileManager.get()
         # AC4 (flag-only rule, no heuristics): first-run wizard when
@@ -20452,24 +20455,19 @@ def dashboard(request: Request):
             # Profiles on disk but none active (a stored null pointer): the
             # rider chooses one. The first-run wizard is for no profile at all.
             if pm.list_profiles():
-                return RedirectResponse(url="/profile-picker")
-            return RedirectResponse(url="/setup")
+                return RedirectResponse(url="/v2/#/profile-picker")
+            return RedirectResponse(url="/v2/#/setup")
         if (_active_profile_entry(pm).get("bootstrapped")
                 and not _setup_marker().exists()):
-            return RedirectResponse(url="/setup")
-        active_profile_id = pm.active_id or ""
+            return RedirectResponse(url="/v2/#/setup")
         # Multiple profiles + skip_picker=false → profile picker
         profiles = pm.list_profiles()
         skip = pm._registry.get("skip_picker", True)
         if len(profiles) > 1 and not skip:
-            return RedirectResponse(url="/profile-picker")
+            return RedirectResponse(url="/v2/#/profile-picker")
     except Exception:
         pass
-    # Otherwise → dashboard. active_profile_id feeds the per-profile
-    # localStorage keys (AC2d) — rendered into an inline const.
-    return templates.TemplateResponse(
-        request=request, name="dashboard.html",
-        context={"active_profile_id": active_profile_id})
+    return RedirectResponse(url="/v2/#/home")
 
 
 if __name__ == "__main__":

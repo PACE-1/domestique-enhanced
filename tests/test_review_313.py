@@ -299,7 +299,6 @@ def test_settings_count_is_labelled_with_the_profile_the_run_was_for(monkeypatch
     assert app_module._last_result_for_active_profile() is None
 
 
-
 def test_a_manual_push_behind_a_sweep_still_runs(env):
     """Grill L1: the rider's own Push after a sweep must not come back as
     "swept" ("couldn't reach intervals.icu")."""

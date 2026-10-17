@@ -43,9 +43,7 @@ import icu_calendar_push as icp  # noqa: E402
 from test_icu_push import (  # noqa: E402,F401  (stub is a fixture)
     stub, FakeICU, _sess, _write_plan, _apikey, _eid, STEADY_ZWO, TEMPO_ZWO,
 )
-from test_331_surfaces import _extract_js_function, _run_node  # noqa: E402
 
-DASHBOARD = Path(__file__).resolve().parent.parent / "src" / "templates" / "dashboard.html"
 
 MON = date(2026, 10, 19)                     # a Monday; the week is ahead of 2026-10-12
 DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
@@ -588,32 +586,6 @@ def test_b13_get_failure_pushes_and_deletes_nothing(env):
 
 # ── B14: the toast says what was left alone ──────────────────────────────────
 
-@pytest.mark.skipif(shutil.which("node") is None, reason="node not installed")
-def test_b14_push_toast_names_held_moves():
-    src = DASHBOARD.read_text(encoding="utf-8")
-    harness = _extract_js_function(src, "icuPushToastFromResult") + """
-const seen = [];
-global.showToast = (m) => seen.push(m);
-const v = 'Pushed to intervals.icu';
-icuPushToastFromResult({pushed: 0, updated: 0, deleted: 0, skipped: [], held: 2}, v);
-icuPushToastFromResult({pushed: 1, updated: 0, deleted: 0, skipped: [{}], held: 1}, v);
-icuPushToastFromResult({pushed: 0, updated: 0, deleted: 0, skipped: [], held: 0}, v);
-icuPushToastFromResult({pushed: 0, updated: 0, deleted: 2, skipped: []}, 'Calendar sync off — cleanup');
-icuPushToastFromResult({pushed: 0, updated: 0, deleted: 0, skipped: [], held: 0, error: 'busy'}, v);
-icuPushToastFromResult({pushed: 0, updated: 0, deleted: 0, skipped: [], held: 0, error: 'network'}, v);
-const want = [
-  'Pushed to intervals.icu: calendar already up to date · 2 workouts kept where you moved them in intervals.icu',
-  'Pushed to intervals.icu: 1 new · 1 skipped · 1 workout kept where you moved it in intervals.icu',
-  'Pushed to intervals.icu: calendar already up to date',
-  'Calendar sync off — cleanup: 2 removed',
-  'A calendar update is already running — try again in a moment.',
-  "Couldn't reach intervals.icu — nothing was changed. Try again in a moment.",
-];
-if (JSON.stringify(seen) !== JSON.stringify(want)) throw new Error(JSON.stringify(seen));
-console.log('OK');
-"""
-    _run_node(harness)
-
 
 # ── B15: one reconcile at a time ─────────────────────────────────────────────
 
@@ -1095,30 +1067,6 @@ def test_send_button_reads_the_plan_after_waiting_for_the_lock(env):
     t.join(10)
     assert out["r"] == {"error": "not a pushable planned session"}
     assert [c[0] for c in env.fk.calls] == []
-
-
-@pytest.mark.skipif(shutil.which("node") is None, reason="node not installed")
-def test_send_button_toast_says_where_the_workout_stayed():
-    src = DASHBOARD.read_text(encoding="utf-8")
-    harness = _extract_js_function(src, "_pushWorkoutToCalendar") + """
-const seen = [];
-global.showToast = (m) => seen.push(m);
-const replies = [{ok: true, pushed: 0, kept_on: '2026-10-20'},
-                 {ok: true, pushed: 1, event_date: '2026-10-19'},
-                 {pushed: 0, error: 'busy'}];
-global.fetch = async () => ({json: async () => replies.shift()});
-(async () => {
-  for (let i = 0; i < 3; i++) await _pushWorkoutToCalendar('planner', 'a.zwo', '2026-10-19', '');
-  const want = [
-    'Already on your intervals.icu calendar for 2026-10-20 — left where you put it',
-    'On your intervals.icu calendar for 2026-10-19 — Garmin / Wahoo / MyWhoosh will pull it automatically',
-    'A calendar update is already running — try again in a moment.',
-  ];
-  if (JSON.stringify(seen) !== JSON.stringify(want)) throw new Error(JSON.stringify(seen));
-  console.log('OK');
-})().catch(e => { console.error(e); process.exit(1); });
-"""
-    _run_node(harness)
 
 
 if __name__ == "__main__":

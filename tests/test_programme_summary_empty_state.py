@@ -19,7 +19,6 @@ from PIL import ImageDraw
 from programme_summary_png import render_programme_summary_png
 
 ROOT = Path(__file__).resolve().parent.parent
-SRC = (ROOT / "src" / "templates" / "dashboard.html").read_text(encoding="utf-8")
 
 
 def _extract_js_function(src: str, name: str) -> str:
@@ -59,33 +58,6 @@ const window = {};
 """
 
 
-def _render(summary: dict) -> dict:
-    """Run the real _psRender over a stub DOM; return the resulting state."""
-    harness = (
-        _DOM_STUB
-        + _extract_js_line(SRC, "const _PS_BLOCKS") + "\n"
-        + _extract_js_function(SRC, "_psDestroyCharts") + "\n"
-        + _extract_js_function(SRC, "_psShowEmpty") + "\n"
-        + _extract_js_function(SRC, "_psHideEmpty") + "\n"
-        + _extract_js_function(SRC, "_psFmtDelta") + "\n"
-        + _extract_js_function(SRC, "_psRender") + "\n"
-        + f"_psRender({json.dumps(summary)});\n"
-        + "console.log(JSON.stringify({"
-          "empty: _el('ps-empty').textContent,"
-          "emptyDisplay: _el('ps-empty').style.display,"
-          "window: _el('ps-window').textContent,"
-          "kpiHtml: _el('ps-kpi-row').innerHTML,"
-          "kpiDisplay: _el('ps-kpi-row').style.display,"
-          "chartsDisplay: _el('ps-charts').style.display,"
-          "totalsDisplay: _el('ps-totals').style.display,"
-          "pngDisplay: _el('ps-png-link').style.display}));\n"
-    )
-    res = subprocess.run(["node", "-e", harness], capture_output=True,
-                         text=True, timeout=30)
-    assert res.returncode == 0, f"node harness failed:\n{res.stderr}"
-    return json.loads(res.stdout)
-
-
 def _summary(rides: int) -> dict:
     return {
         "plan_id": "current", "start_date": "2026-05-18",
@@ -101,57 +73,6 @@ def _summary(rides: int) -> dict:
         "totals": {"km": 0, "hours": 0.0, "kj": 0, "elev_m": 0},
         "decoupling_trend": [], "citations": ["Foster 1998 (MSSE)"],
     }
-
-
-def test_plan_with_no_rides_explains_itself():
-    """Zero rides: a plain sentence, and no empty metric grid behind it."""
-    out = _render(_summary(rides=0))
-    # 74987dc1: the empty state explains what's missing and how to fill it,
-    # not just that rides are absent.
-    assert "no rides" in out["empty"].lower()
-    assert out["emptyDisplay"] == "block"
-    # The plan window is still stated — it is measured, not invented.
-    assert "2026-05-18" in out["window"] and "12 weeks" in out["window"]
-    # Nothing renders as a zero the rider could mistake for a measurement.
-    assert out["kpiHtml"] == ""
-    for key in ("kpiDisplay", "chartsDisplay", "totalsDisplay", "pngDisplay"):
-        assert out[key] == "none", key
-
-
-def test_plan_with_no_weeks_explains_itself():
-    """The minimal dict (plan file with no weeks) must not render blank."""
-    s = _summary(rides=0)
-    s.update({"weeks": 0, "start_date": None, "end_date": None})
-    out = _render(s)
-    assert "no weeks" in out["empty"]
-    assert out["chartsDisplay"] == "none"
-
-
-def test_ridden_plan_still_renders_metrics():
-    """Regression: with rides the grids come back — display is restored to
-    'grid' explicitly, since clearing it would drop grid-template-columns."""
-    out = _render(_summary(rides=4))
-    assert out["empty"] == ""
-    assert out["emptyDisplay"] == "none"
-    assert "FTP" in out["kpiHtml"]
-    assert out["kpiDisplay"] == "grid"
-    assert out["chartsDisplay"] == "grid"
-    assert out["totalsDisplay"] == "grid"
-
-
-def test_no_plan_and_load_failure_reach_the_empty_state():
-    """The 404 and the network-failure branches must both say something."""
-    fn = _extract_js_function(SRC, "showProgrammeSummary")
-    assert "_psShowEmpty" in fn
-    assert "No training plan yet" in fn
-    assert "could not be loaded" in fn
-
-
-def test_modal_is_hoisted_out_of_the_plan_section():
-    """#programme-summary-modal ships inside #sec-plan (display:none unless
-    the Plan tab is open), so the end-of-plan auto-open laid out a 0x0 box."""
-    fn = _extract_js_function(SRC, "showProgrammeSummary")
-    assert "document.body.appendChild(overlay)" in fn
 
 
 def test_png_never_prints_none():

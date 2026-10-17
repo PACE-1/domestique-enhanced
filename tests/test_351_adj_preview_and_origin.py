@@ -20,7 +20,6 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parent.parent
-DASH = (ROOT / "src" / "templates" / "dashboard.html").read_text(encoding="utf-8")
 
 
 # ── 1. Origin gate ───────────────────────────────────────────────────────────
@@ -54,26 +53,6 @@ def test_origin_check_blocks_cross_site_allows_any_local_port():
 
 # ── 2. Preview-before-revert (structure) ─────────────────────────────────────
 
-def test_original_block_carries_lazy_preview_hooks():
-    block = DASH[DASH.index("function _adjOriginalBlockHtml"):]
-    block = block[:block.index("\n}") + 2]
-    # <details> wires the lazy loader; chart container carries the file.
-    assert 'ontoggle="_loadAdjOrigPreview(this)"' in block
-    assert 'class="adj-orig-chart"' in block
-    assert "data-zwo=" in block
-    assert "open to preview" in block
-
-
-def test_loader_exists_uses_real_segment_pipeline_and_is_one_shot():
-    fn = DASH[DASH.index("async function _loadAdjOrigPreview"):]
-    fn = fn[:fn.index("\n}") + 2]
-    # Same segment source + renderer as the modal lead chart.
-    assert "/api/workout/all/" in fn
-    assert "workoutProfileSVG(" in fn
-    # One-shot guard and quiet failure.
-    assert "dataset.loaded" in fn
-    assert "preview unavailable" in fn
-
 
 # ── 2b. Preview-before-revert (behaviour, node harness) ──────────────────────
 
@@ -85,42 +64,3 @@ def _extract_js_function(src: str, name: str) -> str:
     return src[k:j]
 
 
-@pytest.mark.skipif(subprocess.run(["which", "node"], capture_output=True).returncode != 0,
-                    reason="node not installed")
-def test_loader_behaviour_lazy_once_and_failure_path():
-    fn = _extract_js_function(DASH, "_loadAdjOrigPreview")
-    harness = fn + """
-const calls = [];
-global.fetch = async (url) => { calls.push(url);
-  return {ok: true, json: async () => ({segments: [{type:'SteadyState',duration:600,power:1.0}], ftp: 250, total_seconds: 600})}; };
-global.workoutProfileSVG = () => '<svg data-test="orig"></svg>';
-global.settingsFtp = 250;
-function mkDet(zwo) {
-  const box = {dataset: {zwo}, innerHTML: ''};
-  return {open: true, box, querySelector: (sel) => sel === '.adj-orig-chart' ? box : null};
-}
-(async () => {
-  // closed details -> no fetch
-  const closed = mkDet('x.zwo'); closed.open = false;
-  await _loadAdjOrigPreview(closed);
-  if (calls.length !== 0) throw new Error('fetched while closed');
-  // open -> exactly one fetch, chart + caption injected
-  const det = mkDet('Threshold 2x15min.zwo');
-  await _loadAdjOrigPreview(det);
-  if (calls.length !== 1) throw new Error('expected 1 fetch, got ' + calls.length);
-  if (!/data-test="orig"/.test(det.box.innerHTML)) throw new Error('no chart injected');
-  if (!/restores for today/.test(det.box.innerHTML)) throw new Error('no caption');
-  // second toggle -> still one fetch (one-shot)
-  await _loadAdjOrigPreview(det);
-  if (calls.length !== 1) throw new Error('re-fetched on second toggle');
-  // failure path -> quiet caption, no throw
-  global.fetch = async () => ({ok: false, status: 500});
-  const det2 = mkDet('gone.zwo');
-  await _loadAdjOrigPreview(det2);
-  if (!/preview unavailable/.test(det2.box.innerHTML)) throw new Error('no failure caption');
-  console.log('OK');
-})().catch(e => { console.error(e.message); process.exit(1); });
-"""
-    res = subprocess.run(["node", "-e", harness], capture_output=True, text=True, timeout=30)
-    assert res.returncode == 0, f"node harness failed:\n{res.stderr}\n{res.stdout}"
-    assert "OK" in res.stdout

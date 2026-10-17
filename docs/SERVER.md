@@ -173,5 +173,5 @@ does not work in that artifact and it must not be released. A tag push or a run
 with a tag still fails when `ICU_OAUTH_CLIENT_SECRET` is unset.
 
 Not verified: a real desktop session (Wayland, GPU), distributions other than
-Ubuntu 22.04 and Debian 12, and the new `/v2` interface inside the AppImage.
+Ubuntu 22.04 and Debian 12, and the web interface (`/v2`) inside the AppImage on a real desktop.
 The AppImage runs as one user; it does not use the server access token.

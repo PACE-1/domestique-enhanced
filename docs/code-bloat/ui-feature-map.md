@@ -1,8 +1,8 @@
 # Workflow map: legacy dashboard to the TypeScript UI (roadmap #3, #25)
 
-One row per workflow. "New UI" is under `web/src`; "Legacy" is
-`src/templates/dashboard.html`. Both are served today; this table is the
-consumer map that decides what can be deleted.
+One row per workflow. "New UI" is under `web/src`. The legacy dashboard
+(`src/templates/dashboard.html`, the setup and profile pages and `src/static`)
+was deleted in 1.0.1; this table records where each workflow went.
 
 ## Seams the new UI shares
 
@@ -30,9 +30,6 @@ consumer map that decides what can be deleted.
 | Settings | `Settings.tsx`, `ZonesEditor.tsx`, `Folders.tsx`, `CalendarPush.tsx`, `Diagnostics.tsx`, `FtpHistory.tsx` | `/api/settings*`, `/api/icu/*`, `/api/sync*`, `/api/version`, `/api/update/check`, `/api/logs`, `/api/diag/*` | vitest, e2e | none |
 | DFA α1 | `Dfa.tsx` | `/api/profile/dfa-*` | vitest, e2e | none |
 
-## Retirement rule
+## Retirement
 
-A legacy block is deleted only when its row has an empty last column or each
-item in it has a recorded reason to stay, and the rider has accepted the new
-screen. Until then the legacy tab stays reachable and is the only home of the
-behaviour listed above. Nothing in the legacy dashboard has been removed yet.
+The legacy dashboard was removed once every row above had no legacy-only behaviour (1.0.1, roadmap #25). `/`, `/setup`, `/profile-picker` and `/profile-setup` now redirect into the web app under `/v2`. The power-block pictures and per-row library profiles in the last column are the only things not carried over.

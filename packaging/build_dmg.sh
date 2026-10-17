@@ -82,6 +82,10 @@ done
 # always rejected and rewritten. PyInstaller copies workouts/ as it finds it,
 # and the gate at [1b2/9] refuses a bundle without them, so build them first,
 # from the app's own code path rather than a second implementation.
+# The bundle serves the web interface from web/dist (see domestique.spec).
+[ -f web/dist/index.html ] || {
+    echo "✗ web/dist is missing. Build the web interface first: (cd web && pnpm install && pnpm build)" >&2; exit 1; }
+
 echo "[0/9] Building the derived library caches..."
 python3 tools/build-library-caches.py || {
     echo "FATAL: could not build the library caches" >&2; exit 1; }

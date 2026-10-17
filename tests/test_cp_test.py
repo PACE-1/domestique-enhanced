@@ -16,7 +16,6 @@ import pytest
 import fitness_estimation as fe
 from test_icu_push import stub  # noqa: F401  (fixture)
 
-DASHBOARD = Path(__file__).resolve().parent.parent / "src" / "templates" / "dashboard.html"
 FILE = "ftp_test_cp_12-7-3min_100pct_110min.zwo"
 
 
@@ -164,16 +163,6 @@ def test_execution_score_does_not_grade_the_intensity_of_a_cp_test():
 
 
 needs_node = pytest.mark.skipif(shutil.which("node") is None, reason="node not installed")
-
-
-@needs_node
-def test_the_ui_maps_the_file_to_the_cp_protocol():
-    from test_331_surfaces import _extract_js_function
-    js = _extract_js_function(DASHBOARD.read_text(encoding="utf-8"), "_ftpTypeFromFile") + f"""
-console.log(JSON.stringify([_ftpTypeFromFile('{FILE}'), _ftpTypeFromFile('ftp_test_cts_3x1min-1min_105pct_54min.zwo')]));"""
-    res = subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=30)
-    assert res.returncode == 0, res.stderr
-    assert json.loads(res.stdout) == ["cp_test", None]
 
 
 def test_a_riders_own_workout_folder_still_finds_the_cp_test(tmp_path, monkeypatch):

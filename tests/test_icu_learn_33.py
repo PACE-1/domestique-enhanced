@@ -23,9 +23,6 @@ from test_icu_push import stub, _write_plan, _apikey, _eid, TEMPO_ZWO, STEADY_ZW
 from test_icu_hold_28 import (  # noqa: E402
     WindowedFakeICU, MON, D, _week, _move, _one_event_per_session, _counts, _at,
 )
-from test_331_surfaces import _extract_js_function, _run_node
-
-DASHBOARD = Path(__file__).resolve().parent.parent / "src" / "templates" / "dashboard.html"
 
 
 @pytest.fixture()
@@ -221,22 +218,6 @@ def test_the_move_learned_is_pinned_like_a_drag(env):
     assert fri["user_moved"] is True and not fri.get("auto_moved")
 
 
-@pytest.mark.skipif(shutil.which("node") is None, reason="node not installed")
-def test_the_push_toast_says_what_was_learned():
-    src = DASHBOARD.read_text(encoding="utf-8")
-    harness = _extract_js_function(src, "icuPushToastFromResult") + """
-const seen = [];
-global.showToast = (m) => seen.push(m);
-icuPushToastFromResult({pushed: 1, updated: 0, deleted: 1, skipped: [], held: 0,
-                        learned: [{from: '2026-10-21', to: '2026-10-23', name: 'Z2'}]}, 'Pushed to intervals.icu');
-const want = ['Pushed to intervals.icu: 1 new · 1 removed · 1 workout moved in your plan to match intervals.icu'];
-if (JSON.stringify(seen) !== JSON.stringify(want)) throw new Error(JSON.stringify(seen));
-console.log('OK');
-"""
-    _run_node(harness)
-
-
-
 def _files_by_day():
     return {x["day"]: x.get("zwo_file") for w in _plan()["weeks"] for x in w["sessions"]
             if x.get("zwo_file")}
@@ -350,17 +331,3 @@ def test_a_changed_time_of_day_is_not_a_move(env):
     assert r["learned"] == [] and _plan() == before
 
 
-@pytest.mark.skipif(shutil.which("node") is None, reason="node not installed")
-def test_a_failed_push_after_learning_says_the_plan_changed():
-    """Grill r2 L1: "nothing was changed" was wrong; the plan had moved."""
-    src = DASHBOARD.read_text(encoding="utf-8")
-    harness = _extract_js_function(src, "icuPushToastFromResult") + """
-const seen = [];
-global.showToast = (m) => seen.push(m);
-icuPushToastFromResult({error: 'http_500', learned: [{from: 'a', to: 'b'}]}, 'Pushed');
-icuPushToastFromResult({needs_reconnect: true, learned: [{from: 'a', to: 'b'}, {from: 'c', to: 'd'}]}, 'Pushed');
-if (!seen[0].startsWith('Your plan now follows 1 move you made in intervals.icu')) throw new Error(seen[0]);
-if (!seen[1].startsWith('Your plan now follows 2 moves') || !seen[1].includes('reconnect')) throw new Error(seen[1]);
-console.log('OK');
-"""
-    _run_node(harness)

@@ -192,9 +192,3 @@ def test_apply_tier_down_triggers_reforecast(tmp_path, monkeypatch):
     assert "availability_overrides" in called[0]
 
 
-def test_dashboard_has_apply_tier_down_handler():
-    """Pin the frontend wiring."""
-    dash = (Path(app_module.__file__).parent / "templates" / "dashboard.html").read_text(encoding="utf-8")
-    assert "function applyReadinessTierDown" in dash or "async function applyReadinessTierDown" in dash
-    assert "id=\"apply-tier-down-btn\"" in dash
-    assert "/api/readiness/apply-tier-down" in dash

@@ -498,13 +498,6 @@ def test_calendar_planned_payload_carries_execution():
     assert i != -1, "calendar planned_payload must expose session execution"
 
 
-def test_dashboard_renders_badge_and_breakdown():
-    html = (ROOT / "src" / "templates" / "dashboard.html").read_text(encoding="utf-8")
-    assert "planned.execution" in html          # week-strip badge source
-    assert "✓ ${Math.round(execBlock.score)}" in html  # ✓ NN badge
-    assert "Execution <b" in html               # day-modal breakdown line
-
-
 # ── a widened band is judged against the planned file itself ────────────────
 # Planned warm-up, recoveries and cool-down sit below the band, and widening
 # the band raises the in-band share a faithful ride reaches. The file says

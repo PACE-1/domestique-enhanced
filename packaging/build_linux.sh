@@ -38,6 +38,10 @@ if [ "$(uname -s)" != "Linux" ]; then
     exit 1
 fi
 
+# The bundle serves the web interface from web/dist (see domestique.spec).
+[ -f web/dist/index.html ] || {
+    echo "✗ web/dist is missing. Build the web interface first: (cd web && pnpm install && pnpm build)" >&2; exit 1; }
+
 VERSION="$(tr -d '[:space:]' < VERSION)"
 APP_NAME="Domestique"
 DIST="dist/${APP_NAME}"

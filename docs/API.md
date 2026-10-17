@@ -21,8 +21,7 @@ Routes that return a list of a declared model are included.
   breaks an older client.
 - Removing or retyping a field is a breaking change. It needs a new route or a
   documented transition, and the snapshot diff makes it visible in review.
-- The legacy dashboard calls the same routes. Its contract is whatever it reads
-  today; a typed model must therefore describe what the server already sends.
+- A typed model must describe what the server already sends.
 
 ## Errors
 

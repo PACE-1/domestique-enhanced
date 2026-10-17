@@ -191,18 +191,3 @@ def test_api_plan_no_snapshot_no_drift_no_error(plan_env, monkeypatch):
 
 # ── chip: structural (client is render-only) ────────────────────────────────
 
-def test_chip_structure_and_wiring():
-    html = (ROOT / "src" / "templates" / "dashboard.html").read_text(encoding="utf-8")
-    assert 'id="plan-drift-chip"' in html
-    assert "function renderPlanDriftChip(drift)" in html
-    # Keyed strictly on the SERVER's exceeded flag (client renders only).
-    assert "!drift.exceeded" in html
-    assert "renderPlanDriftChip(d.plan_json.ctl_drift)" in html
-    # Locked copy + wired to the EXISTING regenerate action.
-    assert "Plan assumes CTL" in html
-    assert 'onclick="regeneratePlan()"' in html
-    # No auto-regen: the chip renderer must not CALL regeneratePlan itself.
-    start = html.index("function renderPlanDriftChip")
-    body = html[start:html.index("\n}", start)]
-    assert "await regeneratePlan" not in body
-    assert body.count("regeneratePlan()") == 1  # only inside the onclick attr

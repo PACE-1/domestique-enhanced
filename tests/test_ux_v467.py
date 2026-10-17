@@ -33,9 +33,6 @@ import app as app_module
 import training_planner as tp
 
 
-DASH_PATH = Path(__file__).resolve().parent.parent / "src" / "templates" / "dashboard.html"
-
-
 def _mk_plan_weeks(monday: date, weeks_count: int = 2) -> list[dict]:
     weeks = []
     for w_idx in range(weeks_count):
@@ -168,9 +165,6 @@ class TestCalendarGoalBlock(_CalendarUxBase):
 class TestDashboardJsAndCss(unittest.TestCase):
     """F1 + F2 + F3 + F4 — string-level dashboard.html inspection."""
 
-    @classmethod
-    def setUpClass(cls):
-        cls._html = DASH_PATH.read_text(encoding="utf-8")
 
     def test_cooldown_segment_renders_downsloping(self):
         # F1 (v4.6.8 value-based fix) — workoutProfileSVG must render Cooldown

@@ -219,12 +219,3 @@ def test_next_slot_none_without_plan(monkeypatch, tmp_path):
 
 # ── UI structural ────────────────────────────────────────────────────────────
 
-def test_dashboard_banner_and_instructions_modal():
-    html = (ROOT / "src" / "templates" / "dashboard.html").read_text(encoding="utf-8")
-    assert 'id="retest-nudge-host"' in html
-    assert "renderRetestNudge(d.retest_nudge)" in html
-    assert "/api/retest-nudge/snooze" in html
-    assert "showLthrTestInstructions" in html
-    assert "average HR of the final 20 minutes" in html  # 20-min TT protocol
-    # The insert button rides the EXISTING swap-type machinery.
-    assert "session_type: 'ftp_test'" in html

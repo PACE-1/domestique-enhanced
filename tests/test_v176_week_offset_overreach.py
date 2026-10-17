@@ -200,11 +200,3 @@ def test_overreach_unplanned_high_intensity_flag(tmp_path, monkeypatch):
                for s in body["overreach_reasons"])
 
 
-def test_dashboard_renders_last_week_feedback_card():
-    """Pin the frontend wiring."""
-    dash = (Path(app_module.__file__).parent / "templates" / "dashboard.html").read_text(encoding="utf-8")
-    assert 'id="last-week-feedback-card"' in dash
-    assert "function loadLastWeekFeedback" in dash or "async function loadLastWeekFeedback" in dash
-    assert "/api/week-summary?week_offset=-1" in dash
-    # Confirm the loader runs on home init.
-    assert "loadLastWeekFeedback()" in dash

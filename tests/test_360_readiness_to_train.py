@@ -236,13 +236,3 @@ def test_no_input_returns_none(monkeypatch):
 
 # ── UI contract ─────────────────────────────────────────────────────────────
 
-def test_form_offers_it_optionally_and_never_pre_fills():
-    from pathlib import Path
-    src = (Path(app_module.__file__).parent / "templates" / "dashboard.html"
-           ).read_text(encoding="utf-8")
-    assert "_renderReadinessRow" in src
-    assert "readiness_to_train: null" in src, "must not invent a default rating"
-    assert "Ready to train?" in src
-    assert "(optional)" in src or "optional" in src
-    # Sent only when actually set.
-    assert "_hooperDraft.readiness_to_train != null" in src

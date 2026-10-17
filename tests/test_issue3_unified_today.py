@@ -77,11 +77,6 @@ class TestUnifiedTodayEndpoint(unittest.TestCase):
 class TestUnifiedTodayMarkup(unittest.TestCase):
     """Frontend guard: the 3 separate home surfaces are merged into one card."""
 
-    @classmethod
-    def setUpClass(cls):
-        from pathlib import Path
-        cls.html = (Path(__file__).resolve().parent.parent
-                    / "src" / "templates" / "dashboard.html").read_text(encoding="utf-8")
 
     def test_one_today_card(self):
         self.assertEqual(self.html.count('id="today-card"'), 1)
