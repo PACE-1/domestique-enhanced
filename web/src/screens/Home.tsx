@@ -17,6 +17,7 @@ import { DfaSnapshotCard } from "@/screens/DfaSnapshot"
 import { DailyCheckIn } from "@/screens/DailyCheckIn"
 import { Hrv } from "@/screens/Hrv"
 import { Panel, Row, useLoad } from "@/screens/panel"
+import { AskCoach } from "@/screens/Coach"
 import { Readiness } from "@/screens/Readiness"
 import { Records } from "@/screens/Records"
 import { LastWeek, ThisWeek } from "@/screens/WeekSummary"
@@ -61,6 +62,8 @@ export function Home() {
       <DfaSnapshotCard />
 
       <Readiness />
+
+      <AskCoach />
 
       <DailyCheckIn />
 

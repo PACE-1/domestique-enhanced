@@ -5,10 +5,12 @@ import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
+import { rideInsight } from "@/lib/coach"
 import { fmtMinutes } from "@/lib/home"
 import { deleteRide, fitUrl, getFtpAnalysis, getRide, isFitRide, reviewFtp, setRace, setRpe, updateFtp, ZONE_NAMES } from "@/lib/rides"
 import type { Series } from "@/lib/analysis"
 import { LineChart } from "@/screens/Chart"
+import { CoachInsight } from "@/screens/Coach"
 import { Panel, Row, useLoad } from "@/screens/panel"
 
 const when = (iso?: string | null) => (iso ? new Date(iso).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }) : "—")
@@ -268,6 +270,7 @@ function Body({ r }: { r: Ride }) {
           </ul>
         </div>
       )}
+      <CoachInsight label="Review this ride" run={() => rideInsight(r.ride_id)} />
       <Rpe id={r.ride_id} initial={typeof r.rpe === "number" ? r.rpe : null} />
       {r.activity_id && <RaceFlag activityId={r.activity_id} initial={r.is_race === true} />}
       <div className="flex flex-wrap items-center gap-2">
