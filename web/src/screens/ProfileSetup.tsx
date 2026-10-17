@@ -147,12 +147,12 @@ export function ProfileSetup() {
   }
 
   return (
-    <div className="mx-auto flex min-h-svh max-w-xl flex-col justify-center px-6 py-10">
-      <h1 className="text-center text-2xl font-bold">Shepherd</h1>
+    <div className="mx-auto flex min-h-svh max-w-3xl flex-col justify-center px-6 py-12">
+      <h1 className="text-center text-3xl font-semibold tracking-tight">Shepherd</h1>
       <p className="mb-4 text-center text-muted-foreground">Set up a new rider profile in 3 steps.</p>
       <StepDots step={step} total={3} />
-      <Card>
-        <CardContent className="grid gap-4">
+      <Card className="[--card-spacing:--spacing(8)]">
+        <CardContent className="grid gap-6">
           {step === 1 && (
             <>
               <h2 className="text-lg font-semibold">Name &amp; Color</h2>
@@ -211,7 +211,7 @@ export function ProfileSetup() {
                   Heart-rate mode prescribes workout targets from your LTHR — the LTHR field below is required.
                 </p>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-x-6 gap-y-5 sm:grid-cols-2">
                 {NUMBER_FIELDS.map((f) => (
                   <div key={f.key} className="grid gap-2">
                     <Label htmlFor={f.key}>{f.label}</Label>
@@ -232,7 +232,7 @@ export function ProfileSetup() {
                   {/* ponytail: native select; swap for the shadcn Select when a second one appears */}
                   <select
                     id="sex"
-                    className="h-9 rounded-4xl border border-input bg-input/30 px-3 text-sm"
+                    className="h-9 rounded-lg border border-input bg-background px-3 text-sm dark:bg-input/30"
                     value={values.sex}
                     onChange={(e) => setField("sex", e.target.value)}
                   >

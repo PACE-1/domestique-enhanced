@@ -537,14 +537,17 @@ def _open_url(url, platform=None):
 def run_with_tray():
     """Run system tray icon (requires pystray + Pillow)."""
     try:
+        from pathlib import Path
         from pystray import Icon, MenuItem, Menu
         from PIL import Image, ImageDraw
 
-        # Create icon: blue circle with white "H"
-        img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
-        draw = ImageDraw.Draw(img)
-        draw.ellipse([4, 4, 60, 60], fill=(79, 108, 247))
-        draw.text((22, 16), "H", fill="white")
+        # The app icon (assets/icon.png ships in the bundle); a plain dot if it is missing.
+        icon_png = Path(getattr(sys, "_MEIPASS", None) or Path(__file__).resolve().parent.parent) / "assets" / "icon.png"
+        if icon_png.exists():
+            img = Image.open(icon_png).convert("RGBA").resize((64, 64))
+        else:
+            img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+            ImageDraw.Draw(img).ellipse([4, 4, 60, 60], fill=(17, 17, 17))
 
         def open_browser(icon, item):
             _open_url(URL)

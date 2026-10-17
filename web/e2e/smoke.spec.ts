@@ -153,11 +153,11 @@ test("Home shows readiness and a daily check-in can be saved", async ({ page, re
   await page.goto("#/home")
   await expect(page.getByRole("heading", { name: "Readiness" })).toBeVisible()
   await expect(page.getByRole("heading", { name: "Daily check-in" })).toBeVisible()
-  await page.getByLabel("Fatigue").selectOption("6")
+  await page.getByLabel("Fatigue").selectOption("2")
   await page.getByRole("button", { name: "Save check-in" }).click()
-  await expect(page.getByText(/Hooper index/)).toBeVisible()
+  await expect(page.getByText(/Logged today · wellness/)).toBeVisible()
   const log = await (await request.get(BASE + "/api/daily-log")).json()
-  expect(log.today.fatigue).toBe(6)
+  expect(log.today.fatigue).toBe(5) // a rating of 2 of 5 is 5 on the server's Hooper scale
 })
 
 test("a race can be added to the Plan", async ({ page, request }) => {

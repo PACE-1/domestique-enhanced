@@ -134,28 +134,24 @@ export function Setup() {
       const map: [keyof typeof a, FieldId, string][] = [
         ["ftp", "s-ftp", "ftp"], ["weight", "s-weight", "weight"], ["lthr", "s-lthr", "lthr"], ["max_hr", "s-maxhr", "max hr"],
       ]
-      const got: string[] = []
+      const found = a?.ok ? map.filter(([k]) => a[k] != null && a[k] !== ("" as unknown)) : []
       setS((p) => {
         const values = { ...p.values }
         const touched = new Set(p.touched)
         const origin = new Set(p.icuOrigin)
-        if (a?.ok) {
-          for (const [k, id, label] of map) {
-            const v = a[k]
-            if (v != null && v !== ("" as unknown)) {
-              values[id] = String(v)
-              touched.add(id)
-              origin.add(id)
-              got.push(label)
-            }
-          }
+        for (const [k, id] of found) {
+          values[id] = String(a[k])
+          touched.add(id)
+          origin.add(id)
         }
         return { ...p, values, touched: [...touched], icuOrigin: [...origin] }
       })
       setAutofill(
-        got.length
-          ? `Filled from intervals.icu: ${got.join(", ")} — edit anything that looks off.`
-          : "Nothing to fill yet — your first sync runs after setup.",
+        found.length
+          ? `Filled from intervals.icu: ${found.map(([, , label]) => label).join(", ")} — edit anything that looks off.`
+          : a?.ok
+            ? "intervals.icu has no FTP, weight or heart-rate numbers for you yet. Enter them below."
+            : "Couldn’t read your numbers from intervals.icu. Check the connection in step 1, or enter them below.",
       )
     } catch {
       setAutofill("Auto-fill failed — enter your numbers manually.")
@@ -270,12 +266,12 @@ export function Setup() {
   }
 
   return (
-    <div className="mx-auto flex min-h-svh max-w-xl flex-col justify-center px-6 py-10">
-      <h1 className="text-center text-2xl font-bold">Shepherd</h1>
+    <div className="mx-auto flex min-h-svh max-w-3xl flex-col justify-center px-6 py-12">
+      <h1 className="text-center text-3xl font-semibold tracking-tight">Shepherd</h1>
       <p className="mb-4 text-center text-muted-foreground">Let's get you set up in 4 quick steps.</p>
       <StepDots step={step} total={4} />
-      <Card>
-        <CardContent className="grid gap-4">
+      <Card className="[--card-spacing:--spacing(8)]">
+        <CardContent className="grid gap-6">
           {step === 1 && (
             <>
               <h2 className="text-lg font-semibold">Your training data</h2>
@@ -374,20 +370,22 @@ export function Setup() {
                   Heart-rate mode prescribes workout targets from your LTHR — the LTHR field below is required.
                 </p>
               </div>
-              {num("s-weight", "Weight (kg)", { icu: true, step: 0.1, hint: "Used for W/kg and climb power estimates" })}
-              {num("s-ftp", "FTP — Functional Threshold Power (watts)", { icu: true, hint: "The max power you can sustain for ~1 hour" })}
-              {num("s-lthr", "LTHR — Lactate Threshold Heart Rate (bpm)", { icu: true, hint: "Tip: your average HR during a 30min all-out effort is a good estimate" })}
-              {num("s-maxhr", "Max Heart Rate (bpm)", { icu: true, hint: "Formula estimates (220-age) are unreliable. Use your actual recorded max if known." })}
-              {num("s-age", "Age (years) (optional)", { placeholder: "35" })}
-              <div className="grid gap-1.5">
-                <Label htmlFor="s-sex">Sex (optional)</Label>
-                <NativeSelect id="s-sex"
-                  value={s.values["s-sex"]} onChange={(e) => setField("s-sex", e.target.value)}>
-                  <option value="">Prefer not to say</option>
-                  <option value="M">Male</option>
-                  <option value="F">Female</option>
-                  <option value="O">Other</option>
-                </NativeSelect>
+              <div className="grid gap-x-6 gap-y-5 sm:grid-cols-2">
+                {num("s-weight", "Weight (kg)", { icu: true, step: 0.1, hint: "Used for W/kg and climb power estimates" })}
+                {num("s-ftp", "FTP — Functional Threshold Power (watts)", { icu: true, hint: "The max power you can sustain for ~1 hour" })}
+                {num("s-lthr", "LTHR — Lactate Threshold Heart Rate (bpm)", { icu: true, hint: "Tip: your average HR during a 30min all-out effort is a good estimate" })}
+                {num("s-maxhr", "Max Heart Rate (bpm)", { icu: true, hint: "Formula estimates (220-age) are unreliable. Use your actual recorded max if known." })}
+                {num("s-age", "Age (years) (optional)", { placeholder: "35" })}
+                <div className="grid gap-1.5">
+                  <Label htmlFor="s-sex">Sex (optional)</Label>
+                  <NativeSelect id="s-sex"
+                    value={s.values["s-sex"]} onChange={(e) => setField("s-sex", e.target.value)}>
+                    <option value="">Prefer not to say</option>
+                    <option value="M">Male</option>
+                    <option value="F">Female</option>
+                    <option value="O">Other</option>
+                  </NativeSelect>
+                </div>
               </div>
               <details>
                 <summary className="cursor-pointer text-sm text-muted-foreground">Advanced (optional)</summary>

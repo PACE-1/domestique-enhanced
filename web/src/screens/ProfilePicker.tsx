@@ -53,7 +53,7 @@ export function ProfilePicker({ onSwitched = goHome }: { onSwitched?: () => void
     return (
       <Shell subtitle="No profiles yet">
         <Card>
-          <CardContent className="flex flex-col items-center gap-3 py-8">
+          <CardContent className="flex flex-col items-center gap-3 p-8">
             <h2 className="text-lg font-semibold">Create your first profile</h2>
             <p className="max-w-sm text-sm text-muted-foreground">
               Every rider needs a profile. It holds your FTP, weight, training plans, ride history
@@ -69,7 +69,7 @@ export function ProfilePicker({ onSwitched = goHome }: { onSwitched?: () => void
   return (
     <Shell subtitle="Who's riding today?">
       {error && <p role="alert" className="mb-4 text-sm text-destructive">{error}</p>}
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-4">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,220px))] justify-center gap-4">
         {profiles.map((p) => (
           <Card key={p.id} className="relative">
             <button
@@ -78,7 +78,7 @@ export function ProfilePicker({ onSwitched = goHome }: { onSwitched?: () => void
               aria-label={`Ride as ${p.name}`}
               onClick={() => pick(p)}
             />
-            <CardContent className="flex flex-col items-center gap-1 py-6">
+            <CardContent className="flex flex-col items-center gap-1 p-6">
               <div
                 className="mb-2 flex size-14 items-center justify-center rounded-full bg-primary text-xl font-bold text-primary-foreground"
                 style={safeColor(p.color) ? { background: safeColor(p.color) } : undefined}
@@ -102,7 +102,7 @@ export function ProfilePicker({ onSwitched = goHome }: { onSwitched?: () => void
           </Card>
         ))}
         <Card className="border-dashed">
-          <CardContent className="flex h-full items-center justify-center py-6">
+          <CardContent className="flex h-full items-center justify-center p-6">
             <Button variant="ghost" render={<a href="#/profile-setup" />}>
               + Add Profile
             </Button>
@@ -135,7 +135,7 @@ export function ProfilePicker({ onSwitched = goHome }: { onSwitched?: () => void
 function Shell({ subtitle, children }: { subtitle: string; children: React.ReactNode }) {
   return (
     <div className="mx-auto flex min-h-svh max-w-2xl flex-col justify-center px-6 py-10 text-center">
-      <h1 className="text-2xl font-bold">Shepherd</h1>
+      <h1 className="text-3xl font-semibold tracking-tight">Shepherd</h1>
       <p className="mb-8 text-muted-foreground">{subtitle}</p>
       {children}
     </div>

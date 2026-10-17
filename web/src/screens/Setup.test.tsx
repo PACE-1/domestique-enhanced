@@ -134,3 +134,29 @@ describe("Setup: intervals.icu with an API key", () => {
     expect(calls.some((c) => c.url === "/api/setup/ensure-profile")).toBe(true)
   })
 })
+
+describe("Setup: auto-fill from intervals.icu", () => {
+  const linked = { "/api/icu/connection": () => new Response(JSON.stringify({ method: "apikey", connected: true, name: "Isaac", oauth_available: false })) }
+  const toProfile = async (numbers: unknown) => {
+    mockApi({ ...linked, "/api/icu/athlete-numbers": () => new Response(JSON.stringify(numbers)) })
+    render(<Setup />)
+    await userEvent.click(await screen.findByRole("button", { name: /^Continue/ }))
+    await userEvent.click(await screen.findByRole("button", { name: "Auto-fill from your data" }))
+  }
+
+  it("fills what intervals.icu has and says which fields", async () => {
+    await toProfile({ ok: true, ftp: 237, weight: null, lthr: 171, max_hr: 195 })
+    expect(await screen.findByText(/Filled from intervals.icu: ftp, lthr, max hr/)).toBeTruthy()
+    expect((screen.getByLabelText(/^FTP/) as HTMLInputElement).value).toBe("237")
+  })
+
+  it("says so when intervals.icu has none of the numbers", async () => {
+    await toProfile({ ok: true, ftp: null, weight: null, lthr: null, max_hr: null })
+    expect(await screen.findByText(/has no FTP, weight or heart-rate numbers/)).toBeTruthy()
+  })
+
+  it("says so when the numbers could not be read", async () => {
+    await toProfile({ ok: false })
+    expect(await screen.findByText(/Couldn’t read your numbers from intervals.icu/)).toBeTruthy()
+  })
+})

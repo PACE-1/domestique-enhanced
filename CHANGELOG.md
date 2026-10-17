@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **Daily check-in uses a 1 to 5 scale, 5 best.** It is stored on the Hooper 1 to 7 scale (1 best) that the readiness checks were built on, so nothing changes in how readiness works and earlier check-ins still read correctly. After saving it shows an overall wellness score out of 5.
+- **Fixed the setup "Auto-fill from your data" message.** It said "Nothing to fill yet" even when it had filled your numbers. It now lists what it filled, or says whether intervals.icu has no numbers or could not be read.
+- **Setup and profile pages use more of the screen.** The setup wizard is wider with more padding, the profile fields sit in two columns, and the rider picker is centred. A padding regression from the new look (text touching card edges on setup and DFA) is fixed.
+- **New logo:** a leaning shepherd's crook. It appears in the header, the browser tab, the Linux, macOS and Windows app icons and the tray icon.
 - **New look.** A clean black-and-white style with light and dark themes, tighter corners, bordered inputs, and a header with the Shepherd name. A button at the top right cycles System, Light and Dark (the d key still flips light and dark).
 - **The app is now called Shepherd** (it was Domestique). The data folder moves from `~/.domestique` to `~/.shepherd` the first time the new version starts, and a link is left at the old name. The environment settings are renamed from `DOMESTIQUE_*` to `SHEPHERD_*`; the old names still work. The workout library files, the log file, the AppImage name and the window title carry the new name. Your intervals.icu calendar events keep their old internal IDs so existing events are still recognised.
 - **AI coach.** Connect a model in Settings → AI coach: Anthropic, OpenAI, OpenRouter, or a local Ollama or LM Studio. Then ask questions about your training on Home, get a review of your week, or open a ride and choose Review this ride. Only a short summary of your fitness, week and recent rides is sent, never ride files or your intervals.icu key. The connection is stored in your profile folder, readable only by you.

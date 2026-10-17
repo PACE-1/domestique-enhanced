@@ -105,14 +105,14 @@ describe("DailyCheckIn", () => {
     const calls = mock({
       "/api/daily-log": (b) => {
         if (b) { logged = true; return json({ ok: true, entry: { date: "d" } }) }
-        return json({ today: logged ? { date: "d", hooper_index: 12 } : null, history: [] })
+        return json({ today: logged ? { date: "d", sleep_quality: 4, fatigue: 3, stress: 4, soreness: 5, mood: 4 } : null, history: [] })
       },
     })
     render(<DailyCheckIn />)
-    await userEvent.selectOptions(await screen.findByLabelText("Fatigue"), "6")
+    await userEvent.selectOptions(await screen.findByLabelText("Fatigue"), "2")
     await userEvent.click(screen.getByRole("button", { name: "Save check-in" }))
-    expect(await screen.findByText(/Hooper index 12/)).toBeTruthy()
-    expect(calls.find((c) => c.body)!.body).toEqual({ sleep_quality: 4, fatigue: 6, stress: 4, soreness: 4, mood: 4 })
+    expect(await screen.findByText(/wellness 3.0 \/ 5/)).toBeTruthy()
+    expect(calls.find((c) => c.body)!.body).toEqual({ sleep_quality: 4, fatigue: 5, stress: 4, soreness: 4, mood: 4 })
   })
 
   it("shows the server's message when the save is refused", async () => {
@@ -120,5 +120,14 @@ describe("DailyCheckIn", () => {
     render(<DailyCheckIn />)
     await userEvent.click(await screen.findByRole("button", { name: "Save check-in" }))
     expect((await screen.findByRole("alert")).textContent).toContain("fatigue must be 1..7")
+  })
+})
+
+describe("check-in scale", () => {
+  it("maps the 1 to 5 rating onto the Hooper 1 to 7 scale and back, keeping both ends", async () => {
+    const { rateToHooper, hooperToRate } = await import("@/lib/home")
+    expect([5, 4, 3, 2, 1].map(rateToHooper)).toEqual([1, 3, 4, 5, 7])
+    expect([1, 2, 3, 4, 5, 6, 7].map(hooperToRate)).toEqual([5, 4, 4, 3, 2, 2, 1])
+    for (const r of [1, 2, 3, 4, 5]) expect(hooperToRate(rateToHooper(r))).toBe(r)
   })
 })

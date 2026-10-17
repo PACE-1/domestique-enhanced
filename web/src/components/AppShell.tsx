@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react"
 
 import { Button } from "@/components/ui/button"
+import { Logo } from "@/components/Logo"
 import { ThemeToggle } from "@/components/ThemeToggle"
 import { api } from "@/lib/api"
 import { Notices } from "@/screens/Notices"
@@ -40,7 +41,8 @@ export function AppShell({ tab, children }: { tab: TabId; children: ReactNode })
     <ShellContext.Provider value={value}>
       <div className="mx-auto max-w-7xl px-4 py-4">
         <nav className="mb-6 flex flex-wrap items-center gap-1 border-b pb-3" aria-label="Sections">
-          <a href="#/home" className="mr-3 text-base font-semibold tracking-tight">
+          <a href="#/home" className="mr-3 flex items-center gap-1.5 text-base font-semibold tracking-tight">
+            <Logo />
             Shepherd
           </a>
           {TABS.map((t) => (
