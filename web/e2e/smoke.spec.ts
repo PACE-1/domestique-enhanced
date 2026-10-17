@@ -69,7 +69,8 @@ test("navigation is keyboard reachable and marks the current section", async ({ 
   await page.keyboard.press("Tab")
   await expect(nav.getByRole("link", { name: "Workout Shuffle" })).toBeFocused()
   await page.keyboard.press("Enter")
-  await expect(page.getByText("has not moved to the new interface yet")).toBeVisible()
+  await expect(nav.getByRole("link", { name: "Workout Shuffle" })).toHaveAttribute("aria-current", "page")
+  await expect(page.getByRole("heading", { name: "Workout shuffle" })).toBeVisible()
 })
 
 test("the DFA tab shows its empty state, and a failed load says so", async ({ page }) => {
@@ -213,4 +214,33 @@ test("an FTP-test session gets a test type", async ({ page, request }) => {
   const plan = await (await request.get(BASE + "/api/plan")).json()
   const types = plan.plan_json.weeks.flatMap((w: { sessions: { ftp_test_type?: string }[] }) => w.sessions.map((s) => s.ftp_test_type))
   expect(types).toContain("ramp")
+})
+
+test("the Library lists workouts, filters them, and opens one", async ({ page }) => {
+  await page.goto("#/library")
+  await expect(page.getByText(/^Showing \d+ of \d+/)).toBeVisible()
+  await page.getByLabel("Search").fill("recovery")
+  await expect(page.getByText(/^Showing \d+ of \d+/)).toBeVisible()
+  const first = page.getByRole("listitem").first().getByRole("button")
+  await first.click()
+  await expect(page.getByRole("img", { name: /^Power profile/ })).toBeVisible()
+  await expect(page.getByRole("link", { name: "Download .zwo" })).toBeVisible()
+})
+
+test("Workout shuffle suggests workouts", async ({ page }) => {
+  await page.goto("#/picker")
+  await page.getByRole("button", { name: "Suggest workouts" }).click()
+  await expect(page.getByRole("listitem").first()).toBeVisible()
+  await expect(page.getByRole("alert")).toHaveCount(0)
+  await expect(page.getByRole("button", { name: "Shuffle again" })).toBeVisible()
+})
+
+test("Routes lists courses, filters them, and opens one", async ({ page }) => {
+  await page.goto("#/courses")
+  await expect(page.getByText(/^Showing \d+ of \d+/)).toBeVisible()
+  await page.getByLabel("Loops only").check()
+  await expect(page.getByText(/^Showing \d+ of \d+/)).toBeVisible()
+  await page.getByRole("listitem").first().getByRole("button").click()
+  await expect(page.getByRole("img", { name: /^Elevation profile/ })).toBeVisible()
+  await expect(page.getByRole("link", { name: "Download course (.crs)" })).toBeVisible()
 })
