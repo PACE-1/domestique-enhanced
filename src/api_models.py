@@ -509,62 +509,6 @@ class PickerResult(_Model):
     workouts: list[WorkoutRow] = []
 
 
-# ── Routes and climbs ───────────────────────────────────────────────────────
-
-class RouteSummary(_Model):
-    id: str
-    name: str = ""
-    region: str = ""
-    crs_region: Optional[str] = None
-    file: Optional[str] = None
-    source: str = ""                   # virtual | real
-    distance_km: float = 0
-    climb_m: float = 0
-    max_grade: Optional[float] = None
-    difficulty_score: Optional[float] = None
-    category: Optional[str] = None
-    terrain: Optional[str] = None
-    primary_surface: Optional[str] = None
-    loop: Optional[bool] = None
-    est_duration_min_z2: Optional[float] = None
-    est_tss: Optional[float] = None
-    tags: list[str] = []
-    preview_profile: list[list[float]] = []   # [km, elevation m] pairs
-    surface_mix_pct: Optional[dict] = None
-
-
-class RoutesList(_Model):
-    total_matching: int = 0
-    returned: int = 0
-    routes: list[RouteSummary] = []
-
-
-class RegionWorld(_Model):
-    region: str
-    source: str = ""
-    count: int = 0
-    emoji: str = ""
-    title: str = ""
-    blurb: str = ""
-
-
-class RealWorldRegion(_Model):
-    region: str
-    count: int = 0
-    title: str = ""
-
-
-class RealWorldMeta(_Model):
-    count: int = 0
-    title: str = ""
-    regions: list[RealWorldRegion] = []
-
-
-class RegionsList(_Model):
-    worlds: list[RegionWorld] = []
-    real_world_meta: Optional[RealWorldMeta] = None
-
-
 # ── Analysis: fitness and form, power curve, rides ──────────────────────────
 
 class WellnessDay(_Model):
@@ -1087,24 +1031,6 @@ class FatigueResistance(_Model):
 
 class WorkoutTags(_Model):
     tags: list[str] = []
-
-
-class SurfaceTypes(_Model):
-    routes: dict = {}                 # route file -> surface
-    gravel_workouts: list[dict] = []  # workouts that pair well with gravel and cobbles
-
-
-class RouteSuggestion(_Model):
-    route: RouteSummary
-    match_score: float = 0
-    rationale: str = ""
-
-
-class RouteSuggestions(_Model):
-    count: int = 0
-    filters_applied: dict = {}
-    results: list[RouteSuggestion] = []
-    empty_hint: Optional[dict] = None   # {filter, filter_label, would_match}: the one filter to drop for the most routes
 
 
 class WeekSummary(_Model):

@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { NativeSelect } from "@/components/ui/native-select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
-import { getSurfaceTypes, getTags, listWorkouts, PAGE, SORTS, suitsGravel, TYPES, type Outdoor, type WorkoutQuery } from "@/lib/library"
+import { getTags, listWorkouts, PAGE, SORTS, suitsGravel, TYPES, type Outdoor, type WorkoutQuery } from "@/lib/library"
 import { WorkoutCard } from "@/screens/WorkoutCard"
 
 type Load = { state: "loading" } | { state: "ok"; rows: WorkoutRow[]; total: number | null } | { state: "error"; message: string }
@@ -18,7 +18,6 @@ export function Library() {
   const EMPTY: WorkoutQuery = { search: "", minDuration: null, maxDuration: null, sort: "score_desc", contentClass: "", tags: [] }
   const [q, setQ] = useState<WorkoutQuery>(EMPTY)
   const [gravel, setGravel] = useState(false)
-  const [listed, setListed] = useState<{ name?: string }[]>([])
   const [tags, setTags] = useState<string[]>([])
   const [outdoor, setOutdoor] = useState<Outdoor>({ on: false, transitMin: 10, spinMin: 20 })
   const [applied, setApplied] = useState(q)
@@ -41,15 +40,14 @@ export function Library() {
     return () => { live = false }
   }, [applied, attempt])
 
-  // Tags and the gravel list are optional polish: if either fails to load, the rest of the library works.
+  // Tags are optional polish: if they fail to load, the rest of the library works.
   useEffect(() => {
     getTags().then(setTags, () => {})
-    getSurfaceTypes().then((r) => setListed(r.gravel_workouts ?? []), () => {})
   }, [])
 
   const badRange = q.minDuration !== null && q.maxDuration !== null && q.minDuration > q.maxDuration
 
-  const rows = load.state === "ok" ? (gravel ? load.rows.filter((w) => suitsGravel(w, listed)) : load.rows) : []
+  const rows = load.state === "ok" ? (gravel ? load.rows.filter((w) => suitsGravel(w)) : load.rows) : []
 
   return (
     <div className="space-y-4">

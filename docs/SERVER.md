@@ -89,7 +89,7 @@ browser redirect; bearer and cookie sign-in; forwarding headers do not bypass;
 exact trusted origins; server mode without a token refuses to start.
 ## Immutable bundled assets (#15)
 
-The built-in workout and route libraries, static files and the prebuilt library
+The built-in workout library, web build and the prebuilt library
 caches ship inside the image or AppImage and are read-only at run time.
 
 - **Generated workouts** (the planner's own synthesised sessions, when enabled)

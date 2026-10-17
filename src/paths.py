@@ -26,10 +26,6 @@ from user_home import domestique_home
 _user_data_dir = domestique_home()  # 3.4.3: DOMESTIQUE_HOME-aware
 DATA_DIR = _user_data_dir
 
-COURSE_DIR = Path(__file__).parent / "courses"
-ROUTE_DATA = Path(__file__).parent / "routes.json"
-ROUTE_PROFILES_INDEX = Path(__file__).parent / "profiles_indexed.json"
-ROUTE_PROFILES_DIR = Path(__file__).parent / "profiles"
 
 _DEFAULT_PLAN_DIR = _user_data_dir / "plans"
 

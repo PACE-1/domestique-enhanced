@@ -1,4 +1,4 @@
-import type { PickerResult, SurfaceTypes, WorkoutTags, WorkoutDetail, WorkoutRow } from "@/api/types"
+import type { PickerResult, WorkoutTags, WorkoutDetail, WorkoutRow } from "@/api/types"
 import { api, apiFull } from "@/lib/api"
 
 export interface WorkoutQuery {
@@ -21,14 +21,13 @@ export const TYPES: [string, [string, string][]][] = [
 
 export const getTags = () => api<WorkoutTags>("/api/workouts/tags").then((r) => r.tags ?? [])
 
-/** Workouts that suit gravel and cobbles: steady, sustained, low-cadence work (the server's own list plus protocol and name). */
-export const getSurfaceTypes = () => api<SurfaceTypes>("/api/surface-types")
+/** Workouts that suit gravel and cobbles: steady, sustained, low-cadence work, judged by protocol and name. */
 const GRAVEL_PROTOCOLS = ["tempo", "sweet spot", "endurance", "threshold"]
 const GRAVEL_NAMES = ["gravel", "cobble", "strade", "roubaix", "big gear", "pave"]
-export function suitsGravel(w: WorkoutRow, listed: SurfaceTypes["gravel_workouts"]) {
+export function suitsGravel(w: WorkoutRow) {
   const proto = (w.Protocol ?? "").toLowerCase()
   const name = (w.Name ?? "").toLowerCase()
-  return GRAVEL_PROTOCOLS.some((p) => proto.includes(p)) || GRAVEL_NAMES.some((n) => name.includes(n)) || listed.some((g) => (String((g as { name?: string }).name ?? "")).toLowerCase() === name)
+  return GRAVEL_PROTOCOLS.some((p) => proto.includes(p)) || GRAVEL_NAMES.some((n) => name.includes(n))
 }
 
 export const SORTS = [

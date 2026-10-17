@@ -113,7 +113,7 @@ class ReadsDoNotWrite(unittest.TestCase):
 
     def test_no_get_writes_the_plan(self):
         routes = _get_routes()
-        self.assertGreater(len(routes), 60)
+        self.assertGreater(len(routes), 50)
         offenders = {}
         for path in routes:
             before = hashlib.sha256(self.pp.read_bytes()).hexdigest()

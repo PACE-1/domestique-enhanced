@@ -109,36 +109,5 @@ class TestSaveFit(_BridgeTestCase):
         self.assertIn("base64", res["error"].lower())
 
 
-class TestSaveCrs(_BridgeTestCase):
-    """Course downloads did nothing on Windows and Linux: the buttons used
-    <a download> and window.open(), which the app window never turns into a
-    save. They now go through the same bridge as the workouts."""
-
-    def test_save_crs_writes_the_course_text(self):
-        import launcher
-
-        target = str(Path(tempfile.mkdtemp(prefix="domestique-bridge-")) / "out.crs")
-        fake_window = self._install_window((target,))
-        res = launcher.JsApi().save_crs("Alto Arrate.crs", "[COURSE HEADER]\n", "basque")
-        self.assertTrue(res["ok"], f"unexpected error: {res}")
-        self.assertEqual(Path(target).read_text(encoding="utf-8"), "[COURSE HEADER]\n")
-        kwargs = fake_window.create_file_dialog.call_args.kwargs
-        self.assertEqual(kwargs.get("save_filename"), "Alto Arrate.crs")
-
-    def test_an_empty_body_is_read_off_disk(self):
-        import app
-        import launcher
-
-        src = Path(tempfile.mkdtemp(prefix="domestique-crs-")) / "c.crs"
-        src.write_bytes(b"[COURSE DATA]\n")
-        target = str(src.parent / "saved.crs")
-        self._install_window((target,))
-        with mock.patch.object(app, "course_file_path", return_value=src) as cfp:
-            res = launcher.JsApi().save_crs("c.crs", "", "basque")
-        self.assertTrue(res["ok"], f"unexpected error: {res}")
-        cfp.assert_called_once_with("basque", "c.crs")
-        self.assertEqual(Path(target).read_bytes(), b"[COURSE DATA]\n")
-
-
 if __name__ == "__main__":
     unittest.main()

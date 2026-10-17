@@ -61,12 +61,8 @@ The server redirects `/` to the web app. `pnpm build` in `web/` must run before 
 
 | Path | Contents | Notes |
 |---|---|---|
-| `courses/virtual/` | Procedurally generated virtual routes | Apache-2.0 licensed (generated in-repo) |
-| `courses/alps/`, `courses/pyrenees/`, `courses/tenerife/`, `courses/mallorca/`, `courses/dolomites/`, `courses/girona/`, `courses/basque/`, `courses/costa_blanca/`, `courses/costa_daurada/`, `courses/andorra/`, `courses/lanzarote/`, `courses/gravel/`, `courses/other/` | Real-world climb profiles as CRS slope files for GoldenCheetah gradient simulation | User-supplied GPX files can be added and converted via `gpx_to_gc.py` |
 | `workouts/` | Scientific interval template library (~1,750 workouts across endurance, sweet spot, threshold, VO2max, anaerobic, sprint, over-unders, tempo, recovery, mixed) | Classified by training stimulus, not dominant zone |
 | `sports_nutrition_db.json` | 284-product sports nutrition database | Data derived from Open Food Facts — ODbL attribution (see NOTICE) |
-| `routes.json` / `route_profiles.json` | Route index and precomputed elevation profiles | Rebuilt via `rebuild_routes_json.py` |
-| `surface_types.json` | Surface resistance coefficients for simulation | Built-in defaults |
 
 ---
 
@@ -93,8 +89,6 @@ The repository itself ships no personal data. First launch runs a 5-step setup w
 - **Desktop app packaging** — macOS `.app` and Windows `.exe` via PyInstaller, system-tray launcher
 - **Live training** — ERG mode for structured workouts, simulation mode for virtual/real routes, live power/HR/cadence/gradient
 - **Workout library** — ~1,750 scientific interval templates, filterable by stimulus, duration, TSS, and zone
-- **Virtual routes** — Procedurally generated courses with interactive elevation profiles
-- **Real climb library** — Famous climbs (Ventoux, Stelvio, Teide, Rocacorba, Jaizkibel, etc.) as CRS gradient files
 - **Training plan generator** — Backwards periodization from event date, phase schedule, weekly TSS targets
 - **Weekly planner** — Fills 7-day schedules with concrete workouts, respects HIT spacing, zone balance, and time budget
 - **Daily adapter** — Rebalances the week based on morning readiness, HRV, and actual completed load
@@ -130,15 +124,6 @@ pip install -r requirements.txt
 # Launch the app
 python3 app.py
 # → first launch triggers the setup wizard
-
-# Regenerate procedural virtual routes
-python3 generate_procedural_routes.py
-
-# Rebuild route index after adding new GPX-derived courses
-python3 rebuild_routes_json.py
-
-# Convert a new GPX file to a GoldenCheetah CRS
-python3 gpx_to_gc.py --input ~/Downloads/new_climb.gpx
 
 # Run the test suite
 python3 -m pytest test_*.py
