@@ -1,13 +1,13 @@
 # -*- mode: python ; coding: utf-8 -*-
 """
-PyInstaller spec for Domestique.
+PyInstaller spec for Shepherd.
 
 Build:
-  macOS:   pyinstaller domestique.spec
-  Windows: pyinstaller domestique.spec
+  macOS:   pyinstaller shepherd.spec
+  Windows: pyinstaller shepherd.spec
   Linux:   ./build_linux.sh   (wraps the onedir output in an AppImage)
 
-Output: dist/Domestique.app (macOS) or dist/Domestique/Domestique[.exe]
+Output: dist/Shepherd.app (macOS) or dist/Shepherd/Shepherd[.exe]
 """
 
 import sys
@@ -15,7 +15,7 @@ import os
 from pathlib import Path
 
 block_cipher = None
-app_name = "Domestique"
+app_name = "Shepherd"
 
 # Every Linux arm below is guarded on this so a darwin/win32 PyInstaller run
 # produces byte-identical output to before the Linux release existed.
@@ -200,7 +200,7 @@ a = Analysis(
     runtime_hooks=[],
     # v1.0.7: numpy + scipy were previously excluded for a leaner DMG; both are
     # now required for τ-fitting and must NOT be excluded. matplotlib + pandas
-    # remain excluded — Domestique never imports them. (~50 MB bundle hit, see
+    # remain excluded — Shepherd never imports them. (~50 MB bundle hit, see
     # MASTER_DECISIONS_v107_v110_v120_PATCH.md G2.)
     excludes=["matplotlib", "pandas"],  # keep tkinter for folder picker
     win_no_prefer_redirects=False,
@@ -248,7 +248,7 @@ if sys.platform == "darwin":
         coll,
         name=f"{app_name}.app",
         icon="../assets/icon.icns" if os.path.exists("assets/icon.icns") else None,
-        bundle_identifier="com.platypus45.domestique",
+        bundle_identifier="io.github.pace-1.shepherd",
         info_plist={
             "CFBundleDisplayName": app_name,
             # Both keys MUST match VERSION — otherwise the About box and the
@@ -261,9 +261,9 @@ if sys.platform == "darwin":
             # Mojave/Catalina support becomes a hard requirement.
             "LSMinimumSystemVersion": "11.0",
             "NSHighResolutionCapable": True,
-            "NSHumanReadableCopyright": "(c) 2026 Domestique",
+            "NSHumanReadableCopyright": "(c) 2026 Shepherd",
             # v4.0.0-alpha: Bluetooth usage key removed along with the BLE
-            # subsystem -- Domestique no longer scans or connects to any
+            # subsystem -- Shepherd no longer scans or connects to any
             # trainer/HR device. Keeping the key would spuriously trigger
             # the Apple TCC prompt on first launch.
             "LSUIElement": False,  # show in Dock

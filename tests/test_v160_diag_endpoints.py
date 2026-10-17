@@ -31,7 +31,7 @@ from unittest import mock
 def _corrupt_plan(text: str):
     """v3.0.0: isolated tempdir + app._plan_dir patch (see the note in
     test_v160_silent_swallow_fixes — the old helper touched the REAL
-    ~/.domestique plan and broke under per-profile plans + parallel runs)."""
+    ~/.shepherd plan and broke under per-profile plans + parallel runs)."""
     with tempfile.TemporaryDirectory() as td:
         p = Path(td) / "current_plan.json"
         p.write_text(text)

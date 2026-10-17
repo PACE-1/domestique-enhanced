@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Anaerobic (50min)</name>
     <description>Warmup: 10min from 45% to 56% FTP | Steady: 5min @ 56% FTP | Steady: 1min @ 40% FTP | Steady: 1min @ 48% FTP | Steady: 1min @ 56% FTP | Steady: 1min @ 64% FTP | Steady: 1min @ 72% FTP | Steady: 1min @ 80% FTP | Steady: 1min @ 88% FTP | Steady: 1min @ 96% FTP | Steady: 1min @ 102% FTP | Steady: 1min @ 108% FTP | Steady: 30s @ 50% FTP | Steady: 1min @ 113% FTP | Steady: 30s @ 50% FTP | Steady: 1min @ 119% FTP | Steady: 30s @ 50% FTP | Steady: 1min @ 124% FTP | Steady: 30s @ 50% FTP | Steady: 1min @ 129% FTP | Steady: 30s @ 50% FTP | Steady: 1min @ 134% FTP | Steady: 1min @ 50% FTP | Steady: 1min @ 134% FTP | Cooldown: 15min from 56% to 40% FTP</description>
     <sportType>bike</sportType>

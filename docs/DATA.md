@@ -6,7 +6,7 @@ replace it.
 
 ## Where data lives
 
-`DOMESTIQUE_HOME` if set (the Docker image uses `/data`), else `~/.domestique`.
+`SHEPHERD_HOME` if set (the Docker image uses `/data`), else `~/.shepherd`.
 
 | Path | Contents | Owner |
 |---|---|---|
@@ -49,7 +49,7 @@ To go back, restore a backup taken before the upgrade.
 ## Backup and restore
 
 ```sh
-python -m backup create  backup.tar.gz [--home DIR]   # DIR defaults to DOMESTIQUE_HOME / ~/.domestique
+python -m backup create  backup.tar.gz [--home DIR]   # DIR defaults to SHEPHERD_HOME / ~/.shepherd
 python -m backup verify  backup.tar.gz
 python -m backup restore backup.tar.gz [--home DIR] [--force]
 ```
@@ -70,7 +70,7 @@ python -m backup restore backup.tar.gz [--home DIR] [--force]
 
 ```sh
 docker stop <container>
-docker run --rm -v domestique-data:/data -v "$PWD":/out <image> python -m backup create /out/backup.tar.gz --home /data
+docker run --rm -v shepherd-data:/data -v "$PWD":/out <image> python -m backup create /out/backup.tar.gz --home /data
 # restore into a clean volume
 docker run --rm -v new-volume:/data -v "$PWD":/out <image> python -m backup restore /out/backup.tar.gz --home /data
 ```
@@ -81,12 +81,12 @@ compares what the API returns.
 
 ### Linux desktop
 
-The same commands against `~/.domestique`; `tests/test_backup_restore.py`
+The same commands against `~/.shepherd`; `tests/test_backup_restore.py`
 exercises create, verify and restore through the CLI into a fresh directory.
 
 ## If intervals.icu stops serving Garmin data (#31)
 
-Rides and wellness reach Domestique through intervals.icu. If that source dries up,
+Rides and wellness reach Shepherd through intervals.icu. If that source dries up,
 these rules keep what is already stored:
 
 - **Wellness:** a field the sync returns empty never replaces a stored value

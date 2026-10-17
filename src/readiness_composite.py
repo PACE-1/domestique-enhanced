@@ -53,7 +53,7 @@ def _today_tsb(day_iso: str):
         return False, None
 
 
-_log = logging.getLogger("domestique.readiness_composite")
+_log = logging.getLogger("shepherd.readiness_composite")
 
 
 # ── Locked weight contract (PATCH G13) ──────────────────────────────────────

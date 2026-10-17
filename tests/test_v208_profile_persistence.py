@@ -36,7 +36,7 @@ class TestBlockAProfilePersistence(unittest.TestCase):
         ProfileManager._instance = None
         with self._home():
             ProfileManager.get()  # triggers _rebuild_registry on the empty dir
-        reg = Path(self.tmp) / ".domestique" / "profiles.json"
+        reg = Path(self.tmp) / ".shepherd" / "profiles.json"
         self.assertFalse(
             reg.exists(),
             "empty rebuild must NOT persist profiles.json (would block migrate)",
@@ -58,7 +58,7 @@ class TestBlockAProfilePersistence(unittest.TestCase):
                 pm.active_id,
                 "default must be ACTIVE (not None → no 200/70 fallback)")
         self.assertTrue(
-            (Path(self.tmp) / ".domestique" / "profiles.json").exists(),
+            (Path(self.tmp) / ".shepherd" / "profiles.json").exists(),
             "registry must persist across reopen")
 
     def test_accented_name_slugs_to_valid_ascii_id(self):

@@ -1,7 +1,7 @@
 """v2.1.0 L1 + v2.3.0 MAC-TLS-FIX (ICU TLS). A frozen build's bundled Python has no
 CA store for urllib, so HTTPS to intervals.icu fails cert verification → URLError →
 "ICUNetworkError" on every credential save / sync. Fix: bundle certifi
-(domestique.spec) + point urllib at it via SSL_CERT_FILE in launcher.configure_tls_ca.
+(shepherd.spec) + point urllib at it via SSL_CERT_FILE in launcher.configure_tls_ca.
 v2.1.0 did this on win32 only, assuming macOS used system certs — WRONG: the
 notarized .app hit the same error (reported on Mac mini + MacBook Air). v2.3.0
 extends it to the frozen macOS .app (frozen darwin); dev macOS/Linux keep the system

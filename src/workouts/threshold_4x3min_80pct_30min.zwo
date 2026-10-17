@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Tempo 4x1min (30min)</name>
     <description>Warmup: 8min ramp from 50% to 75% FTP | Intervals: 4 x (1min @ 95% / 1min @ 55%) | Cooldown: 3min from 60% to 40% FTP</description>
     <sportType>bike</sportType>

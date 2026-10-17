@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "domestique",
+      "name": "shepherd",
       "runtimeExecutable": "python3",
       "runtimeArgs": [
         "src/app.py"
@@ -10,7 +10,7 @@
       "port": 8080
     },
     {
-      "name": "domestique-preview",
+      "name": "shepherd-preview",
       "runtimeExecutable": "python3.12",
       "runtimeArgs": [
         "src/scripts/dev_preview.py"

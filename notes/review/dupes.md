@@ -12,8 +12,8 @@ seeds and code paths, and broke each probe's detector to confirm the assert trip
 
 Conventions: `R=/tmp/claude-1000/-home-aladjidi-Documents/bb02fc0a-851f-4ace-bcf4-5fc93d19911a/scratchpad/review`,
 `WT=.../scratchpad/rev-dupes`. Every run is
-`cd $WT && WT=$WT DOMESTIQUE_HOME=$R/dhome PYTHONDONTWRITEBYTECODE=1 PYTHONHASHSEED=0 .venv/bin/python $R/<probe>.py`.
-The scratch `DOMESTIQUE_HOME` keeps the planner away from `~/.domestique`, and the sandbox has no
+`cd $WT && WT=$WT SHEPHERD_HOME=$R/dhome PYTHONDONTWRITEBYTECODE=1 PYTHONHASHSEED=0 .venv/bin/python $R/<probe>.py`.
+The scratch `SHEPHERD_HOME` keeps the planner away from `~/.shepherd`, and the sandbox has no
 ride archive. "Today" is 2026-09-10, a Thursday, so every entry point opens with a Thu–Sun stub week.
 Tp = `src/training_planner.py`, WP = `src/week_plan.py`, PI = `src/plan_invariants.py`.
 

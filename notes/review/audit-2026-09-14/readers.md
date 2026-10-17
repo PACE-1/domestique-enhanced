@@ -1,4 +1,4 @@
-# Week-view readers audit — Domestique @ a95447e8 (2026-09-14)
+# Week-view readers audit — Shepherd @ a95447e8 (2026-09-14)
 
 Lens: every reader of the week plan and of today's session; the session-identity
 writers; the form cards. Independent agent, driver under `with TestClient(app)` with

@@ -1,5 +1,5 @@
 """#33 (#28 step 2) — a plain move the rider makes in the intervals.icu
-calendar is learned into the plan, as if dragged in Domestique.
+calendar is learned into the plan, as if dragged in Shepherd.
 
 Learned: one event under its id, both days today or later in one week, from
 a day holding that one pending workout onto a rest/empty/vacated day that is
@@ -179,7 +179,7 @@ def test_an_unavailable_or_race_day_is_not_learned(env, mark):
 
 
 def test_a_day_domestique_changed_after_the_move_is_not_learned(env):
-    """Owner rule: Domestique's own later change of that day wins."""
+    """Owner rule: Shepherd's own later change of that day wins."""
     ss = _week(wed="steady.zwo")
     _seed(env, ss)
     env.fk.drag(_eid(env, D["wed"]), D["fri"])

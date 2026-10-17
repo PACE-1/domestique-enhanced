@@ -25,11 +25,11 @@ from typing import Optional
 
 log = logging.getLogger(__name__)
 # v3.6.0-fix30-logs-ext: named category logger for Monod + post-hoc
-# decoupling emissions. Uses the `domestique.power` category so a ride-log
+# decoupling emissions. Uses the `shepherd.power` category so a ride-log
 # grep for `EVENT=monod_fit|EVENT=aerobic_decoupling_computed` locates
 # every fit attempt in one place. No log_config import here to avoid
 # circular-import risk during test bootstrap.
-log_power = logging.getLogger("domestique.power")
+log_power = logging.getLogger("shepherd.power")
 
 
 # ══════════════════════════════════════════════════════════════════════════════

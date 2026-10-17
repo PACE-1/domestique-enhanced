@@ -1,4 +1,4 @@
-"""Consistent backup and restore of the Domestique data directory (#19).
+"""Consistent backup and restore of the Shepherd data directory (#19).
 
     python -m backup create  <archive.tar.gz> [--home DIR]
     python -m backup verify  <archive.tar.gz>
@@ -30,6 +30,7 @@ from the product version: the fork's release numbers do not have to follow
 upstream's, and a lower product number must not read as a downgrade.
 """
 from __future__ import annotations
+import envcompat  # noqa: F401  (old DOMESTIQUE_* names -> SHEPHERD_*, before anything reads them)
 
 import argparse
 import hashlib
@@ -127,7 +128,7 @@ def create_backup(home: Path, archive: Path) -> dict:
     if not home.is_dir():
         raise BackupError(f"data home not found: {home}")
     files: list[dict] = []
-    with tempfile.TemporaryDirectory(prefix="domestique-backup-") as tmp:
+    with tempfile.TemporaryDirectory(prefix="shepherd-backup-") as tmp:
         staging = Path(tmp)
         for path in sorted(home.rglob("*")):
             if not path.is_file() or path.is_symlink():
@@ -167,7 +168,7 @@ def _read_manifest(tar: tarfile.TarFile) -> dict:
     try:
         member = tar.getmember(MANIFEST)
     except KeyError:
-        raise BackupError("not a Domestique backup (no manifest)")
+        raise BackupError("not a Shepherd backup (no manifest)")
     f = tar.extractfile(member)
     return json.loads(f.read().decode()) if f else {}
 
@@ -281,14 +282,14 @@ def restore_backup(archive: Path, home: Path, *, force: bool = False) -> dict:
 
 
 def main(argv: list[str] | None = None) -> int:
-    from user_home import domestique_home
+    from user_home import shepherd_home
     ap = argparse.ArgumentParser(prog="backup", description=__doc__.split("\n\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
     for name in ("create", "verify", "restore"):
         p = sub.add_parser(name)
         p.add_argument("archive", type=Path)
         if name != "verify":
-            p.add_argument("--home", type=Path, default=None, help="data directory (default: DOMESTIQUE_HOME or ~/.domestique)")
+            p.add_argument("--home", type=Path, default=None, help="data directory (default: SHEPHERD_HOME or ~/.shepherd)")
         if name == "restore":
             p.add_argument("--force", action="store_true")
     args = ap.parse_args(argv)
@@ -296,7 +297,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.cmd == "verify":
             m = verify_backup(args.archive)
         else:
-            home = args.home or domestique_home()
+            home = args.home or shepherd_home()
             m = (create_backup(home, args.archive) if args.cmd == "create"
                  else restore_backup(args.archive, home, force=args.force))
     except (BackupError, tarfile.TarError, sqlite3.Error, OSError) as e:

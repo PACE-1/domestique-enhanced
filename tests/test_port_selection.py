@@ -8,10 +8,10 @@ hold up unattended:
   * it must not sit in any OS ephemeral pool, or it fails to bind
     intermittently rather than never (see the band assertions below);
   * a busy port falls back instead of refusing to launch;
-  * an ALREADY-RUNNING Domestique is not a collision — falling back there
+  * an ALREADY-RUNNING Shepherd is not a collision — falling back there
     would start a second server instead of focusing the open window;
   * whatever bound last time is preferred next time, so bookmarks survive;
-  * DOMESTIQUE_PORT overrides everything, with no second-guessing.
+  * SHEPHERD_PORT overrides everything, with no second-guessing.
 """
 from __future__ import annotations
 
@@ -51,19 +51,19 @@ def test_default_is_the_researched_port():
 
 def test_explicit_override_wins_outright(monkeypatch):
     """A deliberate choice must not be silently overruled by a fallback."""
-    monkeypatch.setenv("DOMESTIQUE_PORT", "23500")
+    monkeypatch.setenv("SHEPHERD_PORT", "23500")
     monkeypatch.setattr(launcher, "_port_is_available", lambda p: False)
     assert launcher._resolve_port() == 23500
 
 
 def test_a_garbled_override_falls_back_instead_of_crashing(monkeypatch):
-    monkeypatch.setenv("DOMESTIQUE_PORT", "not-a-port")
+    monkeypatch.setenv("SHEPHERD_PORT", "not-a-port")
     monkeypatch.setattr(launcher, "_port_is_available", lambda p: True)
     assert launcher._resolve_port() == launcher.DEFAULT_PORT
 
 
 def test_a_busy_default_falls_through_to_the_next_candidate(monkeypatch):
-    monkeypatch.delenv("DOMESTIQUE_PORT", raising=False)
+    monkeypatch.delenv("SHEPHERD_PORT", raising=False)
     monkeypatch.setattr(launcher, "_port_memo", lambda: _Missing())
     taken = {launcher.PORT_CANDIDATES[0]}
     monkeypatch.setattr(launcher, "_port_is_available", lambda p: p not in taken)
@@ -72,7 +72,7 @@ def test_a_busy_default_falls_through_to_the_next_candidate(monkeypatch):
 
 def test_the_remembered_port_is_preferred(monkeypatch, tmp_path):
     """A stable URL is what makes a bookmark or desktop shortcut keep working."""
-    monkeypatch.delenv("DOMESTIQUE_PORT", raising=False)
+    monkeypatch.delenv("SHEPHERD_PORT", raising=False)
     memo = tmp_path / "port.txt"
     memo.write_text("26214\n", encoding="utf-8")
     monkeypatch.setattr(launcher, "_port_memo", lambda: memo)
@@ -88,13 +88,13 @@ def test_exhausting_every_candidate_still_reports_properly(monkeypatch):
     Dying here instead would lose the diagnostics — which is precisely how the
     original bug reached a user with nothing to act on.
     """
-    monkeypatch.delenv("DOMESTIQUE_PORT", raising=False)
+    monkeypatch.delenv("SHEPHERD_PORT", raising=False)
     monkeypatch.setattr(launcher, "_port_memo", lambda: _Missing())
     monkeypatch.setattr(launcher, "_port_is_available", lambda p: False)
     assert launcher._resolve_port() == launcher.DEFAULT_PORT
 
 
-def test_a_running_domestique_does_not_count_as_a_collision(monkeypatch):
+def test_a_running_shepherd_does_not_count_as_a_collision(monkeypatch):
     """Otherwise a second launch starts a SECOND server on the next port
     instead of focusing the window that is already open."""
     import socket
@@ -107,7 +107,7 @@ def test_a_running_domestique_does_not_count_as_a_collision(monkeypatch):
             pass
 
     monkeypatch.setattr(socket, "socket", lambda *a, **k: _Bound())
-    monkeypatch.setattr(launcher, "is_domestique_at", lambda url: True)
+    monkeypatch.setattr(launcher, "is_shepherd_at", lambda url: True)
     assert launcher._port_is_available(22400) is True
 
 
@@ -122,7 +122,7 @@ def test_a_stranger_on_the_port_does_count_as_a_collision(monkeypatch):
             pass
 
     monkeypatch.setattr(socket, "socket", lambda *a, **k: _Bound())
-    monkeypatch.setattr(launcher, "is_domestique_at", lambda url: False)
+    monkeypatch.setattr(launcher, "is_shepherd_at", lambda url: False)
     assert launcher._port_is_available(22400) is False
 
 
@@ -137,7 +137,7 @@ def test_the_oauth_callback_follows_the_bound_port(monkeypatch):
     """The callback must land on the port we actually bound, or the
     intervals.icu round-trip dead-ends on a closed socket."""
     import importlib
-    monkeypatch.setenv("DOMESTIQUE_PORT", "26214")
+    monkeypatch.setenv("SHEPHERD_PORT", "26214")
     import config
     importlib.reload(config)
     try:
@@ -147,7 +147,7 @@ def test_the_oauth_callback_follows_the_bound_port(monkeypatch):
         assert "[::1]" not in config.ICU_OAUTH_REDIRECT_URI
         assert config.ICU_OAUTH_REDIRECT_URI.startswith("http://127.0.0.1:")
     finally:
-        monkeypatch.delenv("DOMESTIQUE_PORT", raising=False)
+        monkeypatch.delenv("SHEPHERD_PORT", raising=False)
         importlib.reload(config)
 
 

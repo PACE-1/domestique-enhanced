@@ -16,7 +16,7 @@ import migrate_profiles
 @pytest.fixture
 def legacy_home(tmp_path, monkeypatch):
     """A pre-profiles data directory holding rider data worth losing."""
-    monkeypatch.setenv("DOMESTIQUE_HOME", str(tmp_path))
+    monkeypatch.setenv("SHEPHERD_HOME", str(tmp_path))
     (tmp_path / ".env").write_text("INTERVALS_API_KEY=secret\n")
     (tmp_path / "user_prefs.json").write_text(json.dumps({"units": "metric"}))
     (tmp_path / ".setup_complete").write_text("1")

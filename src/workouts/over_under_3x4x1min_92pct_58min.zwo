@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Over-Under 12x1min (58min)</name>
     <description>Warmup: 10min ramp from 50% to 65% FTP | Intervals: 12 x (1min @ 92% / 1min @ 97%) | Cooldown: 5min @ 50% FTP</description>
     <sportType>bike</sportType>

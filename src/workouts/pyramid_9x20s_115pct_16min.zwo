@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Endurance 20s/1min 9x (16min)</name>
     <description>Microintervals: 9 x (20s @ 115% / 1min @ 65%)</description>
     <sportType>bike</sportType>

@@ -135,7 +135,7 @@ export function ProfilePicker({ onSwitched = goHome }: { onSwitched?: () => void
 function Shell({ subtitle, children }: { subtitle: string; children: React.ReactNode }) {
   return (
     <div className="mx-auto flex min-h-svh max-w-2xl flex-col justify-center px-6 py-10 text-center">
-      <h1 className="text-2xl font-bold">Domestique</h1>
+      <h1 className="text-2xl font-bold">Shepherd</h1>
       <p className="mb-8 text-muted-foreground">{subtitle}</p>
       {children}
     </div>

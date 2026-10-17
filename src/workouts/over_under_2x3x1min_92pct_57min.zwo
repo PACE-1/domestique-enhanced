@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Sweet Spot 6x1min (57min)</name>
     <description>Warmup: 8min ramp from 50% to 75% FTP | Intervals: 6 x (1min @ 92% / 30s @ 102%) | Cooldown: 5min @ 40% FTP</description>
     <sportType>bike</sportType>

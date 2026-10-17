@@ -32,7 +32,7 @@ git ls-files -z | tar --null -T - -cf - | docker run --rm -i \
     git config --global --add safe.directory "*"
     : > .oauth.env   # no client secret in a local proof of concept
     chmod +x packaging/build_linux.sh && ./packaging/build_linux.sh
-    cp dist/Domestique-v*-x86_64.AppImage dist/host-deps*.txt /out/ 2>/dev/null || true
+    cp dist/Shepherd-v*-x86_64.AppImage dist/host-deps*.txt /out/ 2>/dev/null || true
     chown -R "$HOST_UID:$HOST_GID" /out
   '
 ls -la "$OUT"

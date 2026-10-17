@@ -9,7 +9,7 @@ file_admissible failed closed for every gated slot type → match_zwo /
 sampler pools empty → the weekly auto-recalc "successfully" rebuilt every
 future week into unmatched Z2 placeholders. Fix set covered here:
 
-  F1  domestique.spec bundles the classifier script (string canary).
+  F1  shepherd.spec bundles the classifier script (string canary).
   F2  infra failure (classifier module unimportable) ABORTS the facts
       rebuild: old cache retained on disk (even old-version), zero null
       rows minted, stale rows served in-memory → match_zwo still matches.
@@ -221,9 +221,9 @@ def test_spec_bundles_classifier_script():
     PyInstaller's import scan — only an explicit datas entry ships it. v3.3.0
     shipped without it; this canary stops the packaging from regressing
     silently."""
-    spec = (ROOT / "packaging" / "domestique.spec").read_text(encoding="utf-8")
+    spec = (ROOT / "packaging" / "shepherd.spec").read_text(encoding="utf-8")
     assert '("../src/scripts/classify_library_content.py", "scripts")' in spec, (
-        "domestique.spec no longer bundles scripts/classify_library_content.py"
+        "shepherd.spec no longer bundles scripts/classify_library_content.py"
         " — the frozen app cannot compute workout facts without it (v3.3.0"
         " no-candidates storm)")
 

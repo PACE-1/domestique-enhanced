@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Neuromuscular 2 cycles (52min)</name>
     <description>Over-Under: 2 cycles + 1min @ 130% finisher (alternating above/below threshold)</description>
     <sportType>bike</sportType>

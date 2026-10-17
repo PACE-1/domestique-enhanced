@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Tempo 3x30s (49min)</name>
     <description>Intervals: 3 x (30s @ 110% / 30s @ 50%) | Cooldown: 5min @ 55% FTP</description>
     <sportType>bike</sportType>

@@ -41,9 +41,9 @@ import power_curve
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 # 3.4.3 hermetic-fs gate: HOME is sandboxed suite-wide; this READ-ONLY
-# validation keeps using the machine's real archive via DOMESTIQUE_REAL_HOME.
-REAL_RIDE_PATH = (Path(os.environ.get("DOMESTIQUE_REAL_HOME") or str(Path.home()))
-                  / ".domestique" / "rides" / "icu" / "i144492547.json")
+# validation keeps using the machine's real archive via SHEPHERD_REAL_HOME.
+REAL_RIDE_PATH = (Path(os.environ.get("SHEPHERD_REAL_HOME") or str(Path.home()))
+                  / ".shepherd" / "rides" / "icu" / "i144492547.json")
 
 
 # ── synthetic ride builders ────────────────────────────────────────────────────
@@ -430,7 +430,7 @@ class Test05ThresholdToggle(_FRTestBase):
 
 class Test06RealData(unittest.TestCase):
     """Test 6 (W2A-G7 lessons-learned) — load the real ride
-    ~/.domestique/rides/icu/i144492547.json (May 1, 1626.2 kJ).
+    ~/.shepherd/rides/icu/i144492547.json (May 1, 1626.2 kJ).
 
     Brief mentions i145626886 but that file is 798 kJ; the actual May 1
     1626 kJ ride is i144492547. Verify the threshold gate against real

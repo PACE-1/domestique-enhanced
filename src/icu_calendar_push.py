@@ -39,7 +39,7 @@ Contract highlights (GRILL OUTCOME — LOCKED, /tmp/IP_ICU_PUSH.md):
       * one event per session: the session a held event stands for is not
         pushed anywhere else (found through its moved_from chain); no bumped
         id is ever minted.
-    The hold is released when Domestique has since changed that slot — the
+    The hold is released when Shepherd has since changed that slot — the
     day now holds a different workout, was dismissed, lost the session, or
     its moved_from chain leads to a different workout: the plan's day wins
     and the id is pushed / swept as usual. Never for an event dated before
@@ -78,9 +78,9 @@ from pathlib import Path
 
 import config
 import training as _training
-from user_home import domestique_home
+from user_home import shepherd_home
 
-_log = logging.getLogger("domestique.icu_push")
+_log = logging.getLogger("shepherd.icu_push")
 
 HORIZON_DAYS = 14
 # #28: reconcile reads this far either side of [today, today+horizon] so an
@@ -90,6 +90,8 @@ HORIZON_DAYS = 14
 _LOOKBACK_DAYS = 7
 _LOOKAHEAD_DAYS = 7
 _MAX_CHAIN_HOPS = 7
+# Wire format: events already in riders' intervals.icu calendars carry these roots, so
+# they keep the pre-rename name. Renaming them would orphan every pushed event.
 _ID_ROOT = "domestique:"
 # calendar-push (2026-07-07): a DISTINCT root for user-initiated LIBRARY pushes
 # (the workout-detail "Send to intervals.icu calendar" button). Load-bearing on
@@ -191,7 +193,7 @@ def _http_error_detail(step: str, status: int, body: bytes) -> str:
 
 def _plan_path() -> Path:
     import training_planner as tp
-    return Path(getattr(tp, "PLAN_DIR", domestique_home() / "plans")) / "current_plan.json"
+    return Path(getattr(tp, "PLAN_DIR", shepherd_home() / "plans")) / "current_plan.json"
 
 
 def _load_plan(p: "Path | None" = None) -> dict | None:
@@ -487,7 +489,7 @@ def _ours_in_window(events: list, profile_id: str, today: date,
         ours[eid] = ev
     if foreign:
         _log.warning(
-            "EVENT=icu_push_foreign_prefix count=%d — another Domestique "
+            "EVENT=icu_push_foreign_prefix count=%d — another Shepherd "
             "install pushes to this athlete's calendar (one device per "
             "athlete is supported); leaving those events alone.", foreign)
     return ours
@@ -570,7 +572,7 @@ def _plan_agrees(by_day: dict, enc: str, n: int, ev_day: str, ev: dict):
 
 
 def _slot_changed(by_day: dict, enc: str, n: int, ev: dict, names) -> bool:
-    """W2 (qa_scenario H1/M1): has Domestique changed the slot since the rider
+    """W2 (qa_scenario H1/M1): has Shepherd changed the slot since the rider
     moved its event? The day now holds a different workout, a dismissed
     session, no session at that index, or a stub whose chain leads to a
     different workout. Then the plan's day wins and the hold is released.
@@ -751,7 +753,7 @@ def _day_unavailable(plan: dict, day_iso: str) -> bool:
 def _learnable_moves(held: dict, existing: list, plan: dict, today: date,
                      names) -> list:
     """#33: the held moves the plan can follow as if the rider had dragged
-    them in Domestique: [(external_id, from_day, to_day)].
+    them in Shepherd: [(external_id, from_day, to_day)].
 
     Only the plain case, everything else stays held (#28 step 1): one event
     under the id (never a copy), both days today or later and in the same
@@ -759,7 +761,7 @@ def _learnable_moves(held: dict, existing: list, plan: dict, today: date,
     day it went to is a rest, empty or vacated day the rider has not marked
     unavailable, that is no race and that no other move goes to. A move onto
     a training day is never learned: in intervals.icu the two now share a
-    day, and Domestique cannot tell which of them the rider means to ride.
+    day, and Shepherd cannot tell which of them the rider means to ride.
 
     Dates read back wrong must never look like moves (a learned move would
     otherwise walk on, run after run): the event keeps the midnight we wrote
@@ -999,7 +1001,7 @@ def _reconcile(horizon_days: int) -> dict:
             lambda: _load_classifications(Path(_app.WORKOUT_DIR)))
         held, agreed = _held_ids(existing, by_day, profile_id, today, names)
         # #33 (#28 step 2): a plain move the rider made in intervals.icu is
-        # learned into the plan, as if dragged in Domestique; the agreed-move
+        # learned into the plan, as if dragged in Shepherd; the agreed-move
         # rule below then re-keys its event in this same run.
         result["learned"] = []
         if (held and _learnable_moves(held, existing, plan, today, names)

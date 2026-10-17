@@ -165,7 +165,7 @@ class TestPerProfileSyncMarkers(unittest.TestCase):
 
     ``_icu_sync_state_path`` / ``_icu_wellness_sync_state_path`` resolve
     through the ride_storage AC2a seams (<profile>/rides/icu/,
-    <profile>/wellness/) — not the legacy global ~/.domestique paths — so a
+    <profile>/wellness/) — not the legacy global ~/.shepherd paths — so a
     profile switch or db.purge_profile_data (contract A4) takes the throttle
     state with it. No active profile degrades to None ("never synced").
     A pre-M7 legacy global marker is MOVED into the profile once.

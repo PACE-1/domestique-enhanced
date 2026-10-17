@@ -74,7 +74,7 @@ state mutation order; it is not changed by this layer.
   20 expected failures, 13 non-strict unexpected passes and 26 passed subtests;
   **3 serial passed**. Status: `bulk=0`, `serial=0`, `exit=0`.
   Bulk took 556.71 seconds; serial took 3.87 seconds. Logs are
-  `/tmp/domestique-gate/programme-summary-final.*`.
+  `/tmp/shepherd-gate/programme-summary-final.*`.
 - Web code is unchanged by this layer. Hosted CI is separate: the current
   workflow filters PRs to `clean-main`, so a PR targeting #53's branch needs
   retargeting after that prerequisite lands before its hosted gate runs.

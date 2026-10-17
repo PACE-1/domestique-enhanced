@@ -6,7 +6,7 @@ bundle. These tests pin both:
 
   * layer 3: every sibling target the modules reference exists next to the
     modules, wherever they live (valid before and after any repo move);
-  * layer 4: domestique.spec's datas SOURCES exist relative to the spec dir
+  * layer 4: shepherd.spec's datas SOURCES exist relative to the spec dir
     (a wrong source fails the build loudly — this fails the unit gate
     faster) and its DESTINATIONS equal the pinned set (a wrong destination
     builds fine and degrades silently — the v3.3.0 / Linux-report class).
@@ -81,7 +81,7 @@ def test_bundled_workout_dir_is_populated():
         f"bundled library holds {len(zwo)} .zwo files — expected ≥4000"
 
 
-# ── Layer 4: domestique.spec datas contract ─────────────────────────────────
+# ── Layer 4: shepherd.spec datas contract ─────────────────────────────────
 
 # The DESTINATION set is the frozen app's data layout — module code resolves
 # these as _MEIPASS-siblings, so this set changing means runtime breakage.
@@ -93,14 +93,14 @@ _PINNED_DESTINATIONS = {
 
 def _spec_datas() -> list[tuple[str, str]]:
     spec = None
-    for cand in (ROOT / "packaging" / "domestique.spec", ROOT / "domestique.spec"):
+    for cand in (ROOT / "packaging" / "shepherd.spec", ROOT / "shepherd.spec"):
         if cand.is_file():
             spec = cand
             break
-    assert spec is not None, "domestique.spec not found"
+    assert spec is not None, "shepherd.spec not found"
     text = spec.read_text(encoding="utf-8")
     m = re.search(r"^datas = \[(.*?)^\]", text, re.S | re.M)
-    assert m, "could not locate the datas = [...] block in domestique.spec"
+    assert m, "could not locate the datas = [...] block in shepherd.spec"
     entries = ast.literal_eval("[" + m.group(1) + "]")
     return [(str(s), str(d)) for s, d in entries], spec.parent
 

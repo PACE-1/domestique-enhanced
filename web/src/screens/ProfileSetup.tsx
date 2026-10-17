@@ -148,7 +148,7 @@ export function ProfileSetup() {
 
   return (
     <div className="mx-auto flex min-h-svh max-w-xl flex-col justify-center px-6 py-10">
-      <h1 className="text-center text-2xl font-bold">Domestique</h1>
+      <h1 className="text-center text-2xl font-bold">Shepherd</h1>
       <p className="mb-4 text-center text-muted-foreground">Set up a new rider profile in 3 steps.</p>
       <StepDots step={step} total={3} />
       <Card>
@@ -267,7 +267,7 @@ export function ProfileSetup() {
             <>
               <h2 className="text-lg font-semibold">Your training data</h2>
               <p className="text-sm text-muted-foreground">
-                Profile created ✓. Domestique plans from what you actually ride. It can read that from{" "}
+                Profile created ✓. Shepherd plans from what you actually ride. It can read that from{" "}
                 <a className="underline" href="https://intervals.icu/" target="_blank" rel="noopener noreferrer">
                   intervals.icu
                 </a>

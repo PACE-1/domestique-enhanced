@@ -1,8 +1,8 @@
-"""3.4.3 — DOMESTIQUE_HOME override (dev-preview sandbox contract).
+"""3.4.3 — SHEPHERD_HOME override (dev-preview sandbox contract).
 
 Env set → ALL user-data module constants resolve under it (spot-checked via
 subprocess so import-time constants are exercised for real). Env absent →
-byte-identical legacy behavior (~/.domestique). The packaged app never sets
+byte-identical legacy behavior (~/.shepherd). The packaged app never sets
 the env, so shipping behavior is untouched.
 """
 import os
@@ -22,9 +22,9 @@ _PROBE = (
 
 def _run(env_home: str | None) -> list[str]:
     env = os.environ.copy()
-    env.pop("DOMESTIQUE_HOME", None)
+    env.pop("SHEPHERD_HOME", None)
     if env_home is not None:
-        env["DOMESTIQUE_HOME"] = env_home
+        env["SHEPHERD_HOME"] = env_home
     out = subprocess.run([sys.executable, "-c", _PROBE],
                          capture_output=True, text=True, env=env,
                          cwd=str(Path(__file__).resolve().parent.parent / "src"),
@@ -36,14 +36,14 @@ def _run(env_home: str | None) -> list[str]:
 def test_env_absent_resolves_real_home():
     # NOTE: the suite's hermetic conftest sandbox sets HOME per-process; the
     # subprocess inherits that HOME, so "real home" here = the sandbox HOME —
-    # which is exactly the legacy Path.home()/".domestique" contract.
+    # which is exactly the legacy Path.home()/".shepherd" contract.
     lines = _run(None)
     home = Path(os.environ["HOME"])
-    assert all(str(home / ".domestique") in l for l in lines), lines
+    assert all(str(home / ".shepherd") in l for l in lines), lines
 
 
 def test_env_set_redirects_every_constant(tmp_path):
     sandbox = tmp_path / "devhome"
     lines = _run(str(sandbox))
     assert all(str(sandbox) in l for l in lines), lines
-    assert not any(".domestique" in l for l in lines), lines
+    assert not any(".shepherd" in l for l in lines), lines

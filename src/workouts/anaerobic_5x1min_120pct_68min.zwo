@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>VO2max 5x1min (68min)</name>
     <description>Warmup: 10min ramp from 50% to 75% FTP | Intervals: 5 x (1min @ 120% / 1min 30s @ 52%) | Cooldown: 5min ramp from 60% to 40% FTP</description>
     <sportType>bike</sportType>

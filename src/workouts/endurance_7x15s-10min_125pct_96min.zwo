@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Endurance 15s/10min 7x (96min)</name>
     <description>Warmup: 6min @ 50% FTP | Microintervals: 7 x (15s @ 125% / 10min @ 65%)</description>
     <sportType>bike</sportType>

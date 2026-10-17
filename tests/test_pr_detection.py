@@ -332,7 +332,7 @@ class RealDataRoundTripTests(_IsolatedRideDirMixin, unittest.TestCase):
         # The archive is per-profile (profiles/<id>/rides/icu/) since the
         # profile move; fall back to the legacy global path for old layouts.
         # 3.4.3 hermetic-fs gate: read-only real-archive lookup via real home.
-        _dom = Path(os.environ.get("DOMESTIQUE_REAL_HOME") or str(Path.home())) / ".domestique"
+        _dom = Path(os.environ.get("SHEPHERD_REAL_HOME") or str(Path.home())) / ".shepherd"
         candidates = sorted(
             _dom.glob("profiles/*/rides/icu/i145626886.json")
         ) + [_dom / "rides" / "icu" / "i145626886.json"]

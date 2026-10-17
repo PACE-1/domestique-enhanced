@@ -1,4 +1,4 @@
-"""Security regression tests for Domestique.
+"""Security regression tests for Shepherd.
 
 These lock in the security posture documented in README "Security notes":
 
@@ -73,7 +73,7 @@ def test_download_endpoint_rejects_traversal():
 
 def _pm_with_tmp_profile(tmp_path):
     """A ProfileManager whose active profile dir is under tmp_path, so save_env
-    never touches the real ~/.domestique."""
+    never touches the real ~/.shepherd."""
     pm = profile_manager.ProfileManager()
     pm._profiles_dir = tmp_path / "profiles"
     pm._active_id = "t"
@@ -137,7 +137,7 @@ def test_no_inbound_network_server_entitlement():
 
 def test_setup_accepts_the_apps_own_bundled_directories():
     """A Windows 10 tester could not finish onboarding: "Complete Setup" failed
-    with "workout_dir must be under $HOME, ~/.domestique, or /tmp".
+    with "workout_dir must be under $HOME, ~/.shepherd, or /tmp".
 
     Nothing was wrong with their input. The wizard AUTO-DETECTS the bundled
     workout library, pre-fills it and marks it touched on purpose (an

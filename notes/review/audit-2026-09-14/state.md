@@ -1,4 +1,4 @@
-# State-duplication audit — Domestique @ a95447e8 (2026-09-14)
+# State-duplication audit — Shepherd @ a95447e8 (2026-09-14)
 
 Lens: the same fact answered by more than one derivation, everywhere outside the
 week-plan readers (those are in readers.md). Independent agent; probes ran under the
@@ -39,7 +39,7 @@ Sources: ICU metrics `recent_activities` (7 d, no stub refusal, training.py:733-
 
 ### S-5 · MEDIUM · Availability has six representations; generate reads a prefs file that no longer exists
 (1) per-profile `user_prefs.json` (`pm.save_prefs`, setup 1567: `rest_days`, `available_days`, `hours_per_week`); (2) **root** `DATA_DIR/user_prefs.json` read by `api_plan_generate` (11590), a file `migrate_profiles` moved away; (3) `Goal.rest_days/available_days/daily_max_hours/max_weekday_hours/max_weekend_hours` (tp:1805-1881, keys re-int'ed by `_goal_from_plan_dict` 12679); (4) dense `plan["availability"]` rows (11837-11866); (5) sparse `availability_overrides` rebuilt at 8 sites (4149, 4442, 11731, 12085, 12236, 12827, 16321, 16550) — planner lets overrides beat the Goal (tp:9025-9048); (6) `_compute_missed_suggestions` derives days from `goal.available_days` (13784).
-**Evidence (P5).** `save_prefs` wrote `…/profiles/default/user_prefs.json rest_days=[2,4]`; generate reads `…/.domestique/user_prefs.json exists=False` → default `[0]` (Monday). Latent while the UI always posts `rest_days`. HTTP-1 covers the scaler consequence.
+**Evidence (P5).** `save_prefs` wrote `…/profiles/default/user_prefs.json rest_days=[2,4]`; generate reads `…/.shepherd/user_prefs.json exists=False` → default `[0]` (Monday). Latent while the UI always posts `rest_days`. HTTP-1 covers the scaler consequence.
 
 ### S-6 · MEDIUM · Athlete numbers: defaults and zone models differ by reader
 LTHR default 170 in `pm.lthr`; `or 175` in week-summary (9775). `_hr_zones` honours the HRR model only when handed `pm` (8866); `_session_hr_target` calls it without (11048), so a rider on HRR gets LTHR zones in session targets. Week-summary calls `api_settings()` — an ICU wellness fetch — to read a `timezone` no writer sets (9755, "the UI setup has no tz field"); 79 `date.today()` sites elsewhere; ride dates use the server's `astimezone()` (14652). eFTP is extracted from `sportInfo[0].eftp` at nine hand-copied sites (1020, 3088, 4785, 8360, 8501, 8722, 9473, 9544, 16976). Weight has one owner (athlete.json); ICU weight only prefils the wizard.

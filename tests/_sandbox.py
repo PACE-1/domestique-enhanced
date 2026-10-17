@@ -25,7 +25,7 @@ if str(_SRC) not in sys.path:
 
 # ── 3.4.3 HERMETIC-FS GATE (root fix for the owner-plan clobber) ─────────────
 # The suite sandboxed NETWORK (fixtures below) but never the FILESYSTEM: every
-# data path in the app resolves through Path.home()/.domestique at import time
+# data path in the app resolves through Path.home()/.shepherd at import time
 # (app._user_data_dir, training_planner.PLAN_DIR — which profile_manager
 # rebinds to the ACTIVE PROFILE's plan dir — db, logs). Any test that hit
 # /api/plan/generate via TestClient or a planner save path therefore wrote the
@@ -37,13 +37,13 @@ if str(_SRC) not in sys.path:
 # Path.home()/expanduser resolution lands in the sandbox — one choke point, no
 # per-module patch list to drift. Each xdist worker imports its own conftest →
 # its own sandbox; subprocesses spawned by tests inherit the env. The real
-# home is kept in DOMESTIQUE_REAL_HOME for tests that need to LOOK at it.
+# home is kept in SHEPHERD_REAL_HOME for tests that need to LOOK at it.
 _SANDBOX_HOME = tempfile.mkdtemp(prefix="domestique-test-home-")
 atexit.register(shutil.rmtree, _SANDBOX_HOME, ignore_errors=True)
-# The explicit override wins over HOME in user_home.domestique_home(). Never
+# The explicit override wins over HOME in user_home.shepherd_home(). Never
 # inherit a developer/server data root, even during collection or in a worker.
-os.environ.pop("DOMESTIQUE_HOME", None)
-os.environ["DOMESTIQUE_NO_NET"] = "1"
+os.environ.pop("SHEPHERD_HOME", None)
+os.environ["SHEPHERD_NO_NET"] = "1"
 # App/config .env loaders use setdefault. Blank credentials before importing
 # them so a repository .env or inherited shell credentials cannot enter tests.
 for _credential in ("ICU_ATHLETE_ID", "ICU_API_KEY", "ICU_ACCESS_TOKEN",
@@ -53,8 +53,8 @@ for _credential in ("ICU_ATHLETE_ID", "ICU_API_KEY", "ICU_ACCESS_TOKEN",
 # controller's env with HOME already swapped — only the first process in
 # the chain records the true real home; every process still gets its OWN
 # fresh sandbox below (per-worker isolation).
-_REAL_HOME = os.environ.get("DOMESTIQUE_REAL_HOME") or os.environ.get("HOME", "")
-os.environ["DOMESTIQUE_REAL_HOME"] = _REAL_HOME
+_REAL_HOME = os.environ.get("SHEPHERD_REAL_HOME") or os.environ.get("HOME", "")
+os.environ["SHEPHERD_REAL_HOME"] = _REAL_HOME
 # Child interpreters (xdist workers, test-spawned subprocesses) recompute the
 # per-user site-packages from HOME at startup (macOS: ~/Library/Python/…).
 # When pytest/xdist are pip-installed --user, the sandbox HOME would hide

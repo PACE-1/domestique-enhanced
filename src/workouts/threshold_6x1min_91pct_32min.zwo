@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Sweet Spot (32min)</name>
     <description>Warmup: 8min ramp from 50% to 75% FTP | Steady: 1min @ 78% FTP | Steady: 1min @ 80% FTP | Steady: 1min @ 82% FTP | Steady: 1min @ 84% FTP | Steady: 1min @ 86% FTP | Steady: 1min @ 88% FTP | Steady: 2min @ 50% FTP | Steady: 5min @ 91% FTP | Steady: 2min @ 50% FTP | Steady: 1min @ 85% FTP | Steady: 1min @ 87% FTP | Steady: 1min @ 89% FTP | Steady: 1min @ 91% FTP | Steady: 1min @ 93% FTP | Steady: 1min @ 94% FTP | Cooldown: 4min from 60% to 45% FTP</description>
     <sportType>bike</sportType>

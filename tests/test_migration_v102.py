@@ -1,7 +1,7 @@
 """Tests for v1.0.2 startup version-aware migration check.
 
 Covers ``run_v102_migration_check()`` in migrate_profiles.py — the framework
-that detects an upgrade by comparing ``~/.domestique/last_run_version.txt``
+that detects an upgrade by comparing ``~/.shepherd/last_run_version.txt``
 to the current app version, and returns a result dict shaped per
 MASTER_DECISIONS_v102.md §1 that the dashboard consumes via
 ``GET /api/migrations/last-run-result``.
@@ -24,8 +24,8 @@ from migrate_profiles import run_v102_migration_check, _LAST_RUN_VERSION_FILENAM
 
 @pytest.fixture()
 def data_dir(tmp_path: Path) -> Path:
-    """Empty data dir, mirroring the layout of ~/.domestique."""
-    d = tmp_path / ".domestique"
+    """Empty data dir, mirroring the layout of ~/.shepherd."""
+    d = tmp_path / ".shepherd"
     d.mkdir(parents=True, exist_ok=True)
     return d
 

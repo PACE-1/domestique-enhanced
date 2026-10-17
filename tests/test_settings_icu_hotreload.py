@@ -34,7 +34,7 @@ class _IcuHotreloadBase(unittest.TestCase):
         self._icu_dir = self._base / "rides" / "icu"
         self._icu_dir.mkdir(parents=True, exist_ok=True)
         # Patch the throttle marker into our tmp dir so we can prove it gets
-        # reset without trampling the user's real ~/.domestique state.
+        # reset without trampling the user's real ~/.shepherd state.
         self._sync_state = self._icu_dir / ".last_sync_at"
         self._wellness_state = self._base / "wellness" / ".last_sync_at"
         self._wellness_state.parent.mkdir(parents=True, exist_ok=True)

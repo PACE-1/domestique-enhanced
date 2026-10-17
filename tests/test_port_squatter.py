@@ -1,4 +1,4 @@
-"""A stranger on :8080 must not be mistaken for Domestique.
+"""A stranger on :8080 must not be mistaken for Shepherd.
 
 Reported from Pop!_OS 24.04 / COSMIC / Wayland: "I get a webpage that says no
 cameras and lost connection. No prompt to connect to intervals.icu. I can't
@@ -6,16 +6,16 @@ find that file."
 
 All four symptoms are one bug. ``is_already_running()`` probed the URL and
 returned True if ANYTHING answered, with no identity check. The tester had a
-camera web UI on 8080, so Domestique concluded it was already running and
+camera web UI on 8080, so Shepherd concluded it was already running and
 pointed its window at that server: a page about cameras, a "lost connection"
-from its socket, no intervals.icu onboarding because Domestique never started
+from its socket, no intervals.icu onboarding because Shepherd never started
 — and no crash file, because from the launcher's point of view nothing had
 gone wrong. The one instruction we could give ("send the crash file") named a
 file that could not exist.
 
 Pinned here:
   1. a foreign server on the port is NOT us;
-  2. a real Domestique IS us, including one predating the identity marker,
+  2. a real Shepherd IS us, including one predating the identity marker,
      so upgrading does not make a new launcher refuse an old instance;
   3. losing the port is fatal AND visible, on all three channels.
 """
@@ -62,43 +62,43 @@ _CAMERA_APP = b"<!doctype html><title>Cameras</title><h1>No cameras found</h1>"
     ({"version": "1.2.3"}, "a version endpoint that is not ours"),
     (b"not json at all", "a server returning garbage"),
 ])
-def test_a_stranger_on_our_port_is_not_domestique(payload, label, monkeypatch):
+def test_a_stranger_on_our_port_is_not_shepherd(payload, label, monkeypatch):
     _serving(monkeypatch, payload)
-    assert launcher.is_domestique_at("http://localhost:8080") is False, (
-        f"{label} was accepted as a running Domestique — the window would "
+    assert launcher.is_shepherd_at("http://localhost:8080") is False, (
+        f"{label} was accepted as a running Shepherd — the window would "
         f"have shown that app instead of ours")
 
 
-def test_a_real_domestique_is_recognised(monkeypatch):
-    _serving(monkeypatch, {"app": "domestique", "version": "4.0.0-alpha",
+def test_a_real_shepherd_is_recognised(monkeypatch):
+    _serving(monkeypatch, {"app": "shepherd", "version": "4.0.0-alpha",
                            "python": "3.12.0", "frozen": True,
-                           "data_dir": "/home/x/.domestique"})
-    assert launcher.is_domestique_at("http://localhost:8080") is True
+                           "data_dir": "/home/x/.shepherd"})
+    assert launcher.is_shepherd_at("http://localhost:8080") is True
 
 
 def test_an_instance_predating_the_marker_is_still_recognised(monkeypatch):
     """Upgrade path: a running 3.8.x has no "app" key but is still us."""
     _serving(monkeypatch, {"version": "3.8.1", "python": "3.12.0",
-                           "frozen": True, "data_dir": "/home/x/.domestique"})
-    assert launcher.is_domestique_at("http://localhost:8080") is True, (
+                           "frozen": True, "data_dir": "/home/x/.shepherd"})
+    assert launcher.is_shepherd_at("http://localhost:8080") is True, (
         "a new launcher refused an older running instance — it would "
         "declare the port squatted and refuse to start")
 
 
-def test_unreachable_port_is_not_domestique(monkeypatch):
+def test_unreachable_port_is_not_shepherd(monkeypatch):
     import urllib.request
 
     def _boom(*a, **k):
         raise OSError("connection refused")
 
     monkeypatch.setattr(urllib.request, "urlopen", _boom)
-    assert launcher.is_domestique_at("http://localhost:8080") is False
+    assert launcher.is_shepherd_at("http://localhost:8080") is False
 
 
 def test_version_endpoint_carries_the_marker():
     """The launcher's probe is only as good as what the app answers with."""
     import app as app_mod
-    assert app_mod.api_version().get("app") == "domestique", (
+    assert app_mod.api_version().get("app") == "shepherd", (
         "the identity marker the launcher probes for is gone from "
         "/api/version — single-instance detection silently degrades to "
         "'did anything answer?'")
@@ -121,7 +121,7 @@ def test_losing_the_port_is_fatal_and_visible(monkeypatch, capsys):
         launcher._ensure_port_free_or_die()
     assert exc.value.code != 0
 
-    crash = Path.home() / ".domestique" / "startup_crash.txt"
+    crash = Path.home() / ".shepherd" / "startup_crash.txt"
     assert crash.exists(), "no crash report — the failure is invisible again"
     text = crash.read_text(encoding="utf-8")
     assert str(launcher.PORT) in text
@@ -133,5 +133,5 @@ def test_losing_the_port_is_fatal_and_visible(monkeypatch, capsys):
     # force a port; "port in use" alone is what left the tester with nothing
     # to act on.
     assert "ss -ltnp" in text or "lsof" in text
-    assert "DOMESTIQUE_PORT" in text
+    assert "SHEPHERD_PORT" in text
     assert "free port" in capsys.readouterr().err.lower()

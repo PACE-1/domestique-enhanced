@@ -26,7 +26,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 
-log = logging.getLogger("domestique.workout_gen")
+log = logging.getLogger("shepherd.workout_gen")
 
 # Coggan %FTP edges, mirroring training_planner._acc_zone and zones.py. The
 # three-zone bands: z1 <76%, z2 76-105%, z3 >=106%.
@@ -220,7 +220,7 @@ def to_zwo(s: Session, name: str, description: str) -> str:
     import xml.etree.ElementTree as ET
 
     root = ET.Element("workout_file")
-    ET.SubElement(root, "author").text = "Domestique (generated)"
+    ET.SubElement(root, "author").text = "Shepherd (generated)"
     ET.SubElement(root, "name").text = name
     ET.SubElement(root, "description").text = description
     ET.SubElement(root, "sportType").text = "bike"

@@ -37,7 +37,7 @@ from fastapi.testclient import TestClient
 
 
 def _bootstrap_home(tmp: Path):
-    base = tmp / ".domestique"
+    base = tmp / ".shepherd"
     base.mkdir(parents=True, exist_ok=True)
     p = base / "profiles" / "default"
     p.mkdir(parents=True, exist_ok=True)

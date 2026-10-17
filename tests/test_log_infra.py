@@ -1,19 +1,19 @@
-"""Tests for Domestique's backend observability layer.
+"""Tests for Shepherd's backend observability layer.
 
 v4.0.0-alpha scope: trainer subsystem removed. This suite no longer tests
 the deleted `.ble` / `.gate` / `.phase` / `.trainer` / `.hr` / `.session`
 / `.ws` category loggers; those tests were deleted with the trainer rip.
 What survives:
 
-  - `setup_logging()` default + DOMESTIQUE_VERBOSE env handling.
+  - `setup_logging()` default + SHEPHERD_VERBOSE env handling.
   - `get_levels()` covers every category the app declares (whatever those
     are post-rip; we assert via `log_config.CATEGORY_NAMES`).
   - `set_level()` root + category + FQDN + error paths.
   - Per-session log file creation under a temp HOME.
-  - Rotation honours `DOMESTIQUE_RIDE_LOG_KEEP`.
+  - Rotation honours `SHEPHERD_RIDE_LOG_KEEP`.
   - `GET|POST /api/training/log-level` runtime toggle.
 
-All tests point LOG_DIR at a tmp path so nobody's real ~/.domestique is
+All tests point LOG_DIR at a tmp path so nobody's real ~/.shepherd is
 touched. Each test that reconfigures logging resets `_configured` to
 False before asserting so the setup path actually runs.
 """
@@ -54,7 +54,7 @@ def _reset_log_config(log_dir: Path):
 
     log_config._configured = False
     log_config.LOG_DIR = log_dir
-    log_config.LOG_FILE = log_dir / "domestique.log"
+    log_config.LOG_FILE = log_dir / "shepherd.log"
     # Replay the module-level lazy initializer — `_session_handlers` etc.
     log_config._session_handlers.clear()
     log_config._session_paths.clear()
@@ -69,9 +69,9 @@ def tmp_log_home(tmp_path, monkeypatch):
     log_dir.mkdir(parents=True, exist_ok=True)
     # Clear env flags so tests don't inherit the real shell
     for var in (
-        "DOMESTIQUE_VERBOSE",
-        "DOMESTIQUE_LOG_CATEGORIES",
-        "DOMESTIQUE_RIDE_LOG_KEEP",
+        "SHEPHERD_VERBOSE",
+        "SHEPHERD_LOG_CATEGORIES",
+        "SHEPHERD_RIDE_LOG_KEEP",
     ):
         monkeypatch.delenv(var, raising=False)
     yield _reset_log_config(log_dir)
@@ -95,7 +95,7 @@ def test_setup_logging_default_info(tmp_log_home):
 
 def test_setup_logging_verbose_env(tmp_log_home, monkeypatch):
     lc = tmp_log_home
-    monkeypatch.setenv("DOMESTIQUE_VERBOSE", "1")
+    monkeypatch.setenv("SHEPHERD_VERBOSE", "1")
     lc._configured = False
     lc.setup_logging()
     assert logging.getLogger().getEffectiveLevel() == logging.DEBUG
@@ -105,7 +105,7 @@ def test_setup_logging_categories_env_ignores_unknown(tmp_log_home, monkeypatch)
     """Unknown category names must be ignored without raising."""
     lc = tmp_log_home
     monkeypatch.setenv(
-        "DOMESTIQUE_LOG_CATEGORIES", "bogus,not-a-real-cat",
+        "SHEPHERD_LOG_CATEGORIES", "bogus,not-a-real-cat",
     )
     lc._configured = False
     lc.setup_logging()  # must not raise
@@ -122,7 +122,7 @@ def test_get_levels_covers_all_categories(tmp_log_home):
     levels = lc.get_levels()
     assert "root" in levels
     for cat in lc.CATEGORY_NAMES:
-        assert f"domestique.{cat}" in levels
+        assert f"shepherd.{cat}" in levels
 
 
 def test_set_level_root(tmp_log_home):
@@ -145,7 +145,7 @@ def test_set_level_category_short_name(tmp_log_home):
     cat = lc.CATEGORY_NAMES[0]
     resolved = lc.set_level("DEBUG", category=cat)
     assert resolved == "DEBUG"
-    assert logging.getLogger(f"domestique.{cat}").level == logging.DEBUG
+    assert logging.getLogger(f"shepherd.{cat}").level == logging.DEBUG
 
 
 def test_set_level_category_fqdn(tmp_log_home):
@@ -154,8 +154,8 @@ def test_set_level_category_fqdn(tmp_log_home):
     if not lc.CATEGORY_NAMES:
         pytest.skip("log_config declares no category loggers")
     cat = lc.CATEGORY_NAMES[0]
-    lc.set_level("WARNING", category=f"domestique.{cat}")
-    assert logging.getLogger(f"domestique.{cat}").level == logging.WARNING
+    lc.set_level("WARNING", category=f"shepherd.{cat}")
+    assert logging.getLogger(f"shepherd.{cat}").level == logging.WARNING
 
 
 def test_set_level_unknown_category_raises(tmp_log_home):
@@ -180,7 +180,7 @@ def test_start_session_log_creates_file(tmp_log_home):
 
     Per-session ``app_*.log`` files were deliberately removed (they were the
     unbounded log bloat — commit 0400f031); everything goes to the single
-    capped ``domestique.log``. Lock that: no per-session file may appear,
+    capped ``shepherd.log``. Lock that: no per-session file may appear,
     and the retrievable log path is the capped file.
     """
     lc = tmp_log_home
@@ -195,7 +195,7 @@ def test_start_session_log_creates_file(tmp_log_home):
 
 def test_session_log_rotation_keeps_configured_count(tmp_log_home, monkeypatch):
     lc = tmp_log_home
-    monkeypatch.setenv("DOMESTIQUE_RIDE_LOG_KEEP", "3")
+    monkeypatch.setenv("SHEPHERD_RIDE_LOG_KEEP", "3")
     # Create 5 sessions back-to-back. Only 3 files should survive on disk.
     for i in range(5):
         sid = lc.start_session_log(f"ride{i:02}")
@@ -215,7 +215,7 @@ def test_stop_session_log_is_idempotent(tmp_log_home):
 
 def test_get_active_log_path_none_when_no_session(tmp_log_home):
     """v2.2.0 contract: with no per-session logs, get_active_log_path always
-    resolves to the single capped ``domestique.log`` — session id or not."""
+    resolves to the single capped ``shepherd.log`` — session id or not."""
     lc = tmp_log_home
     assert lc.get_active_log_path() == str(lc.LOG_FILE)
     assert lc.get_active_log_path("nonexistent") == str(lc.LOG_FILE)

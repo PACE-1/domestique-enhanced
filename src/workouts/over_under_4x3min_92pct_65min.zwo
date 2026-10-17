@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Over-Under 30s/15s 10x (65min)</name>
     <description>Microintervals: 10 x (30s @ 110% / 15s @ 50%) | Cooldown: 5min 15s @ 50% FTP</description>
     <sportType>bike</sportType>

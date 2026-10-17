@@ -27,7 +27,7 @@ def test_spec_bundles_classifier():
     """The storm's root cause: the frozen app shipped without the classifier
     script. The spec must bundle it — a string test so packaging can't
     silently regress."""
-    spec = (ROOT / "packaging" / "domestique.spec").read_text(encoding="utf-8")
+    spec = (ROOT / "packaging" / "shepherd.spec").read_text(encoding="utf-8")
     assert "classify_library_content" in spec
 
 

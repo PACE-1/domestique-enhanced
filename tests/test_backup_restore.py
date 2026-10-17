@@ -203,7 +203,7 @@ def test_app_refuses_to_start_on_newer_data(tmp_path, monkeypatch):
     home = tmp_path / "h"
     home.mkdir()
     (home / backup.MARKER).write_text("99\n")
-    monkeypatch.setenv("DOMESTIQUE_HOME", str(home))
+    monkeypatch.setenv("SHEPHERD_HOME", str(home))
     with pytest.raises(backup.BackupError):
         with TestClient(app_module.app):
             pass

@@ -1,4 +1,5 @@
 """Fetch training load metrics from Intervals.icu."""
+import envcompat  # noqa: F401  (old DOMESTIQUE_* names -> SHEPHERD_*, before anything reads them)
 import clock  # the one clock every module reads (see src/clock.py)
 import json
 import logging
@@ -15,9 +16,9 @@ import base64
 from datetime import date, timedelta
 import config
 
-_log = logging.getLogger("domestique.training")
+_log = logging.getLogger("shepherd.training")
 
-# The genuine stdlib transport, captured at import. DOMESTIQUE_NO_NET only
+# The genuine stdlib transport, captured at import. SHEPHERD_NO_NET only
 # short-circuits when urlopen is still this function (see _get).
 _REAL_URLOPEN = urllib.request.urlopen
 
@@ -35,7 +36,7 @@ TRIMP_TO_TSS_FACTOR = 0.7
 # discover_athlete_id() 403s → athlete_id stays empty in .env →
 # _icu_credentials_present() returns False → "Connect Intervals.icu in
 # Settings" toast on every Sync click despite valid key on disk.
-ICU_USER_AGENT = "Domestique/4.5.4 (+https://github.com/platypus45/health_tracker)"
+ICU_USER_AGENT = "Shepherd/1.0 (+https://github.com/PACE-1/domestique-enhanced)"
 
 # Classic CTL/ATL impulse-response time constants (days).
 # Coggan/Banister defaults for cycling. This app is cycling-focused.
@@ -183,7 +184,7 @@ def upload_fit_to_icu(fit_path: "str | pathlib.Path", retry: int = 1) -> dict:
 
     # Minimal multipart/form-data body. Avoid requests dependency; urllib
     # is already the HTTP layer for every other ICU call in this module.
-    boundary = f"----domestique-{_uuid.uuid4().hex}"
+    boundary = f"----shepherd-{_uuid.uuid4().hex}"
     body = (
         f"--{boundary}\r\n"
         f'Content-Disposition: form-data; name="file"; filename="{path.name}"\r\n'
@@ -249,9 +250,9 @@ def _get(path: str, params: dict | None = None) -> list | dict | None:
     # The switch blocks only the REAL transport — tests that patch urlopen
     # with a fake are not using the network, and their mocks must keep
     # winning (the contract in tests/conftest.py::_no_live_icu_network).
-    if (os.environ.get("DOMESTIQUE_NO_NET") == "1"
+    if (os.environ.get("SHEPHERD_NO_NET") == "1"
             and urllib.request.urlopen is _REAL_URLOPEN):
-        raise ICUNetworkError(f"network disabled (DOMESTIQUE_NO_NET=1) for {path}")
+        raise ICUNetworkError(f"network disabled (SHEPHERD_NO_NET=1) for {path}")
     url = f"{config.ICU_BASE}/{path}"
     if params:
         url += "?" + urllib.parse.urlencode(params)

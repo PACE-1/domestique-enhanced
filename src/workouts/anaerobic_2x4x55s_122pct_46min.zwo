@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Anaerobic 55s pairs collapsing rest 4x2 (46min)</name>
     <description>Warmup: 7min ramp from 45% to 75% FTP, 3 x 30s fast-pedal drill @ 82%, primer 1min @ 88% + 1min @ 102% | Collapsing-rest paired block: 4 pairs of 2 x 55s @ 122% FTP with 90s @ 50% inside each pair, and the recovery between pairs collapsing 6min / 4min / 2min @ 45% — by the last pair the gap between pairs has nearly closed onto the gap inside one | Cooldown: 5min from 60% to 45% FTP</description>
     <sportType>bike</sportType>

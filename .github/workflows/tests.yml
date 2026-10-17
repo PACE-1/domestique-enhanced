@@ -34,9 +34,9 @@ jobs:
       - name: Show verification diagnostics
         if: always()
         run: |
-          if test -f /tmp/domestique-gate/linux-ci.status.txt; then
-            cat /tmp/domestique-gate/linux-ci.status.txt
-            tail -n 150 /tmp/domestique-gate/linux-ci.full.txt
+          if test -f /tmp/shepherd-gate/linux-ci.status.txt; then
+            cat /tmp/shepherd-gate/linux-ci.status.txt
+            tail -n 150 /tmp/shepherd-gate/linux-ci.full.txt
           fi
 
   web:

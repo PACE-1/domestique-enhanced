@@ -6,7 +6,7 @@ CI. No Rust is introduced.
 
 ## Implemented scope
 
-- Test bootstrap clears inherited `DOMESTIQUE_HOME`, redirects the existing
+- Test bootstrap clears inherited `SHEPHERD_HOME`, redirects the existing
   home sandbox, blanks ICU credentials before imports and keeps virtualenv
   dependencies isolated. Regression subprocesses cover collection, application
   startup/writes, two separate xdist workers and cleanup of temporary data.

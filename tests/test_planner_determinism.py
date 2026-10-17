@@ -42,7 +42,7 @@ _DRIVER = textwrap.dedent(
         )
         # Pin CTL/volume (W8 values) — byte-determinism must not depend on the
         # live ICU wellness fetch or the machine-local ride archive. The
-        # subprocess also inherits DOMESTIQUE_NO_NET=1 from conftest, so even
+        # subprocess also inherits SHEPHERD_NO_NET=1 from conftest, so even
         # an accidental self-fetch can never reach the live API.
         phases, weeks = tp.generate_plan(
             goal, seed_salt=4242, current_ctl=50.0, recent_weekly_tss=650.0,

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>VO2max 8min Surge 4x (64min)</name>
     <description>Warmup: 5min ramp from 35% to 75% FTP | Priming: 3 x (30s @ 100% / 30s @ 50%) + 2min @ 40% | Main: 4 x 8min VO2max blocks, each 4 x (20s surge @ 115% / 1min 40s @ 104%), 4min @ 50% between blocks — surges pull VO2 up fast, base holds it | Cooldown: 1min @ 40% + 5min ramp from 40% to 25% FTP</description>
     <sportType>bike</sportType>

@@ -1,8 +1,8 @@
 # Cycling Apps with ZWO/FIT Import
 
-Domestique v4.0.0-alpha is a planner + workout library + post-ride viewer.
+Shepherd v4.0.0-alpha is a planner + workout library + post-ride viewer.
 You ride with one of the apps below, then import the FIT file back into
-Domestique for analysis.
+Shepherd for analysis.
 
 This table compares the free (or formerly free) cycling apps that accept
 `.zwo` workout files and/or drive a Tacx Neo 2T smart trainer.

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Microbursts 15s/15s 2x20 (39min)</name>
     <description>Warmup: 5min ramp from 35% to 75% FTP | Priming: 3 x (30s @ 100% / 30s @ 50%) + 2min @ 40% | Main: 2 sets of 20 x (15s @ 115% / 15s @ 50%), 3min @ 50% between sets — microbursts, 2-set rung of the 3x20/4x20 ladder | Cooldown: 1min @ 40% + 5min ramp from 40% to 25% FTP</description>
     <sportType>bike</sportType>

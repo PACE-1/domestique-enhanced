@@ -13,7 +13,7 @@ Linux baseline/remote CI validation is tracked in Forgejo issue #2.
 
 `conftest.py` adds `src/` to the import path and sets up the application fixtures.
 Before project imports it redirects `HOME` into a fresh per-process directory,
-clears inherited `DOMESTIQUE_HOME`, blanks inherited ICU credentials, and disables the
+clears inherited `SHEPHERD_HOME`, blanks inherited ICU credentials, and disables the
 real training transport. Child pytest processes and xdist workers create their
 own roots; normal test subprocesses inherit the parent's disposable root.
 Sandboxes are removed at interpreter exit. Tests intentionally exercising path
@@ -22,7 +22,7 @@ overrides must use temporary directories. Never supply real rider data.
 Virtual environments keep their own dependencies: the harness only preserves
 the user site when Python actually enables user-site packages. Network mocks
 can exercise API behavior without using real accounts. Some historical tests
-explicitly read the original home through `DOMESTIQUE_REAL_HOME`; this is not
+explicitly read the original home through `SHEPHERD_REAL_HOME`; this is not
 permission to write there, and their external fixture dependencies remain a
 separate isolation task (#8).
 
@@ -36,7 +36,7 @@ The gate runs non-hardware bulk tests in parallel by file, then `release_serial`
 performance checks without parallel workers. It requires pytest-xdist and
 pytest-timeout in the selected interpreter; it never installs dependencies.
 `GATE_WORKERS` defaults to 5. `GATE_OUT` selects the log directory (default
-`/tmp/domestique-gate`); `GATE_TEST_TIMEOUT` defaults to 900 seconds per test.
+`/tmp/shepherd-gate`); `GATE_TEST_TIMEOUT` defaults to 900 seconds per test.
 The outer bulk and serial limits default to 3300 seconds each.
 
 The exit status remains nonzero for failures, collection/setup errors and outer

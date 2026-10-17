@@ -27,7 +27,7 @@ from unittest import mock
 @contextlib.contextmanager
 def _corrupt_plan(text: str):
     """v3.0.0: write the corrupt plan into an ISOLATED tempdir and point the
-    app at it — the old helper renamed the REAL ~/.domestique plan (dangerous
+    app at it — the old helper renamed the REAL ~/.shepherd plan (dangerous
     on a dev machine, and wrong since plans became per-profile: under parallel
     orderings the app read a different path and the corruption was invisible)."""
     with tempfile.TemporaryDirectory() as td:

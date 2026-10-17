@@ -1,4 +1,4 @@
-# Contributing to Domestique
+# Contributing to Shepherd
 
 Thanks for your interest in contributing. This document explains how to submit
 changes that we can accept without creating legal or maintenance problems.
@@ -67,7 +67,7 @@ When in doubt, open an issue before doing the work.
 New source files should carry a short header:
 
 ```python
-# Copyright (c) 2024-2026 Domestique contributors
+# Copyright (c) 2024-2026 Shepherd contributors
 # SPDX-License-Identifier: Apache-2.0
 ```
 

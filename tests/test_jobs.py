@@ -102,9 +102,9 @@ def _free_port() -> int:
 
 def test_server_exits_cleanly_on_sigterm_within_the_budget(tmp_path):
     port = _free_port()
-    env = dict(os.environ, DOMESTIQUE_HOME=str(tmp_path / "home"), HOME=str(tmp_path),
-               PYTHONPATH=str(SRC), DOMESTIQUE_SHUTDOWN_BUDGET_S="3")
-    for k in ("DOMESTIQUE_ACCESS_TOKEN", "DOMESTIQUE_SERVER_MODE"):
+    env = dict(os.environ, SHEPHERD_HOME=str(tmp_path / "home"), HOME=str(tmp_path),
+               PYTHONPATH=str(SRC), SHEPHERD_SHUTDOWN_BUDGET_S="3")
+    for k in ("SHEPHERD_ACCESS_TOKEN", "SHEPHERD_SERVER_MODE"):
         env.pop(k, None)
     p = subprocess.Popen(
         [sys.executable, "-m", "uvicorn", "app:app", "--host", "127.0.0.1", "--port", str(port),

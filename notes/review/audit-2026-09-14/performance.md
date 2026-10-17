@@ -1,4 +1,4 @@
-# Performance audit — Domestique @ a95447e8 (2026-09-14), measured
+# Performance audit — Shepherd @ a95447e8 (2026-09-14), measured
 
 Lens: time, memory and work per request. Independent agent. Rig: conftest sandbox
 HOME, sockets blocked except loopback, fake ICU creds + setup marker so the real

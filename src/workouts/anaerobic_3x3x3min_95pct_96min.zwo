@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>VO2max 30s/3min 6x (96min)</name>
     <description>Microintervals: 6 x (30s @ 125% / 3min @ 95%)</description>
     <sportType>bike</sportType>

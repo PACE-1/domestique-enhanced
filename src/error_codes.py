@@ -1,4 +1,4 @@
-"""Error-code taxonomy for Domestique (v1.6.0).
+"""Error-code taxonomy for Shepherd (v1.6.0).
 
 Every error path in the app emits a structured ``E_<domain>_<failure>``
 code via ``_log_error`` so log scrapers can group + the diagnostics
@@ -142,7 +142,7 @@ REGISTRY: dict[str, CodeMeta] = {
     Codes.PLAN_LOAD_OS_ERROR: {
         "severity": "ERROR",
         "description": "OS error while reading current_plan.json (perms, disk).",
-        "user_action": "Check ~/.domestique/plans/ permissions and disk health.",
+        "user_action": "Check ~/.shepherd/plans/ permissions and disk health.",
     },
     Codes.PLAN_GENERATE_FAILED: {
         "severity": "ERROR",
@@ -217,7 +217,7 @@ REGISTRY: dict[str, CodeMeta] = {
     Codes.CACHE_WELLNESS: {
         "severity": "WARN",
         "description": "wellness cache backing fn raised; returning {} for 30s.",
-        "user_action": "Check ~/.domestique/wellness/ accessibility.",
+        "user_action": "Check ~/.shepherd/wellness/ accessibility.",
     },
     Codes.CACHE_GENERIC: {
         "severity": "WARN",
@@ -237,12 +237,12 @@ REGISTRY: dict[str, CodeMeta] = {
     Codes.CALENDAR_RIDES_LOAD: {
         "severity": "WARN",
         "description": "_load_all_rides_safe raised; calendar shows planned only.",
-        "user_action": "Check ~/.domestique/rides/ accessibility.",
+        "user_action": "Check ~/.shepherd/rides/ accessibility.",
     },
     Codes.CALENDAR_LEGACY_RIDES: {
         "severity": "WARN",
         "description": "Legacy ride_storage.list_rides raised.",
-        "user_action": "Check ~/.domestique/profiles/<id>/rides/ for stale files.",
+        "user_action": "Check ~/.shepherd/profiles/<id>/rides/ for stale files.",
     },
     Codes.AUGMENT_3D_FITNESS: {
         "severity": "WARN",
@@ -272,7 +272,7 @@ REGISTRY: dict[str, CodeMeta] = {
     Codes.PROFILE_LOAD: {
         "severity": "ERROR",
         "description": "Profile athlete.json load failed.",
-        "user_action": "Check ~/.domestique/profiles/<id>/athlete.json.",
+        "user_action": "Check ~/.shepherd/profiles/<id>/athlete.json.",
     },
     Codes.DIAG_HEALTH_CHECK: {
         "severity": "ERROR",
@@ -424,7 +424,7 @@ REGISTRY: dict[str, CodeMeta] = {
     Codes.WELLNESS_FETCH_FAILED: {
         "severity": "ERROR",
         "description": "/api/wellness handler raised; client got 500.",
-        "user_action": "Check ICU connectivity and ~/.domestique/wellness/.",
+        "user_action": "Check ICU connectivity and ~/.shepherd/wellness/.",
     },
     Codes.ACTIVITIES_LIST_FAILED: {
         "severity": "ERROR",

@@ -3,7 +3,7 @@
 12 tests verifying the v4.6.0 library overhaul invariants:
 
   1.  No ZWO description contains "0min @" or "0min at" anywhere
-  2.  All ZWO `<author>` = "Domestique Library"
+  2.  All ZWO `<author>` = "Shepherd Library"
   3.  ≥95% of ZWO `<name>` content_class word matches the classifier primary
   4.  Recovery files have main-set avg < 0.55 FTP
   5.  VO2max files have intervals at 1.06-1.20 FTP
@@ -155,14 +155,14 @@ def test_no_zero_min_in_descriptions(all_zwo_files):
     assert not offenders, f"Files emitting '0min @': {offenders[:10]} (and {max(0, len(offenders)-10)} more)"
 
 
-def test_all_authors_domestique(all_zwo_files):
-    """Test 2: every ZWO has <author>Domestique Library</author>."""
+def test_all_authors_shepherd(all_zwo_files):
+    """Test 2: every ZWO has <author>Shepherd Library</author>."""
     bad: list[str] = []
     for f in all_zwo_files:
         meta = _parse_zwo_meta(f)
-        if meta["author"] != "Domestique Library":
+        if meta["author"] != "Shepherd Library":
             bad.append(f.name)
-    assert not bad, f"Files without Domestique Library author: {bad[:10]}"
+    assert not bad, f"Files without Shepherd Library author: {bad[:10]}"
 
 
 CLASS_NAME_KEYWORDS = {

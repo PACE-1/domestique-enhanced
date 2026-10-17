@@ -21,9 +21,9 @@ tests/test_profile_path_rebinding.py enforces that nothing binds them by value.
 """
 from pathlib import Path
 
-from user_home import domestique_home
+from user_home import shepherd_home
 
-_user_data_dir = domestique_home()  # 3.4.3: DOMESTIQUE_HOME-aware
+_user_data_dir = shepherd_home()  # 3.4.3: SHEPHERD_HOME-aware
 DATA_DIR = _user_data_dir
 
 
@@ -60,7 +60,7 @@ def _rides_fit_dir() -> Path:
     """Directory for raw FIT imports — v3.0.0 AC2a: PER-PROFILE, delegated to
     ride_storage._fit_rides_dir() so app.py and ride_storage.load_all_rides
     can never disagree about where FITs live (the old global
-    ~/.domestique/rides made one profile's imports visible to all, and after
+    ~/.shepherd/rides made one profile's imports visible to all, and after
     the per-profile migration an app-side global would make imports vanish
     from load_all_rides entirely)."""
     import ride_storage as _rs

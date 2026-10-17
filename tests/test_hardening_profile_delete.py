@@ -30,7 +30,7 @@ def stub(tmp_path):
     saved = (ProfileManager._instance, db_module.DB_PATH, app_module.DATA_DIR,
              app_module.GPX_DIR, tp.PLAN_DIR, tp.WORKOUT_DIR)
     ProfileManager._instance = None
-    app_module.DATA_DIR = tmp_path / ".domestique"
+    app_module.DATA_DIR = tmp_path / ".shepherd"
     try:
         pm = ProfileManager.get()
         yield types.SimpleNamespace(pm=pm, home=tmp_path,
@@ -59,7 +59,7 @@ def test_a_repeated_delete_leaves_the_last_profile_active(stub):
     assert listing["active"] == a
     assert [p["id"] for p in listing["profiles"]] == [a]
     assert stub.pm.active_id == a
-    assert (stub.home / ".domestique" / "profiles" / a).is_dir()
+    assert (stub.home / ".shepherd" / "profiles" / a).is_dir()
 
 
 def test_an_unknown_id_is_404_and_touches_no_directory(stub):
@@ -67,7 +67,7 @@ def test_an_unknown_id_is_404_and_touches_no_directory(stub):
     a = c.post("/api/profiles/create", json={"name": "Anna"}).json()["id"]
     c.post("/api/profiles/switch", json={"id": a})
     # a directory on disk that the registry does not list is not deletable
-    stray = stub.home / ".domestique" / "profiles" / "stray"
+    stray = stub.home / ".shepherd" / "profiles" / "stray"
     stray.mkdir(parents=True)
     (stray / "keep.txt").write_text("x")
     before = c.get("/api/profiles").json()

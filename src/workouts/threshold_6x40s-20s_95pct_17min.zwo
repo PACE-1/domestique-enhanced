@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Threshold 6x40s (17min)</name>
     <description>Intervals: 6 x (40s @ 95% / 20s @ 50%)</description>
     <sportType>bike</sportType>

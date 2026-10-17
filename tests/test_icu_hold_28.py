@@ -273,7 +273,7 @@ def test_b3_moved_to_today_is_not_pulled_back_next_day(env, freeze_clock):
     _one_event_per_session(env)
 
 
-# ── B4: the same move made in Domestique too ends clean (grill_simple C1) ────
+# ── B4: the same move made in Shepherd too ends clean (grill_simple C1) ────
 
 @pytest.mark.parametrize("echo", [True, False])
 def test_b4_move_made_in_both_places_ends_with_one_event(env, echo):
@@ -358,7 +358,7 @@ def test_b6_chain_of_moves_is_followed(env):
 
 def test_w2_swap_after_an_icu_move_follows_domestique(env):
     """#27 × #28 (grill_cal S8, qa_scenario S4a), restated by W2: the rider
-    moved WED:0 (steady) to Fri, then swapped Wed↔Thu in Domestique. That
+    moved WED:0 (steady) to Fri, then swapped Wed↔Thu in Shepherd. That
     swap changed Wednesday after the rider's move, so the plan's days win:
     the tempo reaches Wed (it was never pushed while WED:0 was held), the
     steady is on Thu — each once."""
@@ -710,7 +710,7 @@ def test_w1_agreed_event_kept_while_its_new_id_is_held(env, freeze_clock):
     env.fk.drag(tue0, D["thu"])                         # intervals.icu: A to Thu,
     env.fk.drag(thu0, D["tue"])                         # B to Tue (past)
     ss[_at(ss, D["tue"])]["status"] = "missed"
-    _write_plan(_swap(ss, D["tue"], D["thu"]))          # Domestique: the same swap
+    _write_plan(_swap(ss, D["tue"], D["thu"]))          # Shepherd: the same swap
     mark = len(env.fk.calls)
     r = _run(env)
     posted, deleted = _touched(env, mark)
@@ -741,7 +741,7 @@ def test_w1_agreed_event_kept_while_its_new_id_cannot_be_built(env, echo):
     _one_event_per_session(env)
 
 
-# ── W2: Domestique changed the slot after the rider's move → the plan wins ───
+# ── W2: Shepherd changed the slot after the rider's move → the plan wins ───
 
 @pytest.mark.parametrize("echo", [True, False])
 def test_w2_a_different_workout_on_a_held_slot_is_pushed(env, echo):
@@ -794,7 +794,7 @@ def test_w2_dismissing_a_session_the_rider_moved_takes_it_off_the_watch(env):
 
 def test_w2_drag_onto_the_held_slot_after_moving_its_session(env):
     """qa_scenario: the rider moved WED:0 to Thu in intervals.icu, then in
-    Domestique dragged Wed's ride to Sat and Fri's tempo onto Wed."""
+    Shepherd dragged Wed's ride to Sat and Fri's tempo onto Wed."""
     ss = _week(wed="steady.zwo", fri="tempo_alt.zwo")
     _seed(env, ss)
     env.fk.drag(_eid(env, D["wed"]), D["thu"])
@@ -808,7 +808,7 @@ def test_w2_drag_onto_the_held_slot_after_moving_its_session(env):
 
 @pytest.mark.parametrize("echo", [True, False])
 def test_w2_stub_whose_chain_leads_to_a_different_workout_releases(env, echo):
-    """The same session dragged on in Domestique keeps the rider's copy (the
+    """The same session dragged on in Shepherd keeps the rider's copy (the
     accepted residual until #33). Once the day it went to holds a different
     workout, the rider's event is a workout the plan no longer has."""
     env.fk.echo_filename = echo
@@ -861,7 +861,7 @@ def test_w2_a_session_the_plan_dropped_leaves_the_watch(env):
 
 def test_w2_moves_in_both_places_end_on_the_plans_days(env):
     """qa_code P1b: in intervals.icu the rider moved P Thu→Sat and S Wed→Thu;
-    in Domestique they dropped S on Thu (a swap: P to Wed). Domestique
+    in Shepherd they dropped S on Thu (a swap: P to Wed). Shepherd
     changed Thursday after the rider's move, so the plan's week wins —
     nothing lost, nothing doubled."""
     ss = _week(wed="sweet.zwo", thu="steady.zwo")
@@ -880,7 +880,7 @@ def test_w2_moves_in_both_places_end_on_the_plans_days(env):
 
 def test_w3_chain_through_a_swap_finds_the_rider_moved_workout(env):
     """qa_code M1 / P2: the rider moved MON:0 (sweet) to Sun in intervals.icu;
-    in Domestique: Mon→Tue, Tue↔Thu swap, Tue→Sat. The stub chain from Mon
+    in Shepherd: Mon→Tue, Tue↔Thu swap, Tue→Sat. The stub chain from Mon
     ends on the partner (steady, Sat); the sweet is on Thu. The rider's Sun
     event stands in for the sweet, and the steady is pushed on Sat."""
     ss = _week(mon="sweet.zwo", thu="steady.zwo")

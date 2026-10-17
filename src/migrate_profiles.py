@@ -20,7 +20,7 @@ import shutil
 import sqlite3
 from datetime import datetime
 from pathlib import Path
-from user_home import domestique_home
+from user_home import shepherd_home
 from atomic_io import write_json_atomic
 
 log = logging.getLogger(__name__)
@@ -160,7 +160,7 @@ def migrate_to_v4(profile_dir: Path) -> bool:
 
 
 def migrate_to_profiles() -> None:
-    base = domestique_home()
+    base = shepherd_home()
     registry = base / "profiles.json"
 
     # ── Idempotent guard ────────────────────────────────────────────────
@@ -297,9 +297,9 @@ def migrate_to_profiles() -> None:
 # ─── v3.0.0 AC2a — per-profile ride/wellness archive migration ───────────────
 #
 # Legacy layout (pre-3.0.0): ONE global archive shared by every profile —
-#   ~/.domestique/rides/icu/*.json   (ICU activity envelopes, stem == ICU id)
-#   ~/.domestique/rides/*.fit (+sidecars, loose files)
-#   ~/.domestique/wellness/YYYY-MM-DD.json
+#   ~/.shepherd/rides/icu/*.json   (ICU activity envelopes, stem == ICU id)
+#   ~/.shepherd/rides/*.fit (+sidecars, loose files)
+#   ~/.shepherd/wellness/YYYY-MM-DD.json
 # New layout: the same subtrees under profiles/<id>/. NAME COLLISION NOTE:
 # profiles/<id>/rides/ already holds ride SUMMARIES (ride_*.json), so the
 # migration merges per-subtree / per-file — never a blanket dir rename.
@@ -373,7 +373,7 @@ def migrate_archives_to_profiles(base: "Path | None" = None) -> dict:
     call directly (tests pass an explicit ``base``). Returns a stats dict:
     {"ran": bool, "icu": n, "wellness": n, "loose": n, "unmatched": n}.
     """
-    base = Path(base) if base is not None else domestique_home()
+    base = Path(base) if base is not None else shepherd_home()
     global_rides = base / "rides"
     global_icu = global_rides / "icu"
     global_wellness = base / "wellness"
@@ -488,7 +488,7 @@ def migrate_archives_to_profiles(base: "Path | None" = None) -> dict:
         try:
             global_rides.mkdir(parents=True, exist_ok=True)
             (global_rides / "MIGRATION_NOTE.txt").write_text(
-                f"Domestique v3.0.0 moved this shared ride/wellness archive "
+                f"Shepherd v3.0.0 moved this shared ride/wellness archive "
                 f"into per-profile storage.\n{stats['unmatched']} file(s) "
                 f"could not be matched to a profile via its database and "
                 f"were assigned to the active profile '{active_name}' "
@@ -519,7 +519,7 @@ def migrate_archives_to_profiles(base: "Path | None" = None) -> dict:
 # Startup version-aware self-check + first-boot-after-upgrade toast framework.
 #
 # Detects an app-version bump by comparing the persisted last-run version
-# (`~/.domestique/last_run_version.txt`) to the current ``VERSION`` and returns
+# (`~/.shepherd/last_run_version.txt`) to the current ``VERSION`` and returns
 # a result dict shaped per MASTER_DECISIONS_v102.md §1. v1.0.2 adds NO actual
 # schema changes — this is the framework for future additive migrations to
 # slot in. The dashboard reads the result from

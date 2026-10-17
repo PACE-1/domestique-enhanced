@@ -7,7 +7,7 @@ import { defineConfig } from "@playwright/test"
 // root, never a rider's. E2E_PYTHON selects an interpreter with the server
 // requirements installed (default: python).
 const port = Number(process.env.E2E_PORT ?? 22488)
-process.env.E2E_HOME ??= mkdtempSync(join(tmpdir(), "domestique-e2e-"))
+process.env.E2E_HOME ??= mkdtempSync(join(tmpdir(), "shepherd-e2e-"))
 const home = process.env.E2E_HOME
 
 export default defineConfig({
@@ -25,8 +25,8 @@ export default defineConfig({
     timeout: 120_000,
     env: {
       HOME: home,
-      DOMESTIQUE_HOME: join(home, "data"),
-      DOMESTIQUE_NO_NET: "1",
+      SHEPHERD_HOME: join(home, "data"),
+      SHEPHERD_NO_NET: "1",
       ICU_ATHLETE_ID: "",
       ICU_API_KEY: "",
       ICU_ACCESS_TOKEN: "",

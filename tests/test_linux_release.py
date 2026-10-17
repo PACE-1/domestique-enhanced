@@ -37,7 +37,7 @@ VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 
 # §11: frozen literal. The v1.8.8 DMG incident came from a bare, unversioned
 # asset name, so the version token is deliberate and pinned here as a string.
-APPIMAGE_NAME = f"Domestique-v{VERSION}-x86_64.AppImage"
+APPIMAGE_NAME = f"Shepherd-v{VERSION}-x86_64.AppImage"
 
 _BASE = "https://github.com/platypus45/domestique/releases/download/v" + VERSION
 
@@ -48,10 +48,10 @@ def _asset(name: str) -> dict:
 
 # A realistic v3.8.0 release: all three platforms' artifacts side by side.
 _RELEASE_ASSETS = [
-    _asset("Domestique.dmg"),
+    _asset("Shepherd.dmg"),
     _asset(APPIMAGE_NAME),
-    _asset("Domestique-Windows.zip"),
-    _asset("Domestique.exe"),
+    _asset("Shepherd-Windows.zip"),
+    _asset("Shepherd.exe"),
 ]
 
 
@@ -68,21 +68,21 @@ def test_macos_and_windows_picks_are_unchanged_by_the_linux_asset():
     pick = _picker()
 
     assert pick(_RELEASE_ASSETS, "darwin") == (
-        f"{_BASE}/Domestique.dmg", "Domestique.dmg")
+        f"{_BASE}/Shepherd.dmg", "Shepherd.dmg")
     assert pick(_RELEASE_ASSETS, "win32") == (
-        f"{_BASE}/Domestique.exe", "Domestique.exe")
+        f"{_BASE}/Shepherd.exe", "Shepherd.exe")
 
     # Decorated .dmg only → still picked; canonical name preferred when both exist.
-    decorated = [_asset(f"Domestique-{VERSION}.dmg"), _asset(APPIMAGE_NAME)]
+    decorated = [_asset(f"Shepherd-{VERSION}.dmg"), _asset(APPIMAGE_NAME)]
     assert pick(decorated, "darwin") == (
-        f"{_BASE}/Domestique-{VERSION}.dmg", f"Domestique-{VERSION}.dmg")
-    assert pick([_asset("Domestique-1.0.3.dmg"), _asset("Domestique.dmg")],
-                "darwin") == (f"{_BASE}/Domestique.dmg", "Domestique.dmg")
+        f"{_BASE}/Shepherd-{VERSION}.dmg", f"Shepherd-{VERSION}.dmg")
+    assert pick([_asset("Shepherd-1.0.3.dmg"), _asset("Shepherd.dmg")],
+                "darwin") == (f"{_BASE}/Shepherd.dmg", "Shepherd.dmg")
 
     # Windows falls back to the .zip only when no .exe is present.
-    assert pick([_asset("Domestique-Windows.zip"), _asset(APPIMAGE_NAME)],
-                "win32") == (f"{_BASE}/Domestique-Windows.zip",
-                             "Domestique-Windows.zip")
+    assert pick([_asset("Shepherd-Windows.zip"), _asset(APPIMAGE_NAME)],
+                "win32") == (f"{_BASE}/Shepherd-Windows.zip",
+                             "Shepherd-Windows.zip")
 
     # Nothing for the platform, and defensive inputs, still yield (None, None).
     assert pick([_asset(APPIMAGE_NAME)], "darwin") == (None, None)
@@ -103,7 +103,7 @@ def test_linux_picks_the_versioned_appimage():
                                               APPIMAGE_NAME)
     # No AppImage in the release → offer nothing, so the banner falls back to
     # the release URL rather than handing a Linux user a .dmg.
-    assert pick([_asset("Domestique.dmg"), _asset("Domestique.exe")],
+    assert pick([_asset("Shepherd.dmg"), _asset("Shepherd.exe")],
                 "linux") == (None, None)
 
 
@@ -141,13 +141,13 @@ def test_qt_dependencies_resolve_on_linux_only():
 
 
 def test_pyqt_is_never_a_dependency():
-    """Licensing, not preference: PyQt is GPL-or-commercial and Domestique
+    """Licensing, not preference: PyQt is GPL-or-commercial and Shepherd
     ships under Apache-2.0. PySide6 (LGPL) is the only admissible Qt binding.
     Checked in both places a Qt binding could enter the build."""
     named = [n for n in _requirements() if n.startswith("pyqt")]
     assert named == [], f"PyQt must not be a dependency: {named}"
 
-    spec_src = (ROOT / "packaging" / "domestique.spec").read_text(encoding="utf-8")
+    spec_src = (ROOT / "packaging" / "shepherd.spec").read_text(encoding="utf-8")
     if "_LINUX" in spec_src:
         for plat in ("darwin", "win32", "linux"):
             offenders = [h for h in _spec_hiddenimports(plat)
@@ -155,10 +155,10 @@ def test_pyqt_is_never_a_dependency():
             assert offenders == [], f"PyQt hidden import on {plat}: {offenders}"
 
 
-# ─── 3. domestique.spec ──────────────────────────────────────────────────────
+# ─── 3. shepherd.spec ──────────────────────────────────────────────────────
 
 def _spec_tree() -> tuple[str, ast.Module]:
-    src = (ROOT / "packaging" / "domestique.spec").read_text(encoding="utf-8")
+    src = (ROOT / "packaging" / "shepherd.spec").read_text(encoding="utf-8")
     return src, ast.parse(src)
 
 
@@ -207,7 +207,7 @@ def _spec_call_kwarg(func_name: str, kwarg: str) -> str:
             for kw in node.keywords:
                 if kw.arg == kwarg:
                     return ast.get_source_segment(src, kw.value)
-    raise AssertionError(f"{func_name}(… {kwarg}=…) not found in domestique.spec")
+    raise AssertionError(f"{func_name}(… {kwarg}=…) not found in shepherd.spec")
 
 
 def _spec_hiddenimports(plat: str) -> list[str]:
@@ -220,7 +220,7 @@ def test_linux_hiddenimports_carry_the_qt_webview_modules():
     in the static import scan reaches the Qt platform module. QtWebChannel is
     load-bearing: without it pywebview's qt.py takes a PyQt5/QtWebKit fallback
     branch that does not exist in this bundle."""
-    if "_LINUX" not in (ROOT / "packaging" / "domestique.spec").read_text(encoding="utf-8"):
+    if "_LINUX" not in (ROOT / "packaging" / "shepherd.spec").read_text(encoding="utf-8"):
         pytest.skip("spec has no Linux arm yet (PACKAGING agent)")
 
     linux = _spec_hiddenimports("linux")
@@ -243,7 +243,7 @@ def test_icon_is_three_way_and_linux_never_gets_the_ico():
     """An ELF carries no embedded icon; handing PyInstaller `assets/icon.ico`
     on Linux makes it attempt a Windows resource stamp. The macOS/Windows
     values must be exactly what they are today."""
-    if "_LINUX" not in (ROOT / "packaging" / "domestique.spec").read_text(encoding="utf-8"):
+    if "_LINUX" not in (ROOT / "packaging" / "shepherd.spec").read_text(encoding="utf-8"):
         pytest.skip("spec has no Linux arm yet (PACKAGING agent)")
 
     icon_expr = _spec_call_kwarg("EXE", "icon")
@@ -337,8 +337,8 @@ def test_linux_backend_failure_is_fatal_not_a_browser_fallback(monkeypatch, caps
     assert exc.value.code == 1, "a dead GUI backend must exit non-zero"
     assert opened == [], f"the Linux path reached the browser/tray: {opened}"
     # HOME is the conftest sandbox, so this asserts the real write path without
-    # touching the developer's ~/.domestique.
-    crash = Path.home() / ".domestique" / "startup_crash.txt"
+    # touching the developer's ~/.shepherd.
+    crash = Path.home() / ".shepherd" / "startup_crash.txt"
     assert crash.exists(), "no crash report written — the failure is invisible"
     assert "WebViewException" in crash.read_text(encoding="utf-8")
     assert "could not open its window" in capsys.readouterr().err
@@ -367,7 +367,7 @@ def test_browser_fallback_still_works_on_macos_and_windows(monkeypatch):
 
 def test_the_crash_dialog_cannot_satisfy_the_native_window_check():
     """B1. The CI smoke test proves a native window exists by searching X for a
-    mapped window titled "Domestique". The startup-failure dialog is a real Qt
+    mapped window titled "Shepherd". The startup-failure dialog is a real Qt
     window, so if it carried that title the release would go green while the app
     was dying in front of it — every assertion in the job passes off the dialog.
     Its title must be one no success path can emit.
@@ -378,7 +378,7 @@ def test_the_crash_dialog_cannot_satisfy_the_native_window_check():
     src = (ROOT / "src" / "launcher.py").read_text(encoding="utf-8")
     i = src.index("def _fatal_report")
     body = src[i:i + 4000]
-    assert 'setWindowTitle("Domestique")' not in body, (
+    assert 'setWindowTitle("Shepherd")' not in body, (
         "the fatal dialog is titled exactly like the real window")
     assert "startup failure" in body
     # Both fatal paths must go through it, or one of them is silent again.
@@ -392,7 +392,7 @@ def test_a_second_linux_launch_does_not_open_a_browser():
     forbids, reached by the DEFAULT path. Focusing the existing window is out of
     scope; doing nothing is correct, doing the wrong thing is not."""
     src = (ROOT / "src" / "launcher.py").read_text(encoding="utf-8")
-    i = src.index("Domestique already running →")
+    i = src.index("Shepherd already running →")
     tail = src[i:i + 700]
     assert 'sys.platform.startswith("linux")' in tail, (
         "the already-running path still opens a browser on Linux")

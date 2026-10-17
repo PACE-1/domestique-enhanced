@@ -1,6 +1,6 @@
 > **Historical document** (last changed 2026-09-14). It records what was found or planned then; the code has moved on. Check the current source before treating anything here as a live defect or instruction. Index: [docs/README.md](../docs/README.md).
 
-# Domestique overhaul — consolidated review and plan
+# Shepherd overhaul — consolidated review and plan
 
 Written 2026-09-10 (evening). **Supersedes §3–§4 of `planner-cleanup-plan.md`** (removed 2026-09-14; in git history before 324cd038):
 an adversarial review, done before any code changed, found that several of

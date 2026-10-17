@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>AC 2min 8x (67min)</name>
     <description>Warmup: 5min ramp from 35% to 75% FTP | Priming: 3 x (30s @ 100% / 30s @ 50%) + 2min @ 40% | Main: 8 x (2min @ 120% / 4min 20s @ 50%) — anaerobic capacity 2min repeats with near-full recovery | Cooldown: 1min @ 40% + 5min ramp from 40% to 25% FTP</description>
     <sportType>bike</sportType>

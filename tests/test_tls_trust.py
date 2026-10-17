@@ -176,7 +176,7 @@ def test_peer_chain_summary_names_subject_and_issuer():
     out = tls_trust.peer_chain_summary("127.0.0.1", port, timeout=5)
     assert len(out) == 1
     assert "subject=CN=localhost" in out[0]
-    assert "issuer=CN=Domestique TEST-ONLY root no_ca_markers" in out[0]
+    assert "issuer=CN=Domestique TEST-ONLY root no_ca_markers" in out[0]  # the test certificate was minted before the rename
 
 
 def test_oauth_network_failure_logs_peer_chain(monkeypatch, caplog):

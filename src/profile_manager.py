@@ -1,6 +1,6 @@
-"""Multi-user profile manager for Domestique.
+"""Multi-user profile manager for Shepherd.
 
-Manages athlete profiles stored in ~/.domestique/profiles/<id>/.
+Manages athlete profiles stored in ~/.shepherd/profiles/<id>/.
 (v3.0.0: data dir migrated from ~/.chickencycling/ — see
 `_maybe_migrate_data_dir()` for the one-time move logic that runs on
 first boot after the upgrade.)
@@ -33,10 +33,10 @@ import time
 import logging
 from datetime import datetime, timezone
 from pathlib import Path
-from user_home import domestique_home
+from user_home import shepherd_home
 from typing import Callable, Optional
 
-log = logging.getLogger("domestique.profiles")
+log = logging.getLogger("shepherd.profiles")
 
 # profile_id validator — lowercase alnum / underscore / dash, 1-32 chars, must
 # start with alnum to avoid ".env"-style dot-files or hidden names.
@@ -112,7 +112,7 @@ class ProfileManager:
     _instance: Optional["ProfileManager"] = None
 
     def __init__(self):
-        self._base = domestique_home()  # 3.4.3: DOMESTIQUE_HOME-aware
+        self._base = shepherd_home()  # 3.4.3: SHEPHERD_HOME-aware
         self._profiles_dir = self._base / "profiles"
         self._registry_path = self._base / "profiles.json"
         self._active_id: Optional[str] = None
@@ -134,10 +134,10 @@ class ProfileManager:
         return cls._instance
 
     def _maybe_migrate_data_dir(self) -> None:
-        """One-time migration of ~/.chickencycling/ → ~/.domestique/ (v3.0.0).
+        """One-time migration of ~/.chickencycling/ → ~/.shepherd/ (v3.0.0).
 
         Behaviour:
-          * If ~/.domestique already exists, do nothing (already migrated, or
+          * If ~/.shepherd already exists, do nothing (already migrated, or
             this is a fresh v3 install).
           * Else if ~/.chickencycling does not exist either, create the new
             dir and return (truly fresh install).
@@ -145,14 +145,14 @@ class ProfileManager:
             atomic on the same filesystem (typical $HOME case) — either the
             old name or the new name exists, never both.
         """
-        new = domestique_home()
+        new = shepherd_home()
         old = new.parent / ".chickencycling"
         if new.exists():
             return  # Already migrated (or fresh v3 install)
         if not old.exists():
             new.mkdir(parents=True, exist_ok=True)
             return  # Fresh install — create new dir
-        log.info("Migrating data dir: ~/.chickencycling → ~/.domestique")
+        log.info("Migrating data dir: ~/.chickencycling → ~/.shepherd")
         shutil.move(str(old), str(new))
         log.info("Migration done. Old path no longer exists.")
 
@@ -350,7 +350,7 @@ class ProfileManager:
 
     # v4.0.0-alpha: the device-pair list was removed in the trainer rip.
     # Rides are now imported as FITs from the user's chosen recording app,
-    # so Domestique no longer tracks hardware addresses.
+    # so Shepherd no longer tracks hardware addresses.
 
     @property
     def profile_name(self) -> str:

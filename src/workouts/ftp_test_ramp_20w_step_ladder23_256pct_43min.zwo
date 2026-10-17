@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>FTP Test Ramp (43min)</name>
     <description>Warmup: 5min from 50% to 65% FTP | Ramp: 28min from 40% to 256% FTP | Cooldown: 10min @ 30% FTP</description>
     <sportType>bike</sportType>

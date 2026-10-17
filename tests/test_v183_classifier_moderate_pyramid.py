@@ -1,7 +1,7 @@
 """v1.8.3 BUG-B — moderate-pyramid classifier branch.
 
 ICU's FastFitness.Tips classifies the user's ride (58.3 / 27.6 / 14.1)
-as Pyramidaal; Domestique returned 'unique' because the strict
+as Pyramidaal; Shepherd returned 'unique' because the strict
 z3z4 >= 35 rule didn't match. v1.8.3 adds a moderate-pyramid branch
 before the final unique fallback:
 

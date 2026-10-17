@@ -25,7 +25,7 @@ from unittest.mock import patch
 
 
 def _make_base(tmp: str) -> Path:
-    base = Path(tmp) / ".domestique"
+    base = Path(tmp) / ".shepherd"
     base.mkdir(parents=True, exist_ok=True)
     return base
 
@@ -91,7 +91,7 @@ class TestICUSyncWritesPmax(_DBProfileFixture):
 
     def test_icu_sync_writes_pmax_to_athlete_metrics(self):
         import db
-        # Live ICU shape from ~/.domestique/wellness/2026-05-05.json: the
+        # Live ICU shape from ~/.shepherd/wellness/2026-05-05.json: the
         # pMax field is a float (best 1s power, watts).
         icu_payload = [{
             "id": "2026-05-05",

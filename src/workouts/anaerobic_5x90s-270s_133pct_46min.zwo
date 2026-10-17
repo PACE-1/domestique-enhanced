@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Anaerobic 90s/4min30s 5x (46min)</name>
     <description>Warmup: 7min ramp from 45% to 75% FTP, 3 x 30s fast-pedal drill @ 82%, primer 1min @ 88% + 1min @ 102% | Sustained supra-threshold: 5 x (90s @ 133% / 4min 30s @ 45%) | Cooldown: 5min from 60% to 45% FTP</description>
     <sportType>bike</sportType>

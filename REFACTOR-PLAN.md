@@ -432,7 +432,7 @@ Coggan Z4.
 
 Rosenblat et al. (Sports Med 2025) name the first two explicitly. The last two
 are measured here: cardiac drift pushes long endurance work into HR-Z3 while
-power stays put. Domestique bins `.zwo` files by power, so the targets are
+power stays put. Shepherd bins `.zwo` files by power, so the targets are
 power time-in-zone, and any figure lifted from a paper has to be checked for
 which frame it is in.
 

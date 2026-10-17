@@ -48,7 +48,7 @@ def enable() -> bool:
         try:
             _proc = subprocess.Popen([
                 "systemd-inhibit", "--what=idle",
-                "--mode=block", "--why=Domestique ride in progress",
+                "--mode=block", "--why=Shepherd ride in progress",
                 "sleep", "infinity",
             ])
             log.info("sleep_inhibit: systemd-inhibit pid=%d", _proc.pid)

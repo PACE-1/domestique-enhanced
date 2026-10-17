@@ -1,7 +1,7 @@
 """Completed grid days carry the ride's own lap blocks, not just plan data.
 
 Reported with a side-by-side: intervals.icu's calendar card draws the ride
-you actually did; Domestique's grid kept showing the planned silhouette on
+you actually did; Shepherd's grid kept showing the planned silhouette on
 ridden days — "a standard preview, completely different from the blocks I
 did". The lap timeline stored on every synced ride already carries the real
 structure, so the actual payload now ships it render-ready.

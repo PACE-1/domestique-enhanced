@@ -1727,11 +1727,11 @@ Score 9-10 = evidence-based gold standard | 7-8 = effective | 5-6 = moderate | <
 | 01. Let's Get Moving | fitness-jumpstart | 39.5min | 39.1 | Sweet Spot — 18min steady @ 92% | 39.2 | 7.6 | 11.4 |
 | Sir Chris Hoy - Keirin | athlete-inspired | 39.4min | 31.4 | Anaerobic — 3×15s @ 130% | 18.4 | 7.6 | 0.0 |
 | Sir Chris Hoy - Keirin | daily-fit | 39.4min | 31.4 | Anaerobic — 3×15s @ 130% | 18.4 | 7.6 | 0.0 |
-| Jesse Allen: Domestique | climbing | 39.0min | 35.8 | Anaerobic — 5×20s @ 110% | 12.8 | 12.8 | 0.0 |
+| Jesse Allen: Shepherd | climbing | 39.0min | 35.8 | Anaerobic — 5×20s @ 110% | 12.8 | 12.8 | 0.0 |
 | Men's Team Workout | daily-fit | 39.0min | 30.1 | Anaerobic — 5×30s @ 115% | 38.5 | 2.6 | 14.1 |
 | Day 1 - Cadence Crusher | hunters-challenge | 39.0min | 37.7 | Threshold — 12min steady @ 102% | 67.9 | 0.0 | 3.8 |
 | Men's Team Workout | pro-training-camp-movistar | 39.0min | 30.1 | Anaerobic — 5×30s @ 115% | 38.5 | 2.6 | 14.1 |
-| Jesse Allen: Domestique | pro-training-camp-team-bikeexchange-jayco | 39.0min | 35.8 | Anaerobic — 5×20s @ 110% | 12.8 | 12.8 | 0.0 |
+| Jesse Allen: Shepherd | pro-training-camp-team-bikeexchange-jayco | 39.0min | 35.8 | Anaerobic — 5×20s @ 110% | 12.8 | 12.8 | 0.0 |
 | 4. Surge Protector [Lite] | sim-camp-inside-out | 39.0min | 38.0 | Sweet Spot — 21min steady @ 94% | 30.8 | 28.2 | 0.0 |
 | Nelson Vails - Sprint | athlete-inspired | 38.5min | 24.8 | Sprint — 3×15s @ 150% | 32.5 | 0.0 | 0.6 |
 | Nelson Vails - Sprint | sprinting | 38.5min | 24.8 | Sprint — 3×15s @ 150% | 32.5 | 0.0 | 0.6 |

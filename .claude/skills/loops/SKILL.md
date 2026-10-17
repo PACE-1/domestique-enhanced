@@ -79,7 +79,7 @@ to fix. The point of the loop is to make the next bottleneck visible — if ever
 feels smooth, you're not looking carefully enough. Find it, fix it, ship a *smaller*
 harness, repeat.
 
-## Domestique mapping (how this is already wired)
+## Shepherd mapping (how this is already wired)
 - Roles → the multi-wave agent pattern (Wave 0 research → grill → impl → QA → ship).
 - Contract → the IP (`IP_*.md`) + `/tmp/MASTER_DECISIONS_*.md`, grilled before code.
 - Disk state → `IP_*.md`, per-item commits, the memory dir.

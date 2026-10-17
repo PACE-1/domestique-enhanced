@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>SST Med 6x5min (85min)</name>
     <description>Warmup: 10min ramp from 40% to 85% FTP | Main: 2 sets of 3 x (5min @ 95% / 5min @ 86%) — continuous sweet spot oscillation; set break of 3min @ 50%, 1min attack @ 110%, 1min @ 50% | Cooldown: 10min ramp from 60% to 45% FTP</description>
     <sportType>bike</sportType>

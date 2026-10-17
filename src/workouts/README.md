@@ -1,7 +1,7 @@
 # Workouts
 
 ZWO (Zwift workout) library. Structured cycling workouts used by the
-Domestique planner. Each file encodes a sequence of power-target
+Shepherd planner. Each file encodes a sequence of power-target
 segments as fractional FTP (0.65 = 65% FTP).
 
 ## File count by category
@@ -28,7 +28,7 @@ Counts are approximate (regenerate with `ls workouts/<type>_*.zwo | wc -l`):
 Two sources contribute to the library; all files conform to the standard
 Zwift ZWO schema and are interchangeable at the file level.
 
-1. **Domestique Library generated** — `<author>Domestique Library</author>`,
+1. **Shepherd Library generated** — `<author>Shepherd Library</author>`,
    the primary source. Produced by the generator scripts: structures are
    chosen from published exercise-physiology protocols (recovery, endurance,
    tempo, sweet-spot, threshold, VO2, anaerobic, sprints, over-unders,
@@ -37,7 +37,7 @@ Zwift ZWO schema and are interchangeable at the file level.
 2. **Imported from permissive GitHub repos** —
      - `macgrrl/zwift-workouts` (Unlicense / public domain)
      - `michaelahlers/michaelahlers-zwift-workouts` (MIT)
-   Imports are re-authored to `<author>Domestique Library</author>` with
+   Imports are re-authored to `<author>Shepherd Library</author>` with
    regenerated names/descriptions. Provenance (source repo, original
    filename, license) is recorded in `workouts/.github_imports_manifest.json`.
 
@@ -75,7 +75,7 @@ filename convention above, then run the dedupe/index command above.
 
 ## Hard rules for new files
 
-- `<author>` must be exactly `Domestique Library`.
+- `<author>` must be exactly `Shepherd Library`.
 - No `<textevent>`, `<TextNotification>`, `<image>`, `<video>` children.
 - Minimum duration 5 minutes.
 - No filenames containing coach names or branded terms (e.g. no
@@ -85,6 +85,6 @@ filename convention above, then run the dedupe/index command above.
 
 ## License
 
-Original `<name>` and `<description>` prose authored by Domestique Library
+Original `<name>` and `<description>` prose authored by Shepherd Library
 is released under Apache-2.0. Imported GitHub content is retained under its
 original license (see the imports manifest).

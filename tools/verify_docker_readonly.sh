@@ -13,7 +13,7 @@ trap cleanup EXIT
 api() { curl -s -m 120 -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' -X "$1" ${3:+-d "$3"} "http://127.0.0.1:$PORT$2"; }
 docker volume create "$VOL" >/dev/null
 docker run -d --name "$NAME" --read-only --tmpfs /tmp -p 127.0.0.1:$PORT:22400 -v "$VOL":/data \
-  -e DOMESTIQUE_ACCESS_TOKEN=$TOKEN "$IMG" >/dev/null
+  -e SHEPHERD_ACCESS_TOKEN=$TOKEN "$IMG" >/dev/null
 for _ in $(seq 1 60); do curl -sf -m 2 "http://127.0.0.1:$PORT/healthz" >/dev/null && break; sleep 1; done
 curl -sf -m 2 "http://127.0.0.1:$PORT/healthz" >/dev/null || { docker logs "$NAME" >&2; echo "server did not start read-only" >&2; exit 1; }
 # Control: prove the root filesystem really is read-only, so a pass means something.

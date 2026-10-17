@@ -1,4 +1,4 @@
-# Domestique — the science (logic + formulas + citations)
+# Shepherd — the science (logic + formulas + citations)
 
 > The deep reference for *why* every threshold has the value it does. Linked from the [README](../README.md). Every study links to PubMed/PMC.
 
@@ -20,13 +20,13 @@ The peer-reviewed evidence supporting TSS as a *quantifier of training that was 
 
 **Where TSS breaks:** when training is intensity-heterogeneous (interval-heavy != endurance-heavy at same TSS); when efforts are above FTP and duration matters (the minute-2 vs minute-19 problem); when one event-specific energy system dominates; when workouts are highly intermittent (the NP recipe was designed for steady road riding, not 30/30 intervals).
 
-**How Domestique mitigates** without replacing TSS as the primary load currency: the seven injury-prevention guardrails (G1–G7) layered on top of TSS-driven planning capture several of the failure modes Vermeire flags — see [§0b](#0b-literature-wired-into-the-planner) below.
+**How Shepherd mitigates** without replacing TSS as the primary load currency: the seven injury-prevention guardrails (G1–G7) layered on top of TSS-driven planning capture several of the failure modes Vermeire flags — see [§0b](#0b-literature-wired-into-the-planner) below.
 
 **One failure mode no load metric can cover.** All of the above measures the dose delivered. None of it measures the athlete's *response* to that dose, and the response is where overreaching announces itself first. In the one cyclist study that tested this directly ([Ten Haaf et al. 2017](https://pubmed.ncbi.nlm.nih.gov/27834554/), n=30), accumulated session-RPE load did **not** discriminate functional overreaching — but two subjective items, pre-session fatigue and readiness-to-train, classified it correctly in 78% of riders at three days (sens 79%, spec 77%). Perceived-effort measures also decouple from power and heart rate far more sharply in overreached riders (d = 0.79–1.79) than objective ratios do on their own (d = 0.03–0.41; [Sanders et al. 2018](https://pubmed.ncbi.nlm.nih.gov/29016241/)). That is the specific gap [§0f](#0f-subjective-load-what-rpe-and-wellness-ratings-can-and-cannot-do) covers, and the reason both items are collected.
 
 ### 0b. Literature wired into the planner
 
-| Critique area / failure mode | Mitigation in Domestique | Source |
+| Critique area / failure mode | Mitigation in Shepherd | Source |
 |---|---|---|
 | Heterogeneous intensity (interval != endurance at same TSS) | **G3 polarization-breach guardrail** + Treff polarization index classification | [Treff et al. 2019 (PMC)](https://pmc.ncbi.nlm.nih.gov/articles/PMC6582670/), [Stoggl & Sperlich 2014](https://pubmed.ncbi.nlm.nih.gov/24550842/) |
 | Above-FTP minute-2-vs-minute-19 (Kontro's headline) | **Live W'-balance during ride** (Skiba 2015 differential) at `training_live.py:500-545` | [Skiba 2012 (PMID 22382171)](https://pubmed.ncbi.nlm.nih.gov/22382171/) |
@@ -44,15 +44,15 @@ The peer-reviewed evidence supporting TSS as a *quantifier of training that was 
 | FTP detection from real rides | Auto-eFTP from FIT archive + ICU eFTP cross-check | inline `fitness_estimation.py:220-263` |
 | W' / Pmax energy-system decomposition (v1.0.6) | **Belastingscore quartet** (Aerobe / Glycolytisch / PCr) — secondary lens to TSS | [Kontro et al. 2026 (PLOS ONE)](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0341721) |
 
-These guardrails layered on top of TSS-driven planning are what makes Domestique more than a TSS-EWMA dashboard. They directly address several of the failure modes Vermeire 2021 flags, while keeping TSS as the central currency the rider sees.
+These guardrails layered on top of TSS-driven planning are what makes Shepherd more than a TSS-EWMA dashboard. They directly address several of the failure modes Vermeire 2021 flags, while keeping TSS as the central currency the rider sees.
 
 ### 0c. Norwegian Method support — what's in, what's missing
 
-The Norwegian Method (Marius Bakken / Ingebrigtsen / Bjorgen) explicitly **rejects TSS** as the primary intensity controller and substitutes blood lactate. Domestique covers parts of it but not the lactate-pacing core.
+The Norwegian Method (Marius Bakken / Ingebrigtsen / Bjorgen) explicitly **rejects TSS** as the primary intensity controller and substitutes blood lactate. Shepherd covers parts of it but not the lactate-pacing core.
 
-**Explicit non-goal:** Domestique does **not** capture or prescribe blood lactate during training. Finger-prick / earlobe-prick blood sampling adds friction we don't want — riders shouldn't have to draw blood mid-ride to use the planner. So we don't ship lactate input fields, lactate-prescribed sessions, or MLSS test protocols. Instead, we approximate the same physiology using signals already captured non-invasively from the FIT file (HR + RR-intervals -> DFA alpha1 + autonomic load) and from the power trace (Skiba W'-balance + post-ride decoupling).
+**Explicit non-goal:** Shepherd does **not** capture or prescribe blood lactate during training. Finger-prick / earlobe-prick blood sampling adds friction we don't want — riders shouldn't have to draw blood mid-ride to use the planner. So we don't ship lactate input fields, lactate-prescribed sessions, or MLSS test protocols. Instead, we approximate the same physiology using signals already captured non-invasively from the FIT file (HR + RR-intervals -> DFA alpha1 + autonomic load) and from the power trace (Skiba W'-balance + post-ride decoupling).
 
-| Norwegian Method element | What it controls intensity by | Domestique substitute |
+| Norwegian Method element | What it controls intensity by | Shepherd substitute |
 |---|---|---|
 | Lactate-controlled threshold work | Blood lactate 2-4 mmol/L during the session | **Power-based threshold class** (95-105 % FTP) + **HR ceiling** at ~88 % HR_max -> flags G6 if exceeded for >15 min in a sub-threshold session. |
 | Double-threshold sessions (AM + PM) | Two sub-LT2 sessions same day | Partially — threshold-class workouts exist; v1.1.0 adds explicit AM/PM scheduling **without lactate gating**. |
@@ -64,7 +64,7 @@ The Norwegian Method (Marius Bakken / Ingebrigtsen / Bjorgen) explicitly **rejec
 | In-session "back off" signal | Lactate climbing above 4 mmol/L | **W'-balance** from Skiba 2015 differential — depleting W' captures the same "above-threshold for too long" dynamic that drives lactate accumulation. Live during ride. |
 | Workout-was-too-hard detection | Post-session lactate elevation | **Aerobic decoupling** post-ride from FIT (HR drift vs. power drift) + DFA alpha1 nadir during the session. |
 
-**The honest framing**: Domestique gives you a Norwegian-Method-shaped polarization plan (80/0/20, Z3 avoidance, conservative ramp) and approximates the daily-readiness piece via DFA alpha1 (autonomic) and W'-balance (mechanical) — both come for free from the FIT file with the right sensors. We don't replicate the lactate-prescribed precision of the Norwegian elites, but we capture the *intent* (sub-LT2 controlled work + autonomic-fatigue-aware day-to-day adjustment) without asking the rider to bleed.
+**The honest framing**: Shepherd gives you a Norwegian-Method-shaped polarization plan (80/0/20, Z3 avoidance, conservative ramp) and approximates the daily-readiness piece via DFA alpha1 (autonomic) and W'-balance (mechanical) — both come for free from the FIT file with the right sensors. We don't replicate the lactate-prescribed precision of the Norwegian elites, but we capture the *intent* (sub-LT2 controlled work + autonomic-fatigue-aware day-to-day adjustment) without asking the rider to bleed.
 
 ### 0d. How a ride is indexed end-to-end
 
@@ -83,16 +83,16 @@ intervals.icu computes (server-side):
   - on-profile: wPrime, pMax (v1.0.6+), eFTP, CP
   |
   v
-Domestique's _sync_icu_activities() (app.py:9141)
+Shepherd's _sync_icu_activities() (app.py:9141)
   | pulls activities list, fetches detail + samples per ride
   v
-Cached as ~/.domestique/rides/icu/i<external_id>.json (24-field envelope)
+Cached as ~/.shepherd/rides/icu/i<external_id>.json (24-field envelope)
   |
   v
 SQLite athlete_metrics table <- daily CTL/ATL/TSB + (v1.0.6) per-component fitness/fatigue
   |
   v
-Library matching <- Domestique's 16-class taxonomy
+Library matching <- Shepherd's 16-class taxonomy
   | matches the picked workout's structure
   | surfaces display_name as the modal title
   |
@@ -107,9 +107,9 @@ Planner reads back on every reforecast / regenerate
 Tomorrow's session adapts to today's ride
 ```
 
-**What ICU computes vs. what Domestique computes:**
+**What ICU computes vs. what Shepherd computes:**
 - **From ICU** (cached as-is): NP, IF, TSS, time-in-zone, aerobic decoupling, kJ above FTP, wPrime, pMax, eFTP, CTL/ATL/TSB defaults.
-- **Locally computed by Domestique**: Treff polarization index + classification (so the result is identical even when ICU is offline), the 16-class library taxonomy match, the seven G1–G7 guardrails, eFTP cross-check from local FIT archive, capability projection (Pinot & Grappe RPP), DFA alpha1 (when RR-intervals are present in the FIT), Belastingscore (v1.0.6) for energy-system decomposition.
+- **Locally computed by Shepherd**: Treff polarization index + classification (so the result is identical even when ICU is offline), the 16-class library taxonomy match, the seven G1–G7 guardrails, eFTP cross-check from local FIT archive, capability projection (Pinot & Grappe RPP), DFA alpha1 (when RR-intervals are present in the FIT), Belastingscore (v1.0.6) for energy-system decomposition.
 
 ### 0e. Belastingscore / 3D impulse-response model (v1.0.6)
 
@@ -128,15 +128,15 @@ The 3-dimensional impulse-response model from [Kontro/Mastracci/Cheung/MacInnis 
 - **Athlete-Metrics chart**: a collapsed `<details>` panel below the existing CTL/ATL/TSB chart with three normalised fitness curves (CP / W' / Pmax), tau defaults from the paper.
 - **Plan tab phase rows**: a small subordinate stacked bar showing CP / W' / Pmax distribution under the primary `weekly_tss` headline.
 
-**Honest caveat the paper itself states**: "no published data exist to support the energy-system specific model parameters." The tau defaults (52/10, 5/5, 10/4) are a single-athlete illustrative example from the paper's supplementary, not population-validated. Domestique exposes them as profile-level overrides and documents the caveat in the dashboard tooltip copy.
+**Honest caveat the paper itself states**: "no published data exist to support the energy-system specific model parameters." The tau defaults (52/10, 5/5, 10/4) are a single-athlete illustrative example from the paper's supplementary, not population-validated. Shepherd exposes them as profile-level overrides and documents the caveat in the dashboard tooltip copy.
 
-**Why TSS stays primary:** the Kontro paper is intentionally additive — its authors keep the conventional Banister/CTL framework alongside the 3D decomposition. Domestique mirrors that. The 3D model adds resolution for athletes who want to see which energy system was stressed, but the planner still picks workouts based on the existing TSS-driven taxonomy the rider is already used to.
+**Why TSS stays primary:** the Kontro paper is intentionally additive — its authors keep the conventional Banister/CTL framework alongside the 3D decomposition. Shepherd mirrors that. The 3D model adds resolution for athletes who want to see which energy system was stressed, but the planner still picks workouts based on the existing TSS-driven taxonomy the rider is already used to.
 
 ### 0f. Subjective load: what RPE and wellness ratings can and cannot do
 
-Session-RPE is the cheapest signal in the stack and the easiest to over-trust. What the literature supports, and where Domestique stops:
+Session-RPE is the cheapest signal in the stack and the easiest to over-trust. What the literature supports, and where Shepherd stops:
 
-| Claim | Evidence | What Domestique does |
+| Claim | Evidence | What Shepherd does |
 |---|---|---|
 | Session-RPE is a valid internal-load measure | [Foster 1998](https://pubmed.ncbi.nlm.nih.gov/9662690/) — modified CR-10, the scale the whole session-RPE base is built on | Foster CR-10 (0–10) with verbal anchors on every value. The scale id is stored alongside each rating, so if the scale ever changes, old numbers can be identified rather than silently re-read — the stored id is a record, not an enforced check |
 | A single rating is noisy | [Wallace et al. 2014](https://pubmed.ncbi.nlm.nih.gov/24662229/) — sRPE test-retest **CV 28.1%** | G7 uses a 3-day mean at Foster's published ≥7 threshold, so several rated sessions dilute one outlier. Honest caveat: with only ONE rated session in the window the mean *is* that rating, so a single 6→7 does cross the threshold — the dilution is real only once you rate regularly |
@@ -144,7 +144,7 @@ Session-RPE is the cheapest signal in the stack and the easiest to over-trust. W
 | Pre-session fatigue + readiness-to-train discriminate functional overreaching | [Ten Haaf et al. 2017](https://pubmed.ncbi.nlm.nih.gov/27834554/), n=30 cyclists — 78% correct at 3 days | Both are collected in the morning check-in; readiness-to-train was added in v3.6.0 because it is not one of Hooper's four items |
 | Poor sleep raises perceived effort at a fixed workload | [Temesi et al. 2013](https://pubmed.ncbi.nlm.nih.gov/23760468/); Kong 2025 sleep-restriction meta-analysis, SMD 0.39 | Wellness ratings **attribute** an elevated fatigue signal rather than casting a second weighted vote for it — two readings of one cause must not be counted twice |
 | Better wellness can produce *higher* RPE | [Sansone et al. 2023](https://pubmed.ncbi.nlm.nih.gov/37259497/) — in free-intensity training, riders who felt better simply did more work | RPE never enters the readiness composite as a linear term. A naive weighted sum can invert the sign of the very thing it is trying to measure |
-| No composite can *diagnose* overreaching | [Meeusen et al. 2013](https://pubmed.ncbi.nlm.nih.gov/23247672/) (ECSS/ACSM consensus) — diagnosis requires a controlled performance test | Nothing in Domestique says "you are overreached". The ceiling on the language is *flag*, and the ceiling on the action is one tier down |
+| No composite can *diagnose* overreaching | [Meeusen et al. 2013](https://pubmed.ncbi.nlm.nih.gov/23247672/) (ECSS/ACSM consensus) — diagnosis requires a controlled performance test | Nothing in Shepherd says "you are overreached". The ceiling on the language is *flag*, and the ceiling on the action is one tier down |
 | HRV reflects overreaching | **Not supported** — [Roete et al. 2021](https://pubmed.ncbi.nlm.nih.gov/34108275/) found HRV does not reflect overreaching in endurance athletes; HRV was never measured in Ten Haaf 2017 | HRV keeps its own role (day-to-day autonomic state, against the rider's own baseline). It is not presented as an overreaching test |
 
 **What is deliberately not built:** an RPE-derived readiness weight, and a per-band RPE-vs-power residual trend. Both were designed and then held: with one rated session in the archive there is nothing to fit, and the residual design had two faults worth re-deriving before it ships (a work-matched comparison needs enough matched sessions per intensity band, and `RPE / IF` leaves a large within-band intensity gradient that re-admits exactly the sign inversion it was meant to remove).
@@ -236,7 +236,7 @@ No FTP haircut for gaps ≤10 days (VO2max intact — Cullinane); expect submaxi
 
 **The bands** (consumer-standard, shown against the ACSM classification in the UI): Z1 50–60, Z2 60–70, Z3 70–80, Z4 80–90, Z5 90–100 %HRR.
 
-**The resting anchor.** The literature's anchor is morning resting HR — which the synced daily wellness RHR (Garmin → intervals.icu → Domestique) approximates. **No published standard exists for an averaging window**, so the default — a rolling 7-day *median*, window editable 2–60 days — is practice extrapolation, labeled as such; a median rather than a mean so a single illness spike (a monitoring signal, not a fitness change — Buchheit 2014) cannot drag the zones. A fixed manual value is available for riders who prefer an anchor that never drifts. Eligibility is a sample-count rule (≥4 RHR samples in 14 days), and a measured max HR is required — the profile's age-based fallback (Tanaka 208 − 0.7×age) is fine for display but not for anchoring a band that tops out at 100 % of it.
+**The resting anchor.** The literature's anchor is morning resting HR — which the synced daily wellness RHR (Garmin → intervals.icu → Shepherd) approximates. **No published standard exists for an averaging window**, so the default — a rolling 7-day *median*, window editable 2–60 days — is practice extrapolation, labeled as such; a median rather than a mean so a single illness spike (a monitoring signal, not a fitness change — Buchheit 2014) cannot drag the zones. A fixed manual value is available for riders who prefer an anchor that never drifts. Eligibility is a sample-count rule (≥4 RHR samples in 14 days), and a measured max HR is required — the profile's age-based fallback (Tanaka 208 − 0.7×age) is fine for display but not for anchoring a band that tops out at 100 % of it.
 
 **Scope, honestly.** HRR drives the **zone table and displays**. Workout prescription (bpm targets in HR mode, the FIT export, hrTSS) stays LTHR-anchored: the prescription pipeline maps %FTP→%LTHR through validated Coggan pairs, **no equivalently validated %FTP→%HRR mapping exists**, and supra-threshold work keeps RPE targets in both models (HR cannot express Z5+; the standing contract stands). Ride-analysis time-in-zone remains bucketed by intervals.icu's zone boundaries, not re-bucketed to HRR. **Honest negatives:** no head-to-head trial of %HRR vs %LTHR zones in trained cyclists exists (Wolpern used sedentary adults and ventilatory thresholds); the %HRR–%VO2R relationship has never been tested during prolonged submaximal exercise; and no study validates any resting-HR averaging window for zone anchoring.
 
@@ -251,16 +251,16 @@ Ride a Coggan 20-min test, a Ramp test, a 60-min test or a Critical Power test i
 
 #### 2a. The FTP test protocols — what the literature actually supports
 
-**The 20-min test (default).** The best-validated field protocol. Borszcz 2018 (PMID 29303908) found 20-min power × 0.95 agreed with 60-min power at the group level (but with individual spread — hence the review modal, never auto-apply); MacInnis 2019 (PMID 30452368) and follow-ups confirmed the correlation in trained riders. The full Coggan protocol *includes* a 5-min all-out effort before the 20-min block: Tramontin 2022 (PMID 34749416) measured that omitting it inflates the 20-min number by ~5% — the anaerobic contribution the blowout is designed to drain. Zwift-style "warm up then just ride 20 minutes" tests skip this and over-read. Domestique's shipped 20-min workout keeps the full protocol: openers, 5-min blowout at ~110%, 9 min recovery, then the test block. Sitko 2023 (PMID 37802084) measured the true 60/20-min ratio by rider level: ~0.96 in professionals falling to ~0.88 in recreational riders — one universal 0.95 flatters weaker riders. When your weight is set, the review modal shows the level-typical band next to the 0.95 default (advisory only; the suggestion itself never moves).
+**The 20-min test (default).** The best-validated field protocol. Borszcz 2018 (PMID 29303908) found 20-min power × 0.95 agreed with 60-min power at the group level (but with individual spread — hence the review modal, never auto-apply); MacInnis 2019 (PMID 30452368) and follow-ups confirmed the correlation in trained riders. The full Coggan protocol *includes* a 5-min all-out effort before the 20-min block: Tramontin 2022 (PMID 34749416) measured that omitting it inflates the 20-min number by ~5% — the anaerobic contribution the blowout is designed to drain. Zwift-style "warm up then just ride 20 minutes" tests skip this and over-read. Shepherd's shipped 20-min workout keeps the full protocol: openers, 5-min blowout at ~110%, 9 min recovery, then the test block. Sitko 2023 (PMID 37802084) measured the true 60/20-min ratio by rider level: ~0.96 in professionals falling to ~0.88 in recreational riders — one universal 0.95 flatters weaker riders. When your weight is set, the review modal shows the level-typical band next to the 0.95 default (advisory only; the suggestion itself never moves).
 
-**The ramp test.** Honesty first: the 0.75 × best-minute factor has **no peer-reviewed validation**. Maximal Aerobic Power from a ramp is protocol-dependent (step size and duration change MAP — Luttikholt/Jones lineage), so a single universal fraction cannot be right for everyone; riders with a large anaerobic capacity over-read because the final minutes are partly anaerobic. It survives here because it is short, needs zero pacing skill, and is self-limiting (you ride to failure, no target to mislead you) — a fine *tracking* tool if you always use the same ramp. Domestique serves the 6%/min ladder (the one its auto-halt detector reconstructs) and flags a likely over-read when a trustworthy measured Pmax says you're punchy (Pmax/FTP ≥ 1.35).
+**The ramp test.** Honesty first: the 0.75 × best-minute factor has **no peer-reviewed validation**. Maximal Aerobic Power from a ramp is protocol-dependent (step size and duration change MAP — Luttikholt/Jones lineage), so a single universal fraction cannot be right for everyone; riders with a large anaerobic capacity over-read because the final minutes are partly anaerobic. It survives here because it is short, needs zero pacing skill, and is self-limiting (you ride to failure, no target to mislead you) — a fine *tracking* tool if you always use the same ramp. Shepherd serves the 6%/min ladder (the one its auto-halt detector reconstructs) and flags a likely over-read when a trustworthy measured Pmax says you're punchy (Pmax/FTP ≥ 1.35).
 
 **The 60-min test.** FTP is *defined* as quasi-steady-state hour power (Allen & Coggan), so this is the definitional test: factor 1.0, zero estimation error — if you finish it, well paced. That's the catch: it is brutal, and pacing errors are common enough that the calculator scores the *detected* sustained plateau, not a fixed window. No blowout effort is prescribed: over a full hour the anaerobic contribution is negligible, which is exactly why no correction factor is needed. Ride it in resistance/free mode (erg off) — the workout's 100% target is your *old* FTP and the point is to find the new one.
 
 **The Critical Power test.** Three maximal time trials of 12, 7 and 3 minutes in one session, with 30 minutes of rest between them. This is the field protocol of Karsten et al., which gave valid and reliable CP against laboratory testing (standard error of the CP estimate 4.5–5.8% across its three experiments; Karsten, Jobson, Hopker, Stevens & Beedie, *Eur J Appl Physiol* 2015;115(1):197–204, doi:10.1007/s00421-014-3001-z). CP comes from the two-parameter model P = W′/t + CP, fitted by least squares to the best 12-, 7- and 3-min powers, each a separate effort. The calculator stays silent unless the efforts get harder as they get shorter, the three-point fit is near-perfect (R² ≥ 0.98; a 3-min effort ridden well below maximal drops it to about 0.93 and would read CP ~8% high), and W′ falls between 5 and 40 kJ. The test is recognised by its workout's name or file only; a ride that only looks like one is never scored, not even as a 20-min test.
-- *Is 3 + 12 minutes the standard?* No. The laboratory standard is 3–5 exhaustive trials on separate days. Two-trial versions exist (Parker Simpson & Kordi, *Int J Sports Physiol Perform* 2017;12(6):825–830, doi:10.1123/ijspp.2016-0371, compared 2 with 3 trials). Domestique uses the three-trial field protocol that was checked against the lab.
+- *Is 3 + 12 minutes the standard?* No. The laboratory standard is 3–5 exhaustive trials on separate days. Two-trial versions exist (Parker Simpson & Kordi, *Int J Sports Physiol Perform* 2017;12(6):825–830, doi:10.1123/ijspp.2016-0371, compared 2 with 3 trials). Shepherd uses the three-trial field protocol that was checked against the lab.
 - *One day, 30-minute rests.* Same-day trials 30 minutes apart gave a valid CP (mean prediction error 3.7%) but not a valid W′ (32.9%) against trials 24 hours apart (Karsten et al., *J Sports Sci* 2017;35(14):1420–1425, doi:10.1080/02640414.2016.1215500). That study used constant-load trials to exhaustion, not the 12/7/3 time trials; the single-visit 12/7/3 protocol itself is the one of Karsten 2015 and 2021 below. W′ is therefore shown for information only and is never written to your profile or used to prescribe anything.
-- *CP is not quite FTP.* Direct comparisons read CP a little higher than a 20-min-test FTP: 256 vs 249 W with the same 12/7/3 protocol (Karsten et al., *Front Physiol* 2021;11:613151), and 282 vs 266 W in highly trained riders, where the two were not interchangeable (McGrath et al., *Int J Exerc Sci* 2021;14(4), CP from fixed-load trials; the authors propose a 16 W correction for their group). Domestique sets FTP to CP without a correction factor: the two studies' gaps differ (7 and 16 W), a factor fitted to one group is not shown to hold for another, and the review modal lets you keep your old number.
+- *CP is not quite FTP.* Direct comparisons read CP a little higher than a 20-min-test FTP: 256 vs 249 W with the same 12/7/3 protocol (Karsten et al., *Front Physiol* 2021;11:613151), and 282 vs 266 W in highly trained riders, where the two were not interchangeable (McGrath et al., *Int J Exerc Sci* 2021;14(4), CP from fixed-load trials; the authors propose a 16 W correction for their group). Shepherd sets FTP to CP without a correction factor: the two studies' gaps differ (7 and 16 W), a factor fitted to one group is not shown to hold for another, and the review modal lets you keep your old number.
 
 **Excluded protocols.** The 8-min test (×0.90) and multi-stage "progressive" tests have no peer-reviewed validation of their factors either, and unlike the ramp they add pacing skill as a confounder — two unvalidated degrees of freedom instead of one. They stay out of the menu.
 
@@ -268,7 +268,7 @@ Ride a Coggan 20-min test, a Ramp test, a 60-min test or a Critical Power test i
 
 ### 3. Capability projection (event preparation)
 
-When you set up a `goal_type=event_preparation` plan with `event_km` and `event_climb_m`, Domestique answers "if I follow this plan can I do it?" via a 4-step model:
+When you set up a `goal_type=event_preparation` plan with `event_km` and `event_climb_m`, Shepherd answers "if I follow this plan can I do it?" via a 4-step model:
 
 1. **Flat-equivalent km** = `event_km + (event_climb_m / 100 x 1.5)` — climbing-distance equivalence heuristic.
 2. **Projected average speed** via Pinot & Grappe 2011 (*Int J Sports Med* 32:839-844) RPP table by athlete W/kg + duration tier.

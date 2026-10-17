@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Sweet Spot 15x1min (48min)</name>
     <description>Intervals: 15 x (1min @ 90% / 1min @ 75%)</description>
     <sportType>bike</sportType>

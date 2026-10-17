@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>Neuromuscular 7x12s Sprints (43min)</name>
     <description>Warmup: 7min from 45% to 75% FTP + 3 openers | Sprints: 7 x (12s @ 210% / 3min @ 55%) with full recoveries | Finish: 4min @ 85% tempo | Seven maximal stabs - quality over grind, each one from a fully recovered tank | Cooldown: 5min from 55% to 40% FTP</description>
     <sportType>bike</sportType>

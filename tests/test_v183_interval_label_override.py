@@ -3,7 +3,7 @@
 User screenshot of the 23 INTERVALS table showed many rows labelled
 "RECOVERY" while Avg Power was 189-297W (Z3-Z5+ on a 248W FTP).
 ICU's auto-detection labels long flat segments "RECOVERY" regardless
-of actual power — Domestique used to display the label verbatim.
+of actual power — Shepherd used to display the label verbatim.
 
 These tests pin down ``_display_interval_name`` (the helper that
 backs ``_project_intervals_for_display``) added to ``app.py``:

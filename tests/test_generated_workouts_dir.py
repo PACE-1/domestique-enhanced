@@ -42,7 +42,7 @@ def test_read_only_library_is_reported_not_silent(tmp_path, caplog):
     ro.mkdir()
     ro.chmod(stat.S_IREAD | stat.S_IEXEC)
     try:
-        with caplog.at_level(logging.WARNING, logger="domestique.workout_gen"):
+        with caplog.at_level(logging.WARNING, logger="shepherd.workout_gen"):
             assert wg.generate_row("vo2max", 60, 18, ro, _scan()) is None
     finally:
         ro.chmod(stat.S_IRWXU)

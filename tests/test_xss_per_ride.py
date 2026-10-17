@@ -31,7 +31,7 @@ from unittest.mock import patch
 
 
 def _make_base(tmp: str) -> Path:
-    base = Path(tmp) / ".domestique"
+    base = Path(tmp) / ".shepherd"
     base.mkdir(parents=True, exist_ok=True)
     return base
 

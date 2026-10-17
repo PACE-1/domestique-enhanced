@@ -2,7 +2,7 @@
 
 import logging as _logging
 
-_log = _logging.getLogger("domestique.readiness")
+_log = _logging.getLogger("shepherd.readiness")
 
 
 def _normalize(value: float, low: float, high: float) -> float:

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>VO2 Short 20s/10s 24x (45min)</name>
     <description>Warmup: 10min ramp from 50% to 75% FTP | Microintervals: 24 x (20s @ 119% / 10s @ 50%) | Cooldown: 5min from 50% to 40% FTP</description>
     <sportType>bike</sportType>

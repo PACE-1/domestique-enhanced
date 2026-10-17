@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <workout_file>
-    <author>Domestique Library</author>
+    <author>Shepherd Library</author>
     <name>FTP Ramp Test 10W steps (to failure)</name>
     <description>Ramp test: 1-min steps rising 4% FTP per step from 20% to 152% — ride to failure, the app computes FTP from your best 1-min step. Nothing but easy spinning afterwards.</description>
     <sportType>bike</sportType>
