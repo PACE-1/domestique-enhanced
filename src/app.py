@@ -17111,7 +17111,7 @@ async def api_plan_ftp_test_type(request: Request):
         return JSONResponse({"detail": "ftp-test-type failed"}, 500)
 
 
-@app.post("/api/plan/dismiss-session")
+@app.post("/api/plan/dismiss-session", responses={200: {"model": api_models.SessionDismissed}})
 async def api_plan_dismiss_session(request: Request):
     """Dismiss a session (§6.8 — stays visible greyed; §6.11 never auto).
 

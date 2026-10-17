@@ -1484,6 +1484,25 @@
         "title": "RiderStats",
         "type": "object"
       },
+      "SessionDismissed": {
+        "additionalProperties": true,
+        "properties": {
+          "dismissed": {
+            "title": "Dismissed",
+            "type": "boolean"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "dismissed"
+        ],
+        "title": "SessionDismissed",
+        "type": "object"
+      },
       "SetupDefaults": {
         "additionalProperties": true,
         "properties": {
@@ -1657,6 +1676,23 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PlanRead"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/plan/dismiss-session": {
+      "post": {
+        "operationId": "api_plan_dismiss_session_api_plan_dismiss_session_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionDismissed"
                 }
               }
             },

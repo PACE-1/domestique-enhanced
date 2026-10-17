@@ -268,3 +268,8 @@ class RiderStats(_Model):
     load: Optional[dict] = None
     body: Optional[dict] = None
     season: Optional[dict] = None
+
+
+class SessionDismissed(_Model):
+    ok: bool = True
+    dismissed: bool
