@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Prove backup and restore across Docker volumes (#19): seed a profile in volume A,
 # back it up, restore into a clean volume B, and read it back through the API.
-# Usage: tools/verify_docker_restore.sh [image]   (builds domestique-enhanced:restore-check if omitted)
+# Usage: tools/verify_docker_restore.sh [image]   (builds shepherd:restore-check if omitted)
 set -euo pipefail
 cd "$(dirname "$0")/.."
 IMG=${1:-}
-if [ -z "$IMG" ]; then IMG=domestique-enhanced:restore-check; docker build -q -t "$IMG" . >/dev/null; fi
+if [ -z "$IMG" ]; then IMG=shepherd:restore-check; docker build -q -t "$IMG" . >/dev/null; fi
 TOKEN=restore-check-token
 A=de-restore-a-$$; B=de-restore-b-$$; OUT=$(mktemp -d)
 cleanup() { docker rm -f "$A-srv" "$B-srv" >/dev/null 2>&1 || true; docker volume rm "$A" "$B" >/dev/null 2>&1 || true; rm -rf "$OUT"; }

@@ -5,7 +5,7 @@ checked and left unchanged on purpose, not overlooked.
 
 | Item | Where | Decision | Reason |
 |---|---|---|---|
-| Update check channel | `src/app.py` `_RELEASE_REPO` | **Changed** | Defaults to `PACE-1/domestique-enhanced`; `SHEPHERD_RELEASE_REPO=<owner>/<repo>` overrides it. Upstream binaries are no longer offered as upgrades. |
+| Update check channel | `src/app.py` `_RELEASE_REPO` | **Changed** | Defaults to `PACE-1/shepherd`; `SHEPHERD_RELEASE_REPO=<owner>/<repo>` overrides it. Upstream binaries are no longer offered as upgrades. |
 | Fallback release page | `src/app.py` | **Changed** | Built from `_RELEASE_REPO`. |
 | Update-check tests | `tests/test_update_check.py` | Added | Pin the default channel and the requested URL. |
 | intervals.icu `User-Agent` | `src/training.py` `ICU_USER_AGENT` | Retained | Still names the upstream project. It cannot be checked against the live service (Cloudflare fronts it; see `tests/test_creds_profile_alignment.py`), so it is not changed blind. |

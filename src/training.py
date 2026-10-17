@@ -36,7 +36,7 @@ TRIMP_TO_TSS_FACTOR = 0.7
 # discover_athlete_id() 403s → athlete_id stays empty in .env →
 # _icu_credentials_present() returns False → "Connect Intervals.icu in
 # Settings" toast on every Sync click despite valid key on disk.
-ICU_USER_AGENT = "Shepherd/1.0 (+https://github.com/PACE-1/domestique-enhanced)"
+ICU_USER_AGENT = "Shepherd/1.0 (+https://github.com/PACE-1/shepherd)"
 
 # Classic CTL/ATL impulse-response time constants (days).
 # Coggan/Banister defaults for cycling. This app is cycling-focused.
